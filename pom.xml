@@ -44,7 +44,7 @@
         <jackson.version>2.9.8</jackson.version>
         <rxjava.version>2.2.7</rxjava.version>
         <reactive-streams.version>1.0.2</reactive-streams.version>
-        <smallrye-reactive-streams-operators.version>1.0.0</smallrye-reactive-streams-operators.version>
+        <smallrye-reactive-streams-operators.version>1.0.2</smallrye-reactive-streams-operators.version>
     </properties>
 
     <dependencyManagement>
