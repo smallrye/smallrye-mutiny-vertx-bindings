@@ -57,14 +57,6 @@
             <version>3.4.13</version>
         </dependency>
 
-        <!-- Extra dependencies -->
-        <dependency>
-            <groupId>io.smallrye.reactive</groupId>
-            <artifactId>smallrye-axle-generator</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
