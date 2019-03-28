@@ -1,18 +1,5 @@
 package io.vertx.it;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermissions;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import io.reactivex.Flowable;
 import io.vertx.axle.core.Vertx;
 import io.vertx.axle.core.file.AsyncFile;
 import io.vertx.core.buffer.Buffer;
@@ -20,6 +7,17 @@ import io.vertx.core.file.OpenOptions;
 import io.vertx.core.impl.Utils;
 import io.vertx.test.core.TestUtils;
 import io.vertx.test.core.VertxTestBase;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 
 public class CoreTest extends VertxTestBase {
 
@@ -56,13 +54,16 @@ public class CoreTest extends VertxTestBase {
 
     private void subscribe(byte[] expected, AsyncFile file, int times) {
         file.setReadPos(0);
-        Flowable<Buffer> flowable = Flowable.fromPublisher(file.toPublisher())
-                .map(io.vertx.axle.core.buffer.Buffer::getDelegate);
         Buffer actual = Buffer.buffer();
-        flowable.subscribe(
-                actual::appendBuffer,
-                this::fail,
-                () -> {
+        file.toPublisherBuilder()
+                .map(io.vertx.axle.core.buffer.Buffer::getDelegate)
+                .forEach(actual::appendBuffer)
+                .run()
+                .exceptionally(t -> {
+                    fail(t);
+                    return null;
+                })
+                .whenComplete((x, e) -> {
                     assertEquals(Buffer.buffer(expected), actual);
                     if (times > 0) {
                         subscribe(expected, file, times - 1);
