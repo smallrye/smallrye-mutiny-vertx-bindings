@@ -63,7 +63,6 @@
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-axle-generator</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
