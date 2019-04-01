@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.Element;
 
@@ -178,14 +179,9 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             writer.println(" getDelegate();");
             writer.println();
 
-            for (MethodInfo method : model.getMethods()) {
-                if (methodKind(method) == MethodKind.HANDLER) {
-                    method = genConsumerMethod(method);
-                }
-                startMethodTemplate(false, method.getName(), method, "", writer);
-                writer.println(";");
-                writer.println();
-            }
+            getGenMethods(model).forEach(method -> {
+                genMethodDecl(model, method, Collections.emptyList(), writer);
+            });
 
             if (type.getRaw().getName().equals("io.vertx.core.streams.ReadStream")) {
                 genReadStream(type.getParams(), writer);
@@ -353,6 +349,21 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         List<String> cacheDecls = new ArrayList<>();
 
         //
+        Stream<MethodInfo> list = getGenMethods(model);
+        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
+
+        for (ConstantInfo constant : model.getConstants()) {
+            genConstant(model, constant, writer);
+        }
+
+        for (String cacheDecl : cacheDecls) {
+            writer.print("  ");
+            writer.print(cacheDecl);
+            writer.println(";");
+        }
+    }
+
+    private Stream<MethodInfo> getGenMethods(ClassModel model) {
         List<List<MethodInfo>> list = new ArrayList<>();
         list.add(model.getMethods());
         list.add(model.getAnyJavaTypeMethods());
@@ -361,7 +372,7 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             ListIterator<MethodInfo> it = methods.listIterator();
             while (it.hasNext()) {
                 MethodInfo meth = it.next();
-                if (methodKind(meth) != MethodKind.FUTURE && meth.isOwnedBy(model.getType())) {
+                if (methodKind(meth) != MethodKind.FUTURE) {
                     long count = methods.stream()
                             .filter(m -> methodKind(m) == MethodKind.FUTURE).filter(m -> isOverride(meth, m))
                             .count();
@@ -384,32 +395,18 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
                 }
             }
         });
-        list.forEach(methods -> {
-            for (MethodInfo method : methods) {
-                genMethods(model, method, cacheDecls, writer);
-            }
-        });
-
-        for (ConstantInfo constant : model.getConstants()) {
-            genConstant(model, constant, writer);
-        }
-
-        for (String cacheDecl : cacheDecls) {
-            writer.print("  ");
-            writer.print(cacheDecl);
-            writer.println(";");
-        }
+        return list.stream().flatMap(Collection::stream);
     }
 
     protected abstract void genToObservable(ApiTypeInfo type, PrintWriter writer);
 
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer);
 
-    protected abstract void genCSMethod(ClassModel model, MethodInfo method, PrintWriter writer);
+    protected abstract void genCSMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     protected abstract MethodInfo genConsumerMethod(MethodInfo method);
 
-    protected abstract void genConsumerMethod(ClassModel model, MethodInfo method, PrintWriter writer);
+    protected abstract void genConsumerMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     private boolean isOverride(MethodInfo s1, MethodInfo s2) {
         if (s1.getName().equals(s2.getName()) && s1.getParams().size() == s2.getParams().size() - 1) {
@@ -425,13 +422,23 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
 
     protected final void genMethod(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
         if (methodKind(method) == MethodKind.FUTURE) {
-            genSimpleMethod(model, true, "__" + method.getName(), method, cacheDecls, writer);
-            genCSMethod(model, method, writer);
+            genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
+            genCSMethod(false, model, method, writer);
         } else if (methodKind(method) == MethodKind.HANDLER) {
-            genSimpleMethod(model, true, "__" + method.getName(), method, cacheDecls, writer);
-            genConsumerMethod(model, method, writer);
+            genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
+            genConsumerMethod(false, model, method, writer);
         } else {
-            genSimpleMethod(model, false, method.getName(), method, cacheDecls, writer);
+            genSimpleMethod(false, model, false, method.getName(), method, cacheDecls, writer);
+        }
+    }
+
+    protected final void genMethodDecl(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
+        if (methodKind(method) == MethodKind.FUTURE) {
+            genCSMethod(true, model, method, writer);
+        } else if (methodKind(method) == MethodKind.HANDLER) {
+            genConsumerMethod(true, model, method, writer);
+        } else {
+            genSimpleMethod(true, model, false, method.getName(), method, cacheDecls, writer);
         }
     }
 
@@ -517,9 +524,18 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
     //
     //  }
 
-    private void genSimpleMethod(ClassModel model, boolean isPrivate, String methodName, MethodInfo method,
-            List<String> cacheDecls, PrintWriter writer) {
+    private void genSimpleMethod(boolean decl,
+                                 ClassModel model,
+                                 boolean isPrivate,
+                                 String methodName,
+                                 MethodInfo method,
+                                 List<String> cacheDecls,
+                                 PrintWriter writer) {
         startMethodTemplate(isPrivate, methodName, method, "", writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
         writer.println(" { ");
         if (method.isFluent()) {
             writer.print("    ");

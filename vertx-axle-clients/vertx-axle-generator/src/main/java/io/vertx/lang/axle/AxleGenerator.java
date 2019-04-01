@@ -150,9 +150,13 @@ class AxleGenerator extends AbstractAxleGenerator {
     }
 
     @Override
-    protected void genConsumerMethod(ClassModel model, MethodInfo method, PrintWriter writer) {
+    protected void genConsumerMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
         MethodInfo futMethod = genConsumerMethod(method);
         startMethodTemplate(false, futMethod.getName(), futMethod, "", writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
         writer.println(" {");
         writer.print("    ");
         if (!method.getReturnType().isVoid()) {
@@ -177,12 +181,16 @@ class AxleGenerator extends AbstractAxleGenerator {
     }
 
     @Override
-    protected void genCSMethod(ClassModel model, MethodInfo method, PrintWriter writer) {
+    protected void genCSMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
         MethodInfo futMethod = genCSMethod(method);
         ClassTypeInfo raw = futMethod.getReturnType().getRaw();
         String methodSimpleName = raw.getSimpleName();
         String adapterType = "io.vertx.axle.AsyncResult" + methodSimpleName + ".to" + methodSimpleName;
         startMethodTemplate(false, futMethod.getName(), futMethod, "", writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
         writer.println(" { ");
         writer.print("    return ");
         writer.print(adapterType);
