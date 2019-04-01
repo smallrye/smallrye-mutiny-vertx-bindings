@@ -40,7 +40,7 @@
     <properties>
         <junit.version>4.12</junit.version>
         <testcontainers.version>1.11.1</testcontainers.version>
-        <vertx.version>3.6.3</vertx.version>
+        <vertx.version>3.7.0</vertx.version>
         <jackson.version>2.9.8</jackson.version>
         <rxjava.version>2.2.8</rxjava.version>
         <reactive-streams.version>1.0.2</reactive-streams.version>
