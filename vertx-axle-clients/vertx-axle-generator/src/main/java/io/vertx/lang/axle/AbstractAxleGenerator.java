@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -363,33 +364,69 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         }
     }
 
+    /**
+     * Build the list of method to generate.
+     *
+     * @param model the class model
+     * @return the list of methods as a stream
+     */
     private Stream<MethodInfo> getGenMethods(ClassModel model) {
         List<List<MethodInfo>> list = new ArrayList<>();
         list.add(model.getMethods());
         list.add(model.getAnyJavaTypeMethods());
         list.forEach(methods -> {
+
             // First pass: filter conflicting overrides, that will partly filter it
             ListIterator<MethodInfo> it = methods.listIterator();
             while (it.hasNext()) {
-                MethodInfo meth = it.next();
-                if (methodKind(meth) != MethodKind.FUTURE) {
-                    long count = methods.stream()
-                            .filter(m -> methodKind(m) == MethodKind.FUTURE).filter(m -> isOverride(meth, m))
-                            .count();
-                    if (count > 0) {
-                        it.remove();
+                MethodInfo method = it.next();
+                if (methodKind(method) != MethodKind.FUTURE) {
+                    // Has it been removed above ?
+                    Predicate<MethodInfo> pred;
+                    if (method.isOwnedBy(model.getType())) {
+                        pred = other -> isOverride(method, other);
+                    } else {
+                        pred = other -> {
+                            if (isOverride(method, other)) {
+                                Set<ClassTypeInfo> tmp = new HashSet<>(method.getOwnerTypes());
+                                tmp.removeAll(other.getOwnerTypes());
+                                return tmp.isEmpty();
+                            }
+                            return false;
+                        };
+                    }
+                    if (methods.stream()
+                        .filter(m -> methodKind(m) == MethodKind.FUTURE)
+                        .anyMatch(pred)) {
+                        it.remove();;
                     }
                 }
             }
+
             // Second pass: filter future methods that might be still conflict
             it = methods.listIterator();
             while (it.hasNext()) {
                 MethodInfo meth = it.next();
                 if (methodKind(meth) == MethodKind.FUTURE) {
-                    long count = methods.stream()
-                            .filter(m -> methodKind(m) != MethodKind.FUTURE).filter(m -> isOverride(m, meth))
-                            .count();
-                    if (count > 0) {
+                    boolean remove;
+                    List<MethodInfo> abc = model.getMethodMap().getOrDefault(meth.getName(), Collections.emptyList());
+                    if (meth.isOwnedBy(model.getType())) {
+                        remove = abc.stream()
+                            .filter(m -> methodKind(m) != MethodKind.FUTURE && isOverride(m, meth))
+                            .anyMatch(m -> !m.isOwnedBy(model.getType()) || methods.contains(m));
+                    } else {
+                        remove = abc.stream()
+                            .filter(other -> methodKind(other) != MethodKind.FUTURE)
+                            .anyMatch(other -> {
+                                if (methodKind(other) != MethodKind.FUTURE) {
+                                    Set<ClassTypeInfo> tmp = new HashSet<>(other.getOwnerTypes());
+                                    tmp.retainAll(meth.getOwnerTypes());
+                                    return isOverride(meth, other) & !tmp.isEmpty();
+                                }
+                                return false;
+                            });
+                    }
+                    if (remove) {
                         it.remove();
                     }
                 }
