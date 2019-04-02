@@ -28,6 +28,11 @@
             <artifactId>rxjava</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-reactive-streams-operators</artifactId>
+            <version>${smallrye-reactive-streams-operators.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.reactivestreams</groupId>
             <artifactId>reactive-streams</artifactId>
         </dependency>

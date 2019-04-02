@@ -70,12 +70,6 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.smallrye.reactive</groupId>
-            <artifactId>smallrye-reactive-streams-operators</artifactId>
-            <version>${smallrye-reactive-streams-operators.version}</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 
