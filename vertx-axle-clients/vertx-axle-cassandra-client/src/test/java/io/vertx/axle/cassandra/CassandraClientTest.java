@@ -36,8 +36,5 @@ public class CassandraClientTest {
         CassandraClient client = CassandraClient.createNonShared(vertx, new CassandraClientOptions()
                 .addContactPoint(container.getContainerIpAddress())
                 .setPort(container.getMappedPort(9042)));
-
-        client.connect()
-                .toCompletableFuture().join();
     }
 }

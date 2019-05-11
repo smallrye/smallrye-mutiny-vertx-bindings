@@ -11,7 +11,6 @@ import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.axle.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.RedisOptions;
 
 public class RedisClientTest {
 
@@ -34,9 +33,9 @@ public class RedisClientTest {
 
     @Test
     public void testAxleAPI() {
-        RedisClient client = RedisClient.create(vertx, new RedisOptions()
-                .setPort(container.getMappedPort(6379))
-                .setHost(container.getContainerIpAddress()));
+        RedisClient client = RedisClient.create(vertx, new JsonObject()
+                .put("port", container.getMappedPort(6379))
+                .put("host", container.getContainerIpAddress()));
 
         JsonObject object = client.hset("book", "title", "The Hobbit")
                 .thenCompose(x -> client.hgetall("book"))
