@@ -41,6 +41,7 @@ class AxleGenerator extends AbstractAxleGenerator {
         writer.println();
 
         genToXXXAble(streamType, "Publisher", "publisher", writer);
+        generateToPublisherBuilderMethod(streamType, "Publisher", "publisher", writer);
     }
 
     private void genToXXXAble(TypeInfo streamType, String rxType, String rxName, PrintWriter writer) {
@@ -104,6 +105,68 @@ class AxleGenerator extends AbstractAxleGenerator {
         writer.print("    return ");
         writer.print(rxName);
         writer.println(";");
+        writer.println("  }");
+        writer.println();
+    }
+
+    private void generateToPublisherBuilderMethod(TypeInfo streamType, String rxType, String rxName, PrintWriter writer) {
+        writer.print("  public synchronized org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder");
+        writer.print("<");
+        writer.print(genTypeName(streamType));
+        writer.println("> toPublisherBuilder() {");
+
+        writer.print("    ");
+        writer.print("if (");
+        writer.print(rxName);
+        writer.println(" == null) {");
+
+        if (streamType.getKind() == ClassKind.API) {
+            writer.print("      java.util.function.Function<");
+            writer.print(streamType.getName());
+            writer.print(", ");
+            writer.print(genTypeName(streamType));
+            writer.print("> conv = ");
+            writer.print(genTypeName(streamType.getRaw()));
+            writer.println("::newInstance;");
+
+            writer.print("      ");
+            writer.print(rxName);
+            writer.print(" = io.vertx.axle.");
+            writer.print(rxType);
+            writer.print("Helper.to");
+            writer.print(rxType);
+            writer.println("(delegate, conv);");
+        } else if (streamType.isVariable()) {
+            String typeVar = streamType.getSimpleName();
+            writer.print("      java.util.function.Function<");
+            writer.print(typeVar);
+            writer.print(", ");
+            writer.print(typeVar);
+            writer.print("> conv = (java.util.function.Function<");
+            writer.print(typeVar);
+            writer.print(", ");
+            writer.print(typeVar);
+            writer.println(">) __typeArg_0.wrap;");
+
+            writer.print("      ");
+            writer.print(rxName);
+            writer.print(" = io.vertx.axle.");
+            writer.print(rxType);
+            writer.print("Helper.to");
+            writer.print(rxType);
+            writer.println("(delegate, conv);");
+        } else {
+            writer.print("      ");
+            writer.print(rxName);
+            writer.print(" = io.vertx.axle.");
+            writer.print(rxType);
+            writer.print("Helper.to");
+            writer.print(rxType);
+            writer.println("(this.getDelegate());");
+        }
+
+        writer.println("    }");
+        writer.println("    return org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams.fromPublisher(" + rxName + ");");
         writer.println("  }");
         writer.println();
     }

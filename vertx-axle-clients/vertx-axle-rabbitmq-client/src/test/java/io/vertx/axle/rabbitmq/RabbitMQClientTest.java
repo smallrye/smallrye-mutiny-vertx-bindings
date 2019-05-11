@@ -1,6 +1,16 @@
 package io.vertx.axle.rabbitmq;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConnectionFactory;
+import io.vertx.axle.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.rabbitmq.RabbitMQOptions;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
+import org.testcontainers.containers.GenericContainer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,20 +21,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.containers.GenericContainer;
-
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
-
-import io.vertx.axle.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.rabbitmq.RabbitMQOptions;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RabbitMQClientTest {
 
@@ -57,7 +54,7 @@ public class RabbitMQClientTest {
         client.start().toCompletableFuture().join();
         createQueue(uri);
         RabbitMQConsumer consumer = client.basicConsumer(QUEUE).toCompletableFuture().join();
-        CompletionStage<Optional<String>> stage = ReactiveStreams.fromPublisher(consumer.toPublisher())
+        CompletionStage<Optional<String>> stage = consumer.toPublisherBuilder()
                 .map(m -> m.body().toString()).findFirst().run();
 
         client.basicPublish("", QUEUE, new JsonObject().put("body", uuid))

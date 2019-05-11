@@ -5,12 +5,12 @@
     <parent>
         <groupId>io.smallrye</groupId>
         <artifactId>smallrye-parent</artifactId>
-        <version>2</version>
+        <version>3</version>
     </parent>
 
     <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-utilities-projects</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -39,7 +39,7 @@
 
     <properties>
         <junit.version>4.12</junit.version>
-        <testcontainers.version>1.11.1</testcontainers.version>
+        <testcontainers.version>1.11.2</testcontainers.version>
         <vertx.version>3.7.0</vertx.version>
         <jackson.version>2.9.8</jackson.version>
         <rxjava.version>2.2.8</rxjava.version>

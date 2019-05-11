@@ -1,6 +1,15 @@
 package io.vertx.axle.kafka;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.vertx.axle.core.Vertx;
+import io.vertx.axle.kafka.client.consumer.KafkaConsumer;
+import io.vertx.axle.kafka.client.consumer.KafkaConsumerRecord;
+import io.vertx.axle.kafka.client.producer.KafkaProducer;
+import io.vertx.axle.kafka.client.producer.KafkaProducerRecord;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.testcontainers.containers.KafkaContainer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,18 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
-import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.testcontainers.containers.KafkaContainer;
-
-import io.vertx.axle.core.Vertx;
-import io.vertx.axle.kafka.client.consumer.KafkaConsumer;
-import io.vertx.axle.kafka.client.consumer.KafkaConsumerRecord;
-import io.vertx.axle.kafka.client.producer.KafkaProducer;
-import io.vertx.axle.kafka.client.producer.KafkaProducerRecord;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class KafkaClientTest {
 
@@ -58,7 +56,7 @@ public class KafkaClientTest {
         String uuid = UUID.randomUUID().toString();
         KafkaConsumer<String, String> consumer = KafkaConsumer.create(vertx, configOfTheConsumer,
                 String.class, String.class);
-        CompletionStage<Optional<String>> result = ReactiveStreams.fromPublisher(consumer.toPublisher())
+        CompletionStage<Optional<String>> result = consumer.toPublisherBuilder()
                 .map(KafkaConsumerRecord::value)
                 .findFirst()
                 .run();
