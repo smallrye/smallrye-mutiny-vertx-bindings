@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.smallrye</groupId>
         <artifactId>smallrye-parent</artifactId>
-        <version>3</version>
+        <version>4</version>
     </parent>
 
     <groupId>io.smallrye.reactive</groupId>
@@ -38,8 +38,6 @@
     </scm>
 
     <properties>
-        <junit.version>4.12</junit.version>
-        <testcontainers.version>1.11.2</testcontainers.version>
         <vertx.version>3.7.0</vertx.version>
         <jackson.version>2.9.8</jackson.version>
         <rxjava.version>2.2.8</rxjava.version>
@@ -63,24 +61,6 @@
                 <groupId>org.reactivestreams</groupId>
                 <artifactId>reactive-streams</artifactId>
                 <version>${reactive-streams.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers</artifactId>
-                <version>${testcontainers.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>3.12.2</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
