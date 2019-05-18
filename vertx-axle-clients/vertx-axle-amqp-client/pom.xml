@@ -8,13 +8,12 @@
         <version>0.0.5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>smallrye-axle-postgres-client</artifactId>
-    <name>SmallRye Axle - Reactiverse Reactive PostGreSQL Client</name>
+    <artifactId>smallrye-axle-amqp-client</artifactId>
+    <name>SmallRye Axle - Vert.x AMQP Client</name>
 
     <properties>
-        <gen-source-groupId>io.reactiverse</gen-source-groupId>
-        <gen-source-artifactId>reactive-pg-client</gen-source-artifactId>
-        <gen-source-version>0.11.3</gen-source-version>
+        <gen-source-groupId>io.vertx</gen-source-groupId>
+        <gen-source-artifactId>vertx-amqp-client</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
     </properties>
 
@@ -23,7 +22,7 @@
         <dependency>
             <groupId>${gen-source-groupId}</groupId>
             <artifactId>${gen-source-artifactId}</artifactId>
-            <version>${gen-source-version}</version>
+            <version>${vertx.version}</version>
         </dependency>
 
         <!-- Vert.x Axle Core -->
@@ -42,16 +41,10 @@
             <artifactId>testcontainers</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${version.testcontainers}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -73,7 +66,7 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includes>io/vertx/**/*.java,io/reactiverse/pgclient/**/*.java</includes>
+                            <includes>io/vertx/**/*.java</includes>
                             <excludes>**/impl/**/*.java</excludes>
                             <outputDirectory>${gen.output}</outputDirectory>
                         </configuration>
@@ -114,4 +107,19 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

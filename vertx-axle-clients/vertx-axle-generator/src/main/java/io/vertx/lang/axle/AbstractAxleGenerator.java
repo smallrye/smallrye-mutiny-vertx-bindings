@@ -6,7 +6,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.Element;
 
@@ -178,14 +180,9 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             writer.println(" getDelegate();");
             writer.println();
 
-            for (MethodInfo method : model.getMethods()) {
-                if (methodKind(method) == MethodKind.HANDLER) {
-                    method = genConsumerMethod(method);
-                }
-                startMethodTemplate(false, method.getName(), method, "", writer);
-                writer.println(";");
-                writer.println();
-            }
+            getGenMethods(model).forEach(method -> {
+                genMethodDecl(model, method, Collections.emptyList(), writer);
+            });
 
             if (type.getRaw().getName().equals("io.vertx.core.streams.ReadStream")) {
                 genReadStream(type.getParams(), writer);
@@ -353,42 +350,8 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         List<String> cacheDecls = new ArrayList<>();
 
         //
-        List<List<MethodInfo>> list = new ArrayList<>();
-        list.add(model.getMethods());
-        list.add(model.getAnyJavaTypeMethods());
-        list.forEach(methods -> {
-            // First pass: filter conflicting overrides, that will partly filter it
-            ListIterator<MethodInfo> it = methods.listIterator();
-            while (it.hasNext()) {
-                MethodInfo meth = it.next();
-                if (methodKind(meth) != MethodKind.FUTURE && meth.isOwnedBy(model.getType())) {
-                    long count = methods.stream()
-                            .filter(m -> methodKind(m) == MethodKind.FUTURE).filter(m -> isOverride(meth, m))
-                            .count();
-                    if (count > 0) {
-                        it.remove();
-                    }
-                }
-            }
-            // Second pass: filter future methods that might be still conflict
-            it = methods.listIterator();
-            while (it.hasNext()) {
-                MethodInfo meth = it.next();
-                if (methodKind(meth) == MethodKind.FUTURE) {
-                    long count = methods.stream()
-                            .filter(m -> methodKind(m) != MethodKind.FUTURE).filter(m -> isOverride(m, meth))
-                            .count();
-                    if (count > 0) {
-                        it.remove();
-                    }
-                }
-            }
-        });
-        list.forEach(methods -> {
-            for (MethodInfo method : methods) {
-                genMethods(model, method, cacheDecls, writer);
-            }
-        });
+        Stream<MethodInfo> list = getGenMethods(model);
+        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
 
         for (ConstantInfo constant : model.getConstants()) {
             genConstant(model, constant, writer);
@@ -401,15 +364,86 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         }
     }
 
+    /**
+     * Build the list of method to generate.
+     *
+     * @param model the class model
+     * @return the list of methods as a stream
+     */
+    private Stream<MethodInfo> getGenMethods(ClassModel model) {
+        List<List<MethodInfo>> list = new ArrayList<>();
+        list.add(model.getMethods());
+        list.add(model.getAnyJavaTypeMethods());
+        list.forEach(methods -> {
+
+            // First pass: filter conflicting overrides, that will partly filter it
+            ListIterator<MethodInfo> it = methods.listIterator();
+            while (it.hasNext()) {
+                MethodInfo method = it.next();
+                if (methodKind(method) != MethodKind.FUTURE) {
+                    // Has it been removed above ?
+                    Predicate<MethodInfo> pred;
+                    if (method.isOwnedBy(model.getType())) {
+                        pred = other -> isOverride(method, other);
+                    } else {
+                        pred = other -> {
+                            if (isOverride(method, other)) {
+                                Set<ClassTypeInfo> tmp = new HashSet<>(method.getOwnerTypes());
+                                tmp.removeAll(other.getOwnerTypes());
+                                return tmp.isEmpty();
+                            }
+                            return false;
+                        };
+                    }
+                    if (methods.stream()
+                        .filter(m -> methodKind(m) == MethodKind.FUTURE)
+                        .anyMatch(pred)) {
+                        it.remove();;
+                    }
+                }
+            }
+
+            // Second pass: filter future methods that might be still conflict
+            it = methods.listIterator();
+            while (it.hasNext()) {
+                MethodInfo meth = it.next();
+                if (methodKind(meth) == MethodKind.FUTURE) {
+                    boolean remove;
+                    List<MethodInfo> abc = model.getMethodMap().getOrDefault(meth.getName(), Collections.emptyList());
+                    if (meth.isOwnedBy(model.getType())) {
+                        remove = abc.stream()
+                            .filter(m -> methodKind(m) != MethodKind.FUTURE && isOverride(m, meth))
+                            .anyMatch(m -> !m.isOwnedBy(model.getType()) || methods.contains(m));
+                    } else {
+                        remove = abc.stream()
+                            .filter(other -> methodKind(other) != MethodKind.FUTURE)
+                            .anyMatch(other -> {
+                                if (methodKind(other) != MethodKind.FUTURE) {
+                                    Set<ClassTypeInfo> tmp = new HashSet<>(other.getOwnerTypes());
+                                    tmp.retainAll(meth.getOwnerTypes());
+                                    return isOverride(meth, other) & !tmp.isEmpty();
+                                }
+                                return false;
+                            });
+                    }
+                    if (remove) {
+                        it.remove();
+                    }
+                }
+            }
+        });
+        return list.stream().flatMap(Collection::stream);
+    }
+
     protected abstract void genToObservable(ApiTypeInfo type, PrintWriter writer);
 
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer);
 
-    protected abstract void genCSMethod(ClassModel model, MethodInfo method, PrintWriter writer);
+    protected abstract void genCSMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     protected abstract MethodInfo genConsumerMethod(MethodInfo method);
 
-    protected abstract void genConsumerMethod(ClassModel model, MethodInfo method, PrintWriter writer);
+    protected abstract void genConsumerMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     private boolean isOverride(MethodInfo s1, MethodInfo s2) {
         if (s1.getName().equals(s2.getName()) && s1.getParams().size() == s2.getParams().size() - 1) {
@@ -425,13 +459,23 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
 
     protected final void genMethod(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
         if (methodKind(method) == MethodKind.FUTURE) {
-            genSimpleMethod(model, true, "__" + method.getName(), method, cacheDecls, writer);
-            genCSMethod(model, method, writer);
+            genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
+            genCSMethod(false, model, method, writer);
         } else if (methodKind(method) == MethodKind.HANDLER) {
-            genSimpleMethod(model, true, "__" + method.getName(), method, cacheDecls, writer);
-            genConsumerMethod(model, method, writer);
+            genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
+            genConsumerMethod(false, model, method, writer);
         } else {
-            genSimpleMethod(model, false, method.getName(), method, cacheDecls, writer);
+            genSimpleMethod(false, model, false, method.getName(), method, cacheDecls, writer);
+        }
+    }
+
+    protected final void genMethodDecl(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
+        if (methodKind(method) == MethodKind.FUTURE) {
+            genCSMethod(true, model, method, writer);
+        } else if (methodKind(method) == MethodKind.HANDLER) {
+            genConsumerMethod(true, model, method, writer);
+        } else {
+            genSimpleMethod(true, model, false, method.getName(), method, cacheDecls, writer);
         }
     }
 
@@ -517,9 +561,18 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
     //
     //  }
 
-    private void genSimpleMethod(ClassModel model, boolean isPrivate, String methodName, MethodInfo method,
-            List<String> cacheDecls, PrintWriter writer) {
+    private void genSimpleMethod(boolean decl,
+                                 ClassModel model,
+                                 boolean isPrivate,
+                                 String methodName,
+                                 MethodInfo method,
+                                 List<String> cacheDecls,
+                                 PrintWriter writer) {
         startMethodTemplate(isPrivate, methodName, method, "", writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
         writer.println(" { ");
         if (method.isFluent()) {
             writer.print("    ");
@@ -797,7 +850,7 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
                     tmp.append(", ");
                     ClassKind argKind = arg.getKind();
                     if (argKind == API) {
-                        tmp.append(arg.translateName(id)).append(".__TYPE_ARG");
+                        tmp.append("(io.vertx.lang.axle.TypeArg)").append(arg.getRaw().translateName(id)).append(".__TYPE_ARG");
                     } else {
                         String typeArg = "io.vertx.lang.axle.TypeArg.unknown()";
                         if (argKind == OBJECT && arg.isVariable()) {
