@@ -289,17 +289,43 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             writer.println(";");
         }
         writer.println("  ");
+        generateConstructorWithDelegateParameter(model, constructor, writer, typeParams);
+        generateConstructorWithGenericType(model, constructor, writer, typeParams);
+        generateEmptyConstructor(model, constructor, writer, type, typeParams);
 
-        writer.print("  public ");
-        writer.print(constructor);
-        writer.print("(");
-        writer.print(Helper.getNonGenericType(model.getIfaceFQCN()));
-        writer.println(" delegate) {");
-
-        if (model.isConcrete() && model.getConcreteSuperType() != null) {
-            writer.println("    super(delegate);");
+        ApiTypeInfo api = (ApiTypeInfo) type;
+        if (api.isReadStream()) {
+            genToObservable(api, writer);
         }
-        writer.println("    this.delegate = delegate;");
+        List<String> cacheDecls = new ArrayList<>();
+
+        //
+        Stream<MethodInfo> list = getGenMethods(model);
+        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
+
+        for (ConstantInfo constant : model.getConstants()) {
+            genConstant(model, constant, writer);
+        }
+
+        for (String cacheDecl : cacheDecls) {
+            writer.print("  ");
+            writer.print(cacheDecl);
+            writer.println(";");
+        }
+    }
+
+    private void generateEmptyConstructor(ClassModel model, String constructor, PrintWriter writer, ClassTypeInfo type, List<TypeParamInfo.Class> typeParams) {
+        // Constructor without parameter, used by CDI
+        writer.println("  /**");
+        writer.println("  * Empty constructor used by CDI, do not use this constructor directly.");
+        writer.println("  **/");
+        writer.print("  ");
+        writer.print(constructor);
+        writer.print("() {");
+        if (model.isConcrete() && model.getConcreteSuperType() != null) {
+            writer.println("    super(null);");
+        }
+        writer.println("    this.delegate = null;");
         for (TypeParamInfo.Class typeParam : typeParams) {
             writer.print("    this.__typeArg_");
             writer.print(typeParam.getIndex());
@@ -308,6 +334,16 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         writer.println("  }");
         writer.println();
 
+        writer.print("  public ");
+        writer.print(type.getName());
+        writer.println(" getDelegate() {");
+        writer.println("    return delegate;");
+        writer.println("  }");
+        writer.println();
+    }
+
+    private void generateConstructorWithGenericType(ClassModel model, String constructor, PrintWriter writer, List<TypeParamInfo.Class> typeParams) {
+        // Constructor with generic type
         if (typeParams.size() > 0) {
             writer.print("  public ");
             writer.print(constructor);
@@ -335,33 +371,27 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             writer.println("  }");
             writer.println();
         }
+    }
 
+    private void generateConstructorWithDelegateParameter(ClassModel model, String constructor, PrintWriter writer, List<TypeParamInfo.Class> typeParams) {
+        // Constructor taking delegate as parameter.
         writer.print("  public ");
-        writer.print(type.getName());
-        writer.println(" getDelegate() {");
-        writer.println("    return delegate;");
+        writer.print(constructor);
+        writer.print("(");
+        writer.print(Helper.getNonGenericType(model.getIfaceFQCN()));
+        writer.println(" delegate) {");
+
+        if (model.isConcrete() && model.getConcreteSuperType() != null) {
+            writer.println("    super(delegate);");
+        }
+        writer.println("    this.delegate = delegate;");
+        for (TypeParamInfo.Class typeParam : typeParams) {
+            writer.print("    this.__typeArg_");
+            writer.print(typeParam.getIndex());
+            writer.print(" = io.vertx.lang.axle.TypeArg.unknown();");
+        }
         writer.println("  }");
         writer.println();
-
-        ApiTypeInfo api = (ApiTypeInfo) type;
-        if (api.isReadStream()) {
-            genToObservable(api, writer);
-        }
-        List<String> cacheDecls = new ArrayList<>();
-
-        //
-        Stream<MethodInfo> list = getGenMethods(model);
-        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
-
-        for (ConstantInfo constant : model.getConstants()) {
-            genConstant(model, constant, writer);
-        }
-
-        for (String cacheDecl : cacheDecls) {
-            writer.print("  ");
-            writer.print(cacheDecl);
-            writer.println(";");
-        }
     }
 
     /**
