@@ -43,6 +43,9 @@
         <rxjava.version>2.2.8</rxjava.version>
         <reactive-streams.version>1.0.2</reactive-streams.version>
         <smallrye-reactive-streams-operators.version>1.0.4</smallrye-reactive-streams-operators.version>
+
+        <!-- Used by release plugin to define git tag -->
+        <tagNameFormat>@{project.version}</tagNameFormat>
     </properties>
 
     <dependencyManagement>
