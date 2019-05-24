@@ -112,7 +112,7 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             }
             writer.print(abstractSuperTypes.stream().map(it -> " " + genTypeName(it)).collect(Collectors.joining(", ")));
         }
-        TypeInfo handlerType = model.getHandlerType();
+        TypeInfo handlerType = model.getHandlerArg();
         if (handlerType != null) {
             if (abstractSuperTypes.isEmpty()) {
                 writer.print(" ");
@@ -293,9 +293,8 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         generateConstructorWithGenericType(model, constructor, writer, typeParams);
         generateEmptyConstructor(model, constructor, writer, type, typeParams);
 
-        ApiTypeInfo api = (ApiTypeInfo) type;
-        if (api.isReadStream()) {
-            genToObservable(api, writer);
+        if (model.isReadStream()) {
+            genToObservable(model.getReadStreamArg(), writer);
         }
         List<String> cacheDecls = new ArrayList<>();
 
@@ -417,12 +416,14 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
                         pred = other -> isOverride(method, other);
                     } else {
                         pred = other -> {
+/*
                             if (isOverride(method, other)) {
                                 Set<ClassTypeInfo> tmp = new HashSet<>(method.getOwnerTypes());
                                 tmp.removeAll(other.getOwnerTypes());
                                 return tmp.isEmpty();
                             }
-                            return false;
+*/
+                            return isOverride(method, other);
                         };
                     }
                     if (methods.stream()
@@ -465,7 +466,7 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         return list.stream().flatMap(Collection::stream);
     }
 
-    protected abstract void genToObservable(ApiTypeInfo type, PrintWriter writer);
+    protected abstract void genToObservable(TypeInfo streamType, PrintWriter writer);
 
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer);
 

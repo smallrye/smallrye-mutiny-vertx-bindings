@@ -31,8 +31,7 @@ class AxleGenerator extends AbstractAxleGenerator {
     }
 
     @Override
-    protected void genToObservable(ApiTypeInfo type, PrintWriter writer) {
-        TypeInfo streamType = type.getReadStreamArg();
+    protected void genToObservable(TypeInfo streamType, PrintWriter writer) {
 
         writer.print("  private org.reactivestreams.Publisher<");
         writer.print(genTypeName(streamType));

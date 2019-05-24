@@ -38,7 +38,7 @@
     </scm>
 
     <properties>
-        <vertx.version>3.7.0</vertx.version>
+        <vertx.version>3.7.1</vertx.version>
         <jackson.version>2.9.9</jackson.version>
         <rxjava.version>2.2.8</rxjava.version>
         <reactive-streams.version>1.0.2</reactive-streams.version>
