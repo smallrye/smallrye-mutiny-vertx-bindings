@@ -1,9 +1,9 @@
 package io.vertx.axle.kafka;
 
 import io.vertx.axle.core.Vertx;
-import io.vertx.axle.ext.amqp.AmqpClient;
-import io.vertx.axle.ext.amqp.AmqpMessage;
-import io.vertx.ext.amqp.AmqpClientOptions;
+import io.vertx.axle.amqp.AmqpClient;
+import io.vertx.axle.amqp.AmqpMessage;
+import io.vertx.amqp.AmqpClientOptions;
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.junit.After;
 import org.junit.Before;
