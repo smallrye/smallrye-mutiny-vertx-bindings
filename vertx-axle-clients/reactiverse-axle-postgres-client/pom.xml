@@ -14,7 +14,7 @@
     <properties>
         <gen-source-groupId>io.reactiverse</gen-source-groupId>
         <gen-source-artifactId>reactive-pg-client</gen-source-artifactId>
-        <gen-source-version>0.11.3</gen-source-version>
+        <gen-source-version>0.11.4</gen-source-version>
         <gen.output>${project.build.directory}/sources/java</gen.output>
     </properties>
 
