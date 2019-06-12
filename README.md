@@ -1,5 +1,7 @@
 # SmallRye Reactive Utilities
 
+[![Build Status](https://semaphoreci.com/api/v1/smallrye/smallrye-reactive-utils/branches/master/badge.svg)](https://semaphoreci.com/smallrye/smallrye-reactive-utils)
+
 This contains a set of modules helping the development of reactive applications in SmallRye 
 
 ## Vert.x Axle Clients
