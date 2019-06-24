@@ -1,16 +1,5 @@
 package io.vertx.it;
 
-import io.vertx.axle.core.Vertx;
-import io.vertx.axle.core.file.AsyncFile;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.file.OpenOptions;
-import io.vertx.core.impl.Utils;
-import io.vertx.test.core.TestUtils;
-import io.vertx.test.core.VertxTestBase;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -18,6 +7,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import io.vertx.axle.core.Vertx;
+import io.vertx.axle.core.file.AsyncFile;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.file.OpenOptions;
+import io.vertx.core.impl.Utils;
+import io.vertx.test.core.TestUtils;
+import io.vertx.test.core.VertxTestBase;
 
 public class CoreTest extends VertxTestBase {
 

@@ -1,15 +1,6 @@
 package io.vertx.axle.kafka;
 
-import io.vertx.axle.core.Vertx;
-import io.vertx.axle.kafka.client.consumer.KafkaConsumer;
-import io.vertx.axle.kafka.client.consumer.KafkaConsumerRecord;
-import io.vertx.axle.kafka.client.producer.KafkaProducer;
-import io.vertx.axle.kafka.client.producer.KafkaProducerRecord;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.testcontainers.containers.KafkaContainer;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +8,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.testcontainers.containers.KafkaContainer;
+
+import io.vertx.axle.core.Vertx;
+import io.vertx.axle.kafka.client.consumer.KafkaConsumer;
+import io.vertx.axle.kafka.client.consumer.KafkaConsumerRecord;
+import io.vertx.axle.kafka.client.producer.KafkaProducer;
+import io.vertx.axle.kafka.client.producer.KafkaProducerRecord;
 
 public class KafkaClientTest {
 
