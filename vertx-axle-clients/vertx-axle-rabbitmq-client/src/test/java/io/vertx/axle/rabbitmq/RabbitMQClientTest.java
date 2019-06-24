@@ -1,16 +1,6 @@
 package io.vertx.axle.rabbitmq;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
-import io.vertx.axle.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.rabbitmq.RabbitMQOptions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.containers.GenericContainer;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,7 +11,19 @@ import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
+import org.testcontainers.containers.GenericContainer;
+
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConnectionFactory;
+
+import io.vertx.axle.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.rabbitmq.RabbitMQOptions;
 
 public class RabbitMQClientTest {
 

@@ -1,9 +1,11 @@
 package io.vertx.axle.kafka;
 
-import io.vertx.axle.core.Vertx;
-import io.vertx.axle.amqp.AmqpClient;
-import io.vertx.axle.amqp.AmqpMessage;
-import io.vertx.amqp.AmqpClientOptions;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletionStage;
+
 import org.eclipse.microprofile.reactive.streams.operators.PublisherBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -11,11 +13,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletionStage;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import io.vertx.amqp.AmqpClientOptions;
+import io.vertx.axle.amqp.AmqpClient;
+import io.vertx.axle.amqp.AmqpMessage;
+import io.vertx.axle.core.Vertx;
 
 public class AMQPClientTest {
 
@@ -45,7 +46,8 @@ public class AMQPClientTest {
                 .setPassword("simetraehcapa");
 
         AmqpClient client = AmqpClient.create(vertx, options);
-        PublisherBuilder<AmqpMessage> stream = client.createReceiver("my-address").thenApply(receiver -> receiver.toPublisherBuilder()).toCompletableFuture().join();
+        PublisherBuilder<AmqpMessage> stream = client.createReceiver("my-address")
+                .thenApply(receiver -> receiver.toPublisherBuilder()).toCompletableFuture().join();
         CompletionStage<Optional<String>> result = stream
                 .map(AmqpMessage::bodyAsString)
                 .findFirst().run();

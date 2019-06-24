@@ -15,6 +15,7 @@
     <properties>
         <lang>java</lang>
         <source.skip>true</source.skip>
+        <format.skip>true</format.skip>
     </properties>
 
     <dependencies>
