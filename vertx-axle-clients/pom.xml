@@ -24,6 +24,9 @@
         <module>vertx-axle-kafka-client</module>
         <module>vertx-axle-amqp-client</module>
         <module>vertx-axle-rabbitmq-client</module>
+        <module>vertx-axle-sql-client</module>
+        <module>vertx-axle-pg-client</module>
+        <module>vertx-axle-mysql-client</module>
         <module>reactiverse-axle-postgres-client</module>
     </modules>
 
