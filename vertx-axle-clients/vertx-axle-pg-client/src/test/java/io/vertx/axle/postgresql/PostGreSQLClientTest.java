@@ -1,18 +1,19 @@
 package io.vertx.axle.postgresql;
 
-import io.vertx.axle.core.Vertx;
-import io.vertx.axle.pgclient.PgPool;
-import io.vertx.axle.sqlclient.Pool;
-import io.vertx.axle.sqlclient.RowSet;
-import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.sqlclient.PoolOptions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.vertx.axle.core.Vertx;
+import io.vertx.axle.pgclient.PgPool;
+import io.vertx.axle.sqlclient.Pool;
+import io.vertx.axle.sqlclient.RowSet;
+import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.sqlclient.PoolOptions;
 
 public class PostGreSQLClientTest {
 
