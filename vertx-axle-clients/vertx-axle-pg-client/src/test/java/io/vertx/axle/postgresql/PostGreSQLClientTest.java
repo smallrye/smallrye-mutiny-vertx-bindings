@@ -1,4 +1,4 @@
-package io.vertx.axle.redis;
+package io.vertx.axle.postgresql;
 
 import io.vertx.axle.core.Vertx;
 import io.vertx.axle.pgclient.PgPool;
