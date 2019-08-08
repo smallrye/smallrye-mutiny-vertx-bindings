@@ -30,6 +30,11 @@
         </license>
     </licenses>
 
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/smallrye/smallrye-reactive-utils/issues</url>
+    </issueManagement>
+
     <scm>
         <connection>scm:git:git@github.com:smallrye/smallrye-reactive-utils.git</connection>
         <developerConnection>scm:git:git@github.com:smallrye/smallrye-reactive-utils.git</developerConnection>
@@ -44,8 +49,7 @@
         <reactive-streams.version>1.0.2</reactive-streams.version>
         <smallrye-reactive-streams-operators.version>1.0.5</smallrye-reactive-streams-operators.version>
 
-        <!-- Used by release plugin to define git tag -->
-        <tagNameFormat>@{project.version}</tagNameFormat>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
