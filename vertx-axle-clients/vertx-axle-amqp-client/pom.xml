@@ -22,7 +22,7 @@
         <dependency>
             <groupId>${gen-source-groupId}</groupId>
             <artifactId>${gen-source-artifactId}</artifactId>
-            <version>3.8.1</version>
+            <version>${vertx.version}</version>
         </dependency>
 
         <!-- Vert.x Axle Core -->
