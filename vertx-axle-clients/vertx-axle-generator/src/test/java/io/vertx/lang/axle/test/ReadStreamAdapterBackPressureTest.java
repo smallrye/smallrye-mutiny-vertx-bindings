@@ -97,6 +97,8 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         subscribe(observable, subscriber);
         if (err == null) {
             stream.end();
+            subscriber.assertEmpty();
+            subscriber.request(1);
             subscriber.assertCompleted();
         } else {
             stream.fail(err);
@@ -134,7 +136,9 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         for (int i = 0; i < count; i++) {
             subscriber.assertItem(Buffer.buffer("" + i));
         }
-        subscriber.assertCompleted().assertEmpty();
+        subscriber.assertEmpty();
+        subscriber.request(1);
+        subscriber.assertCompleted();
     }
 
     @Test
@@ -159,7 +163,7 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         } else {
             stream.fail(err);
         }
-        subscriber.request(2);
+        subscriber.request(3);
         if (err == null) {
             subscriber.assertItems(buffer("0"), buffer("1"));
             subscriber.assertCompleted();
@@ -190,7 +194,7 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         } else {
             stream.fail(err);
         }
-        subscriber.request(2);
+        subscriber.request(3);
         if (err == null) {
             subscriber.assertItems(buffer("0"), buffer("1"));
             subscriber.assertCompleted();
@@ -252,7 +256,9 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         for (int i = 0; i < count; i++) {
             subscriber.assertItem(Buffer.buffer("" + i));
         }
-        subscriber.assertCompleted().assertEmpty();
+        subscriber.assertEmpty();
+        subscriber.request(1);
+        subscriber.assertCompleted();
     }
 
     @Test
@@ -276,7 +282,9 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         stream.emit(buffer("0"));
         stream.end();
         subscriber.request(1);
-        subscriber.assertItem(buffer("0")).assertCompleted().assertEmpty();
+        subscriber.assertItem(buffer("0"));
+        subscriber.request(1);
+        subscriber.assertCompleted().assertEmpty();
     }
 
     @Test
@@ -363,7 +371,9 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         }
         subscriber.assertEmpty();
         stream.end();
-        subscriber.assertCompleted().assertEmpty();
+        subscriber.assertEmpty();
+        subscriber.request(1);
+        subscriber.assertCompleted();
     }
 
     @Test
@@ -377,6 +387,8 @@ public abstract class ReadStreamAdapterBackPressureTest<O> extends ReadStreamAda
         stream.emit(buffer("foo"));
         stream.end();
         subscriber.assertItem(buffer("foo"));
+        subscriber.assertEmpty();
+        subscriber.request(1);
         subscriber.assertCompleted();
     }
 
