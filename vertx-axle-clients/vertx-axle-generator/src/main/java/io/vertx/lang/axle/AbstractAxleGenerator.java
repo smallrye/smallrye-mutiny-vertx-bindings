@@ -609,8 +609,10 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             writer.println("   */");
         }
         writer.print(model.isConcrete() ? "  public static final" : "");
-        writer.println(" " + constant.getType().getSimpleName() + " " + constant.getName() + " = "
-                + genConvReturn(constant.getType(), null, model.getType().getName() + "." + constant.getName()) + ";");
+        writer.format(" %s %s = %s;%n",
+                genTypeName(constant.getType()),
+                constant.getName(),
+                genConvReturn(constant.getType(), null, model.getType().getName() + "." + constant.getName()));
     }
 
     protected void startMethodTemplate(boolean isPrivate, String methodName, MethodInfo method, String deprecated,
