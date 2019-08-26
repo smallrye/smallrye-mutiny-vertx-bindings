@@ -45,7 +45,7 @@
     <properties>
         <vertx.version>3.8.1</vertx.version>
         <jackson.version>2.9.9</jackson.version>
-        <rxjava.version>2.2.11</rxjava.version>
+        <rxjava.version>2.2.12</rxjava.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
         <smallrye-reactive-streams-operators.version>1.0.8</smallrye-reactive-streams-operators.version>
 
