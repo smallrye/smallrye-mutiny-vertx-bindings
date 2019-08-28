@@ -47,7 +47,7 @@
         <jackson.version>2.9.9</jackson.version>
         <rxjava.version>2.2.12</rxjava.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
-        <smallrye-reactive-streams-operators.version>1.0.8</smallrye-reactive-streams-operators.version>
+        <smallrye-reactive-streams-operators.version>1.0.9</smallrye-reactive-streams-operators.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
