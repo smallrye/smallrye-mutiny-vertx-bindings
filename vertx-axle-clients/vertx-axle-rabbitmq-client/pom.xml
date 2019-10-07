@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>smallrye-axle-rabbitmq-client</artifactId>
-    <name>SmallRye Axle - cRabbitMQ Client</name>
+    <name>SmallRye Axle - RabbitMQ Client</name>
 
     <properties>
         <gen-source-groupId>io.vertx</gen-source-groupId>
