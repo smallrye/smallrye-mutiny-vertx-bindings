@@ -1,1 +1,3 @@
-vertx-mutiny-generator/src/test/java/io/vertx/core
+vertx-mutiny-generator/src/tck/java/io/vertx
+vertx-mutiny-generator/src/tck/java/com/acme/pkg
+vertx-mutiny-generator/src/tck/java/META-INF
