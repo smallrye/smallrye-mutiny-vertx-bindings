@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>vertx-mutiny-runtime</artifactId>
+    <name>SmallRye Mutiny - Runtime Helpers</name>
 
     <dependencies>
         <dependency>

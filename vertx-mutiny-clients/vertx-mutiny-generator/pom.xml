@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>vertx-mutiny-generator</artifactId>
+    <name>SmallRye Mutiny - Code Generator</name>
 
     <properties>
         <lang>java</lang>

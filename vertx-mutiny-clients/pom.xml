@@ -11,25 +11,26 @@
     </parent>
 
     <artifactId>vertx-mutiny-clients</artifactId>
+    <name>SmallRye Mutiny - Client APIs</name>
     <packaging>pom</packaging>
 
     <modules>
         <module>vertx-mutiny-runtime</module>
         <module>vertx-mutiny-generator</module>
         <module>vertx-mutiny-core</module>
-        <!--<module>vertx-mutiny-mail-client</module>-->
-        <!--<module>vertx-mutiny-web-client</module>-->
-        <!--<module>vertx-mutiny-mongo-client</module>-->
-        <!--<module>vertx-mutiny-redis-client</module>-->
-        <!--<module>vertx-mutiny-cassandra-client</module>-->
-        <!--<module>vertx-mutiny-consul-client</module>-->
-        <!--<module>vertx-mutiny-kafka-client</module>-->
-        <!--<module>vertx-mutiny-amqp-client</module>-->
-        <!--<module>vertx-mutiny-rabbitmq-client</module>-->
-        <!--<module>vertx-mutiny-sql-client</module>-->
-        <!--<module>vertx-mutiny-pg-client</module>-->
-        <!--<module>vertx-mutiny-mysql-client</module>-->
-        <!--<module>reactiverse-mutiny-postgres-client</module>-->
+        <module>vertx-mutiny-mail-client</module>
+        <module>vertx-mutiny-web-client</module>
+        <module>vertx-mutiny-mongo-client</module>
+        <module>vertx-mutiny-redis-client</module>
+        <module>vertx-mutiny-cassandra-client</module>
+        <module>vertx-mutiny-consul-client</module>
+        <module>vertx-mutiny-kafka-client</module>
+        <module>vertx-mutiny-amqp-client</module>
+        <module>vertx-mutiny-rabbitmq-client</module>
+        <module>vertx-mutiny-sql-client</module>
+        <module>vertx-mutiny-pg-client</module>
+        <module>vertx-mutiny-mysql-client</module>
+        <module>reactiverse-mutiny-postgres-client</module>
     </modules>
 
     <build>
