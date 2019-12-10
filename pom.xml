@@ -44,6 +44,7 @@
 
     <properties>
         <vertx.version>3.8.4</vertx.version>
+        <mutiny.version>0.1.0</mutiny.version>
         <jackson.version>2.10.1</jackson.version>
         <rxjava.version>2.2.15</rxjava.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
@@ -69,11 +70,24 @@
                 <artifactId>reactive-streams</artifactId>
                 <version>${reactive-streams.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>mutiny</artifactId>
+                <version>${mutiny.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-dependencies</artifactId>
+                <version>${vertx.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
         <module>vertx-axle-clients</module>
+        <module>vertx-mutiny-clients</module>
     </modules>
 
     <repositories>
