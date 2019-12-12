@@ -49,4 +49,16 @@ public class MailClientTest {
                 .subscribeAsCompletionStage()
                 .join();
     }
+
+    @Test
+    public void testBlockingAPI() {
+        MailClient client = MailClient.createShared(vertx, new MailConfig()
+                .setPort(container.getMappedPort(25))
+                .setHostname(container.getContainerIpAddress()));
+        assertThat(client, is(notNullValue()));
+        client.sendMailAndAwait(new MailMessage().setText("hello mutiny")
+                .setSubject("test email")
+                .setTo("clement@apache.org")
+                .setFrom("clement@apache.org"));
+    }
 }

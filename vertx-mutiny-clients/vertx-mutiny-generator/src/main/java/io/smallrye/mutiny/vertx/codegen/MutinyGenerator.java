@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.AsyncResultUni;
+import io.smallrye.mutiny.vertx.codegen.lang.CodeGenHelper;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
@@ -92,6 +93,25 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         writer.println();
     }
 
+    @Override
+    protected void genBlockingMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
+        MethodInfo blockingMethod = genBlockingMethodInfo(method);
+        startMethodTemplate(false, blockingMethod.getName() + "AndAwait", blockingMethod, "", writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
+        writer.println(" { ");
+        writer.print("    return (" + CodeGenHelper.genTypeName(blockingMethod.getReturnType()) + ") ");
+        writer.print(blockingMethod.getName());
+        writer.print("(");
+        List<ParamInfo> params = blockingMethod.getParams();
+        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
+        writer.println(").await().indefinitely();");
+        writer.println("  }");
+        writer.println();
+    }
+
     public MethodInfo genConsumerMethodInfo(MethodInfo method) {
         List<ParamInfo> futParams = new ArrayList<>();
         int count = 0;
@@ -131,6 +151,21 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         TypeInfo futReturnType = new io.vertx.codegen.type.ParameterizedTypeInfo(
                 io.vertx.codegen.type.TypeReflectionFactory.create(Uni.class).getRaw(),
                 futUnresolvedType.isNullable(), Collections.singletonList(futType));
+        return method.copy().setReturnType(futReturnType).setParams(futParams);
+    }
+
+    private MethodInfo genBlockingMethodInfo(MethodInfo method) {
+        List<ParamInfo> futParams = new ArrayList<>();
+        int count = 0;
+        int size = method.getParams().size() - 1;
+        while (count < size) {
+            ParamInfo param = method.getParam(count);
+            futParams.add(param);
+            count = count + 1;
+        }
+        ParamInfo futParam = method.getParam(size);
+        TypeInfo futType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) futParam.getType()).getArg(0)).getArg(0);
+        TypeInfo futReturnType = futType;
         return method.copy().setReturnType(futReturnType).setParams(futParams);
     }
 

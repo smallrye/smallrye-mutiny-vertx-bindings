@@ -180,6 +180,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             PrintWriter writer);
 
     protected abstract void genUniMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
+    protected abstract void genBlockingMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     protected abstract MethodInfo genConsumerMethodInfo(MethodInfo method);
 
@@ -202,6 +203,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
             genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
             genUniMethod(false, model, method, writer);
+            if (!model.getMethods().stream().anyMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
+                genBlockingMethod(false, model, method, writer);
+            }
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
             genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
             genConsumerMethodInfo(false, model, method, writer);
@@ -210,10 +214,13 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         }
     }
 
-    private final void genMethodDecl(ClassModel model, MethodInfo method, List<String> cacheDecls,
+    private void genMethodDecl(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer) {
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
             genUniMethod(true, model, method, writer);
+            if (!model.getMethods().stream().anyMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
+                genBlockingMethod(true, model, method, writer);
+            }
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
             genConsumerMethodInfo(true, model, method, writer);
         } else {

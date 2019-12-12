@@ -16,6 +16,8 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.OpenOptions;
 import io.vertx.core.impl.Utils;
 import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.core.eventbus.EventBus;
+import io.vertx.mutiny.core.eventbus.Message;
 import io.vertx.mutiny.core.file.AsyncFile;
 import io.vertx.test.core.TestUtils;
 import io.vertx.test.core.VertxTestBase;
@@ -52,6 +54,27 @@ public class CoreTest extends VertxTestBase {
                     subscribe(expected, file, 3);
                 });
         await();
+    }
+
+    @Test
+    public void testAsyncFileBlocking() throws Exception {
+        String fileName = "some-file.dat";
+        int chunkSize = 1000;
+        int chunks = 10;
+        byte[] expected = TestUtils.randomAlphaString(chunkSize * chunks).getBytes();
+        createFile(fileName, expected);
+        Buffer buffer = Buffer.buffer();
+        AsyncFile asyncFile = vertx.fileSystem().openAndAwait(testDir + pathSep + fileName, new OpenOptions());
+        asyncFile.toBlockingStream().forEach(b -> buffer.appendBuffer(b.getDelegate()));
+        assertEquals(Buffer.buffer(expected), buffer);
+    }
+
+    @Test
+    public void testAndWaitMethod() {
+        EventBus eventBus = vertx.eventBus();
+        eventBus.consumer("my-address").handler(m -> m.getDelegate().reply(m.body() + " world"));
+        Message<Object> message = eventBus.requestAndAwait("my-address", "hello");
+        assertEquals("hello world", message.body());
     }
 
     private void subscribe(byte[] expected, AsyncFile file, int times) {

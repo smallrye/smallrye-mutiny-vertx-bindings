@@ -14,6 +14,8 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
         writer.println("> multi;");
 
         genToMulti(model.getReadStreamArg(), "multi", writer);
+        genToBlockingIterable(model.getReadStreamArg(), writer);
+        genToBlockingStream(model.getReadStreamArg(), writer);
     }
 
     @Override
@@ -70,6 +72,32 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
         writer.print("    return ");
         writer.print(fieldName);
         writer.println(";");
+        writer.println("  }");
+        writer.println();
+    }
+
+    private void genToBlockingIterable(TypeInfo type, PrintWriter writer) {
+        writer.print("  public java.lang.Iterable");
+        writer.print("<");
+        writer.print(genTypeName(type));
+        writer.print("> toBlockingIterable");
+        writer.println("() {");
+
+        writer.print("    ");
+        writer.print("return toMulti().subscribe().asIterable();");
+        writer.println("  }");
+        writer.println();
+    }
+
+    private void genToBlockingStream(TypeInfo type, PrintWriter writer) {
+        writer.print("  public java.util.stream.Stream");
+        writer.print("<");
+        writer.print(genTypeName(type));
+        writer.print("> toBlockingStream");
+        writer.println("() {");
+
+        writer.print("    ");
+        writer.print("return toMulti().subscribe().asStream();");
         writer.println("  }");
         writer.println();
     }
