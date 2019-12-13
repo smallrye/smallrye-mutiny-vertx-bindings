@@ -5,7 +5,14 @@
 
 This contains a set of modules helping the development of reactive applications in SmallRye 
 
-## Vert.x Axle Clients
+## Vert.x Mutiny Clients
+
+[Mutiny](https://smallrye.io/smallrye-mutiny) is a novel approach to deal with Reactive APIs.
+The `vertx-mutiny-clients` module contains the Vert.x client API using the Mutiny model (`Uni` and `Multi`).
+
+It also contains the Vert.x code generator.
+
+## Vert.x Axle Clients - deprecated
 
 This module delivers Vert.x client using the _Axle_ API. 
 

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.smallrye.reactive</groupId>
+        <artifactId>smallrye-reactive-utilities-projects</artifactId>
+        <version>0.0.11-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>vertx-mutiny-clients</artifactId>
+    <name>SmallRye Mutiny - Client APIs</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>vertx-mutiny-runtime</module>
+        <module>vertx-mutiny-generator</module>
+        <module>vertx-mutiny-core</module>
+        <module>vertx-mutiny-mail-client</module>
+        <module>vertx-mutiny-web-client</module>
+        <module>vertx-mutiny-mongo-client</module>
+        <module>vertx-mutiny-redis-client</module>
+        <module>vertx-mutiny-cassandra-client</module>
+        <module>vertx-mutiny-consul-client</module>
+        <module>vertx-mutiny-kafka-client</module>
+        <module>vertx-mutiny-amqp-client</module>
+        <module>vertx-mutiny-rabbitmq-client</module>
+        <module>vertx-mutiny-sql-client</module>
+        <module>vertx-mutiny-pg-client</module>
+        <module>vertx-mutiny-mysql-client</module>
+        <module>reactiverse-mutiny-postgres-client</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>coverage</id>
+            <properties>
+                <argLine>@{jacocoArgLine}</argLine>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
