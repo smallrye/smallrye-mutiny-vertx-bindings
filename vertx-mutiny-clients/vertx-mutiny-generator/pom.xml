@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
-            <artifactId>vertx-mutiny-runtime</artifactId>
+            <artifactId>smallrye-mutiny-vertx-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
