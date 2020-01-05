@@ -3,7 +3,6 @@ package io.smallrye.mutiny.vertx;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -42,11 +41,6 @@ public class MultiReadStream<T, U> extends AbstractMulti<U> implements Multi<U> 
                 }
             }
         }
-    }
-
-    @Override
-    protected Publisher<U> publisher() {
-        return this;
     }
 
     @Override
