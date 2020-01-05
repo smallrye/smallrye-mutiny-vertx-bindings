@@ -34,6 +34,12 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
     }
 
     @Override
+    protected void genForgetMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
+            PrintWriter writer) {
+        genForgetMethod(false, model, method, cacheDecls, writer);
+    }
+
+    @Override
     protected void genConsumerMethodInfo(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
         MethodInfo futMethod = genConsumerMethodInfo(method);
         startMethodTemplate(false, futMethod.getName(), futMethod, "", writer);
@@ -118,7 +124,6 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         int size = method.getParams().size() - 1;
         while (count < size) {
             ParamInfo param = method.getParam(count);
-            /* Transform ReadStream -> Flowable */
             futParams.add(param);
             count = count + 1;
         }
@@ -139,7 +144,6 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         int size = method.getParams().size() - 1;
         while (count < size) {
             ParamInfo param = method.getParam(count);
-            /* Transform ReadStream -> Flowable */
             futParams.add(param);
             count = count + 1;
         }

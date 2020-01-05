@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.joining;
 public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     public static final String ID = "mutiny";
+    private List<MethodInfo> forget = new ArrayList<>();
 
     public AbstractMutinyGenerator() {
         this.kinds = Collections.singleton("class");
@@ -102,6 +103,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         // This list filters out method that conflict during the generation
         Stream<MethodInfo> list = getGenMethods(model);
         list.forEach(method -> genMethods(model, method, cacheDecls, writer));
+        // Generate AndForget method
+        forget.forEach(method -> genForgetMethods(model, method, cacheDecls, writer));
 
         new ConstantCodeWriter().apply(model, writer);
 
@@ -119,6 +122,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
      * @return the list of methods as a stream
      */
     private Stream<MethodInfo> getGenMethods(ClassModel model) {
+        forget = new ArrayList<>();
         List<List<MethodInfo>> list = new ArrayList<>();
         list.add(model.getMethods());
         list.add(model.getAnyJavaTypeMethods());
@@ -139,6 +143,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                     if (methods.stream()
                             .filter(m -> CodeGenHelper.methodKind(m) == MethodKind.FUTURE)
                             .anyMatch(pred)) {
+                        // These methods are removed because it generated a signature conflict.
+                        // We store them in a specific list and generate "andForget" methods
+                        forget.add(method);
                         it.remove();
                     }
                 }
@@ -179,6 +186,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer);
 
+    protected abstract void genForgetMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
+            PrintWriter writer);
+
     protected abstract void genUniMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
     protected abstract void genBlockingMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
@@ -212,6 +222,65 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         } else {
             genSimpleMethod(false, model, false, method.getName(), method, cacheDecls, writer);
         }
+    }
+
+    final void genForgetMethod(boolean decl, ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
+        startMethodTemplate(false, method.getName()+ "AndForget", method, "", writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
+
+        writer.println(" { ");
+        if (method.isFluent()) {
+            writer.print("    ");
+            writer.print(genInvokeDelegate(model, method));
+            writer.println(";");
+            if (method.getReturnType().isVariable()) {
+                writer.print("    return (");
+                writer.print(method.getReturnType().getName());
+                writer.println(") this;");
+            } else {
+                writer.println("    return this;");
+            }
+        } else if (method.getReturnType().getName().equals("void")) {
+            writer.print("    ");
+            writer.print(genInvokeDelegate(model, method));
+            writer.println(";");
+        } else {
+            if (method.isCacheReturn()) {
+                writer.print("    if (cached_");
+                writer.print(cacheDecls.size());
+                writer.println(" != null) {");
+
+                writer.print("      return cached_");
+                writer.print(cacheDecls.size());
+                writer.println(";");
+                writer.println("    }");
+            }
+            String cachedType;
+            TypeInfo returnType = method.getReturnType();
+            if (method.getReturnType().getKind() == PRIMITIVE) {
+                cachedType = ((PrimitiveTypeInfo) returnType).getBoxed().getName();
+            } else {
+                cachedType = CodeGenHelper.genTypeName(returnType);
+            }
+            writer.print("    ");
+            writer.print(CodeGenHelper.genTypeName(returnType));
+            writer.print(" ret = ");
+            writer.print(CodeGenHelper.genConvReturn(returnType, method, genInvokeDelegate(model, method)));
+            writer.println(";");
+            if (method.isCacheReturn()) {
+                writer.print("    cached_");
+                writer.print(cacheDecls.size());
+                writer.println(" = ret;");
+                cacheDecls.add("private" + (method.isStaticMethod() ? " static" : "") + " " + cachedType + " cached_"
+                        + cacheDecls.size());
+            }
+            writer.println("    return ret;");
+        }
+        writer.println("  }");
+        writer.println();
     }
 
     private void genMethodDecl(ClassModel model, MethodInfo method, List<String> cacheDecls,
