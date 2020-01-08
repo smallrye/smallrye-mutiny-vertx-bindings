@@ -95,7 +95,7 @@
                         </goals>
                         <configuration>
                             <includes>io/vertx/**/*.java</includes>
-                            <excludes>**/impl/**/*.java</excludes>
+                            <excludes>**/impl/**/*.java,io/vertx/core/logging/Log4jLogDelegate.java</excludes>
                             <outputDirectory>${gen.output}</outputDirectory>
                         </configuration>
                     </execution>
@@ -153,11 +153,6 @@
 
                 <!-- Log dependencies required by Vert.x -->
                 <dependencies>
-                    <dependency>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                        <version>1.2.17</version>
-                    </dependency>
                     <dependency>
                         <groupId>org.apache.logging.log4j</groupId>
                         <artifactId>log4j-api</artifactId>
