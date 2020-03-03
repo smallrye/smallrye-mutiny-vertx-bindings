@@ -10,7 +10,7 @@
 
     <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-utilities-projects</artifactId>
-    <version>0.0.13-SNAPSHOT</version>
+    <version>0.0.14-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -44,9 +44,9 @@
 
     <properties>
         <vertx.version>3.8.5</vertx.version>
-        <mutiny.version>0.3.1</mutiny.version>
-        <jackson.version>2.10.2</jackson.version>
-        <rxjava.version>2.2.17</rxjava.version>
+        <mutiny.version>0.4.0</mutiny.version>
+        <jackson.version>2.10.3</jackson.version>
+        <rxjava.version>2.2.18</rxjava.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
         <smallrye-reactive-streams-operators.version>1.0.10</smallrye-reactive-streams-operators.version>
 
