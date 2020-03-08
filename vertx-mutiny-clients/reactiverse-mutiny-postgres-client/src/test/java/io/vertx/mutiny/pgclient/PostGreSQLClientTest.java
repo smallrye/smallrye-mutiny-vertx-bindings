@@ -28,7 +28,7 @@ public class PostGreSQLClientTest {
 
     @After
     public void tearDown() {
-        vertx.close();
+        vertx.closeAndAwait();
     }
 
     @Test

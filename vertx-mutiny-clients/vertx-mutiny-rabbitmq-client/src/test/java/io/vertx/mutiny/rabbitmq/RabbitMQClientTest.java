@@ -43,7 +43,7 @@ public class RabbitMQClientTest {
 
     @After
     public void tearDown() {
-        vertx.close();
+        vertx.closeAndAwait();
     }
 
     @Test

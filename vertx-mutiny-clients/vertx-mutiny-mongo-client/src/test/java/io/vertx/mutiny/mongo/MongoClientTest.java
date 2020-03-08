@@ -30,7 +30,7 @@ public class MongoClientTest {
 
     @After
     public void tearDown() {
-        vertx.close();
+        vertx.closeAndAwait();
     }
 
     @Test

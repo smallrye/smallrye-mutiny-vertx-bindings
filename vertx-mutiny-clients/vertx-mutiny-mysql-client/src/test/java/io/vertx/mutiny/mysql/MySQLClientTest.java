@@ -35,7 +35,7 @@ public class MySQLClientTest {
 
     @After
     public void tearDown() {
-        vertx.close();
+        vertx.closeAndAwait();
     }
 
     @Test

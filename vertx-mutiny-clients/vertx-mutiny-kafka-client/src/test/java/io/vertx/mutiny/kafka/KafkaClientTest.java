@@ -35,7 +35,7 @@ public class KafkaClientTest {
 
     @After
     public void tearDown() {
-        vertx.close();
+        vertx.closeAndAwait();
     }
 
     @Test
