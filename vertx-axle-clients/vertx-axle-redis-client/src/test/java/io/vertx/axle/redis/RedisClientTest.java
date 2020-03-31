@@ -15,7 +15,7 @@ import io.vertx.core.json.JsonObject;
 public class RedisClientTest {
 
     @Rule
-    public GenericContainer container = new GenericContainer("redis")
+    public GenericContainer<?> container = new GenericContainer<>("redis")
             .withExposedPorts(6379);
 
     private Vertx vertx;

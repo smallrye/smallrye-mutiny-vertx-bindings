@@ -15,7 +15,7 @@ import io.vertx.mutiny.core.Vertx;
 public class CassandraClientTest {
 
     @Rule
-    public GenericContainer container = new CassandraContainer()
+    public GenericContainer<?> container = new CassandraContainer()
             .withExposedPorts(9042);
 
     private Vertx vertx;

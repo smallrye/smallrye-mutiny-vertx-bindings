@@ -18,7 +18,7 @@ import io.vertx.mutiny.ext.consul.ConsulClient;
 public class ConsulClientTest {
 
     @Rule
-    public GenericContainer container = new GenericContainer("consul")
+    public GenericContainer<?> container = new GenericContainer<>("consul")
             .withExposedPorts(8500);
 
     private Vertx vertx;

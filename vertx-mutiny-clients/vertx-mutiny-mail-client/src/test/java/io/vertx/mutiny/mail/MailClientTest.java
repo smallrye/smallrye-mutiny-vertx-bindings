@@ -19,7 +19,7 @@ import io.vertx.mutiny.ext.mail.MailClient;
 public class MailClientTest {
 
     @Rule
-    public GenericContainer container = new GenericContainer("digiplant/fake-smtp")
+    public GenericContainer<?> container = new GenericContainer<>("digiplant/fake-smtp")
             .withExposedPorts(25)
             .withFileSystemBind("target", "/tmp/fakemail", BindMode.READ_WRITE);
 
