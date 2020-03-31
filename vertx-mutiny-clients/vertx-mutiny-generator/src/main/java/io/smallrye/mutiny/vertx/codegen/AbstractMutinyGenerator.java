@@ -1,31 +1,38 @@
 package io.smallrye.mutiny.vertx.codegen;
 
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
+import io.smallrye.mutiny.vertx.TypeArg;
 import io.smallrye.mutiny.vertx.codegen.lang.*;
 import io.vertx.codegen.*;
 import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.codegen.doc.Doc;
 import io.vertx.codegen.doc.Token;
+import io.vertx.codegen.type.ClassKind;
 import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.PrimitiveTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
+import io.vertx.codegen.type.TypeVariableInfo;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
+import static io.vertx.codegen.type.ClassKind.API;
+import static io.vertx.codegen.type.ClassKind.OBJECT;
 import static io.vertx.codegen.type.ClassKind.PRIMITIVE;
 import static java.util.stream.Collectors.joining;
 
 public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     public static final String ID = "mutiny";
+    private List<MethodInfo> methods = new ArrayList<>();
     private List<MethodInfo> forget = new ArrayList<>();
+    private Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap = new HashMap<>();
 
     public AbstractMutinyGenerator() {
         this.kinds = Collections.singleton("class");
@@ -44,10 +51,16 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     @Override
     public String render(ClassModel model, int index, int size, Map<String, Object> session) {
+        initState(model);
         StringWriter sw = new StringWriter();
         PrintWriter writer = new PrintWriter(sw);
         generateClass(model, writer);
         return sw.toString();
+    }
+
+    private void initState(ClassModel model) {
+        initGenMethods(model);
+        initCachedTypeArgs();
     }
 
     private List<CodeWriter> generators = Arrays.asList(
@@ -66,6 +79,14 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             new NoArgConstructorCodeWriter(),
             new GetDelegateMethodCodeWriter(),
 
+            (mode, writer) -> {
+                methodTypeArgMap.forEach((method, map) -> {
+                    map.forEach((typeArg, identifier) -> {
+                        genTypeArgDecl(typeArg, method, identifier, writer);
+                    });
+                });
+            },
+
             new DelegateMethodDeclarationCodeWriter(),
             new BufferRelatedMethodCodeWriter(),
             new ToStringMethodCodeWriter(),
@@ -80,8 +101,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                 if (model.isConcrete()) {
                     generateClassBody(model, writer);
                 } else {
-                    getGenMethods(model)
-                            .forEach(method -> genMethodDecl(model, method, Collections.emptyList(), writer));
+                    methods.forEach(method -> genMethodDecl(model, method, Collections.emptyList(), writer));
                 }
             },
 
@@ -101,12 +121,11 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         List<String> cacheDecls = new ArrayList<>();
 
         // This list filters out method that conflict during the generation
-        Stream<MethodInfo> list = getGenMethods(model);
-        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
+        methods.forEach(method -> genMethods(model, method, cacheDecls, writer));
         // Generate AndForget method
         forget.forEach(method -> genForgetMethods(model, method, cacheDecls, writer));
 
-        new ConstantCodeWriter().apply(model, writer);
+        new ConstantCodeWriter(methodTypeArgMap).apply(model, writer);
 
         for (String cacheDecl : cacheDecls) {
             writer.print("  ");
@@ -116,12 +135,11 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     }
 
     /**
-     * Build the list of methods to generate.
+     * Build the list of methods to generate and updates {@link #forget} and {@link #methods} fields
      *
      * @param model the class model
-     * @return the list of methods as a stream
      */
-    private Stream<MethodInfo> getGenMethods(ClassModel model) {
+    private void initGenMethods(ClassModel model) {
         forget = new ArrayList<>();
         List<List<MethodInfo>> list = new ArrayList<>();
         list.add(model.getMethods());
@@ -180,7 +198,49 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                 }
             }
         });
-        return list.stream().flatMap(Collection::stream);
+        methods = list.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    /**
+     * Build the map of type arguments that can be statically cached within the generated class
+     */
+    private void initCachedTypeArgs() {
+        methodTypeArgMap.clear();
+        int count = 0;
+        for (MethodInfo method : methods) {
+            TypeInfo returnType = method.getReturnType();
+            if (returnType instanceof ParameterizedTypeInfo) {
+                ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo)returnType;
+                List<TypeInfo> typeArgs = parameterizedType.getArgs();
+                Map<TypeInfo, String> typeArgMap = new HashMap<>();
+                for (TypeInfo typeArg : typeArgs) {
+                    if (typeArg.getKind() == API && !containsTypeVariableArgument(typeArg)) {
+                        String typeArgRef = "TYPE_ARG_" + count++;
+                        typeArgMap.put(typeArg, typeArgRef);
+                    }
+                }
+                methodTypeArgMap.put(method, typeArgMap);
+            }
+        }
+    }
+
+    /**
+     * @return whether a type contains a nested type variable declaration
+     */
+    private boolean containsTypeVariableArgument(TypeInfo type) {
+        if (type.isVariable()) {
+            return true;
+        } else if (type.isParameterized()) {
+            List<TypeInfo> typeArgs = ((ParameterizedTypeInfo)type).getArgs();
+            for (TypeInfo typeArg : typeArgs) {
+                if (typeArg.isVariable()) {
+                    return true;
+                } else if (typeArg.isParameterized() && containsTypeVariableArgument(typeArg)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
@@ -268,7 +328,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             writer.print("    ");
             writer.print(CodeGenHelper.genTypeName(returnType));
             writer.print(" ret = ");
-            writer.print(CodeGenHelper.genConvReturn(returnType, method, genInvokeDelegate(model, method)));
+            writer.print(CodeGenHelper.genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
             writer.println(";");
             if (method.isCacheReturn()) {
                 writer.print("    cached_");
@@ -399,7 +459,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             writer.print("    ");
             writer.print(CodeGenHelper.genTypeName(returnType));
             writer.print(" ret = ");
-            writer.print(CodeGenHelper.genConvReturn(returnType, method, genInvokeDelegate(model, method)));
+            writer.print(CodeGenHelper.genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
             writer.println(";");
             if (method.isCacheReturn()) {
                 writer.print("    cached_");
@@ -442,7 +502,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                         .append(",")
                         .append(adapterFunction).append(").resume()");
             } else {
-                ret.append(CodeGenHelper.genConvParam(type, method, param.getName()));
+                ret.append(CodeGenHelper.genConvParam(methodTypeArgMap, type, method, param.getName()));
             }
             index = index + 1;
         }
@@ -450,4 +510,17 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         return ret.toString();
     }
 
+    private void genTypeArgDecl(TypeInfo typeArg, MethodInfo method, String typeArgRef, PrintWriter writer) {
+        StringBuilder sb = new StringBuilder();
+        CodeGenHelper.genTypeArg(typeArg, method, 1, sb);
+        writer.print("  static final ");
+        writer.print(TypeArg.class.getName());
+        writer.print("<");
+        writer.print(typeArg.translateName(ID));
+        writer.print("> ");
+        writer.print(typeArgRef);
+        writer.print(" = ");
+        writer.print(sb);
+        writer.println(";");
+    }
 }

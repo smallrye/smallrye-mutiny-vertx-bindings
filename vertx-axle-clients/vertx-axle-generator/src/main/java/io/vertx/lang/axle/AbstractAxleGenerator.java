@@ -15,7 +15,7 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import static io.vertx.codegen.type.ClassKind.*;
 import static java.util.stream.Collectors.joining;
@@ -23,6 +23,8 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
     private String id;
+    private List<MethodInfo> methods;
+    private Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap;
 
     public AbstractAxleGenerator(String id) {
         this.id = id;
@@ -61,8 +63,14 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
     public String render(ClassModel model, int index, int size, Map<String, Object> session) {
         StringWriter sw = new StringWriter();
         PrintWriter writer = new PrintWriter(sw);
+        initState(model);
         generateClass(model, writer);
         return sw.toString();
+    }
+
+    private void initState(ClassModel model) {
+        initGenMethods(model);
+        initCachedTypeArgs();
     }
 
     private void generateClass(ClassModel model, PrintWriter writer) {
@@ -185,7 +193,7 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
             writer.println(" getDelegate();");
             writer.println();
 
-            getGenMethods(model).forEach(method -> {
+            methods.forEach(method -> {
                 genMethodDecl(model, method, Collections.emptyList(), writer);
             });
 
@@ -390,8 +398,14 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
         List<String> cacheDecls = new ArrayList<>();
 
         //
-        Stream<MethodInfo> list = getGenMethods(model);
-        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
+        methods.forEach(method -> genMethods(model, method, cacheDecls, writer));
+
+        // Generate cached type args
+        methodTypeArgMap.forEach((method, map) -> {
+            map.forEach((typeArg, ref) -> {
+                genTypeArgDecl(typeArg, method, ref, writer);
+            });
+        });
 
         for (ConstantInfo constant : model.getConstants()) {
             genConstant(model, constant, writer);
@@ -488,9 +502,8 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
      * Build the list of method to generate.
      *
      * @param model the class model
-     * @return the list of methods as a stream
      */
-    private Stream<MethodInfo> getGenMethods(ClassModel model) {
+    private void initGenMethods(ClassModel model) {
         List<List<MethodInfo>> list = new ArrayList<>();
         list.add(model.getMethods());
         list.add(model.getAnyJavaTypeMethods());
@@ -554,7 +567,44 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
                 }
             }
         });
-        return list.stream().flatMap(Collection::stream);
+        methods = list.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private void initCachedTypeArgs() {
+        methodTypeArgMap = new HashMap<>();
+        int count = 0;
+        for (MethodInfo method : methods) {
+            TypeInfo returnType = method.getReturnType();
+            if (returnType instanceof ParameterizedTypeInfo) {
+                ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo)returnType;
+                List<TypeInfo> typeArgs = parameterizedType.getArgs();
+                Map<TypeInfo, String> typeArgMap = new HashMap<>();
+                for (TypeInfo typeArg : typeArgs) {
+                    if (typeArg.getKind() == API && !containsTypeVariableArgument(typeArg)) {
+                        String typeArgRef = "TYPE_ARG_" + count++;
+                        typeArgMap.put(typeArg, typeArgRef);
+                        // genTypeArgDecl(typeArg, method, typeArgRef, writer);
+                    }
+                }
+                methodTypeArgMap.put(method, typeArgMap);
+            }
+        }
+    }
+
+    private boolean containsTypeVariableArgument(TypeInfo type) {
+        if (type.isVariable()) {
+            return true;
+        } else if (type.isParameterized()) {
+            List<TypeInfo> typeArgs = ((ParameterizedTypeInfo)type).getArgs();
+            for (TypeInfo typeArg : typeArgs) {
+                if (typeArg.isVariable()) {
+                    return true;
+                } else if (typeArg.isParameterized() && containsTypeVariableArgument(typeArg)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected abstract void genToObservable(TypeInfo streamType, PrintWriter writer);
@@ -952,6 +1002,71 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
     //    return false;
     //  }
 
+    private void genTypeArgDecl(TypeInfo typeArg, MethodInfo method, String typeArgRef, PrintWriter writer) {
+        StringBuilder sb = new StringBuilder();
+        genTypeArg(typeArg, method, 1, sb);
+        writer.print("  private static final io.vertx.lang.axle.TypeArg<");
+        writer.print(typeArg.translateName(id));
+        writer.print("> ");
+        writer.print(typeArgRef);
+        writer.print(" = ");
+        writer.print(sb);
+        writer.println(";");
+    }
+
+    private void genTypeArg(TypeInfo arg, MethodInfo method, int depth, StringBuilder sb) {
+        ClassKind argKind = arg.getKind();
+        if (argKind == API) {
+            sb.append("new io.vertx.lang.axle.TypeArg<").append(arg.translateName(id))
+                .append(">(o").append(depth).append(" -> ");
+            sb.append(arg.getRaw().translateName(id)).append(".newInstance((").append(arg.getRaw()).append(")o").append(depth);
+            if (arg instanceof ParameterizedTypeInfo) {
+                ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) arg;
+                List<TypeInfo> args = parameterizedType.getArgs();
+                for (int i = 0; i < args.size(); i++) {
+                    sb.append(", ");
+                    genTypeArg(args.get(i), method, depth + 1, sb);
+                }
+            }
+            sb.append(")");
+            sb.append(", o").append(depth).append(" -> o").append(depth).append(".getDelegate())");
+        } else {
+            String typeArg = "io.vertx.lang.axle.TypeArg.unknown()";
+            if (argKind == OBJECT && arg.isVariable()) {
+                String resolved = genTypeArg((TypeVariableInfo) arg, method);
+                if (resolved != null) {
+                    typeArg = resolved;
+                }
+            }
+            sb.append(typeArg);
+        }
+    }
+
+    private String genTypeArg(TypeInfo arg, MethodInfo method) {
+        Map<TypeInfo, String> typeArgMap = methodTypeArgMap.get(method);
+        if (typeArgMap != null) {
+            String typeArgRef = typeArgMap.get(arg);
+            if (typeArgRef != null) {
+                return typeArgRef;
+            }
+        }
+        ClassKind kind = arg.getKind();
+        if (kind == ClassKind.API) {
+            StringBuilder sb = new StringBuilder();
+            genTypeArg(arg, method, 0, sb);
+            return sb.toString();
+        } else {
+            String typeArg = "io.vertx.lang.axle.TypeArg.unknown()";
+            if (arg.isVariable()) {
+                String resolved = genTypeArg((TypeVariableInfo) arg, method);
+                if (resolved != null) {
+                    typeArg = resolved;
+                }
+            }
+            return typeArg;
+        }
+    }
+
     private String genConvReturn(TypeInfo type, MethodInfo method, String expr) {
         ClassKind kind = type.getKind();
         if (kind == OBJECT) {
@@ -972,19 +1087,7 @@ public abstract class AbstractAxleGenerator extends Generator<ClassModel> {
                 ParameterizedTypeInfo parameterizedTypeInfo = (ParameterizedTypeInfo) type;
                 for (TypeInfo arg : parameterizedTypeInfo.getArgs()) {
                     tmp.append(", ");
-                    ClassKind argKind = arg.getKind();
-                    if (argKind == API) {
-                        tmp.append("(io.vertx.lang.axle.TypeArg)").append(arg.getRaw().translateName(id)).append(".__TYPE_ARG");
-                    } else {
-                        String typeArg = "io.vertx.lang.axle.TypeArg.unknown()";
-                        if (argKind == OBJECT && arg.isVariable()) {
-                            String resolved = genTypeArg((TypeVariableInfo) arg, method);
-                            if (resolved != null) {
-                                typeArg = resolved;
-                            }
-                        }
-                        tmp.append(typeArg);
-                    }
+                    tmp.append(genTypeArg(arg, method));
                 }
             }
             tmp.append(")");
