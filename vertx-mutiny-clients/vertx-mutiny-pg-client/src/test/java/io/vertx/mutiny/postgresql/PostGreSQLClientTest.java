@@ -44,7 +44,8 @@ public class PostGreSQLClientTest {
 
         Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
-        RowSet join = client.query("SELECT 1").subscribeAsCompletionStage().join();
+        RowSet<?> join = client.query("SELECT 1")
+                .executeAndAwait();
         assertThat(join).isNotNull();
         assertThat(join.size()).isEqualTo(1);
     }
