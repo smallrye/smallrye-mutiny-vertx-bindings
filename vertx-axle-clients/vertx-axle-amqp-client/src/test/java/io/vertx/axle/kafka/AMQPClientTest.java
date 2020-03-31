@@ -21,7 +21,7 @@ import io.vertx.axle.core.Vertx;
 public class AMQPClientTest {
 
     @Rule
-    public GenericContainer container = new GenericContainer("vromero/activemq-artemis")
+    public GenericContainer<?> container = new GenericContainer<>("vromero/activemq-artemis")
             .withExposedPorts(5672);
 
     private Vertx vertx;

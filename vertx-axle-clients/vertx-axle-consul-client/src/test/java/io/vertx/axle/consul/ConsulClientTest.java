@@ -18,7 +18,7 @@ import io.vertx.ext.consul.KeyValue;
 public class ConsulClientTest {
 
     @Rule
-    public GenericContainer container = new GenericContainer("consul")
+    public GenericContainer<?> container = new GenericContainer<>("consul")
             .withExposedPorts(8500);
 
     private Vertx vertx;

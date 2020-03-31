@@ -20,7 +20,7 @@ import io.vertx.mutiny.ext.web.client.WebClient;
 public class WebClientTest {
 
     @Rule
-    public GenericContainer container = new GenericContainer("kennethreitz/httpbin")
+    public GenericContainer<?> container = new GenericContainer<>("kennethreitz/httpbin")
             .withExposedPorts(80)
             .withFileSystemBind("target", "/tmp/fakemail", BindMode.READ_WRITE);
 

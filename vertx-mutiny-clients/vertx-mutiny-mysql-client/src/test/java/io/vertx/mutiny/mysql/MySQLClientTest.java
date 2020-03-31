@@ -20,7 +20,7 @@ public class MySQLClientTest {
     private static final String MYSQL_DATABASE = "test";
 
     @Rule
-    public GenericContainer container = new GenericContainer("mysql:5")
+    public GenericContainer<?> container = new GenericContainer<>("mysql:5")
             .withExposedPorts(3306)
             .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_ROOT_PASSWORD)
             .withEnv("MYSQL_DATABASE", MYSQL_DATABASE);
@@ -49,7 +49,8 @@ public class MySQLClientTest {
 
         Pool client = MySQLPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
-        RowSet join = client.query("SELECT 1").subscribeAsCompletionStage().join();
+        RowSet<?> join = client.query("SELECT 1")
+                .executeAndAwait();
         assertThat(join).isNotNull();
         assertThat(join.size()).isEqualTo(1);
     }
