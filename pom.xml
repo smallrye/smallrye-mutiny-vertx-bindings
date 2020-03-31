@@ -43,7 +43,7 @@
     </scm>
 
     <properties>
-        <vertx.version>3.8.5</vertx.version>
+        <vertx.version>3.9.0</vertx.version>
         <mutiny.version>0.4.3</mutiny.version>
         <jackson.version>2.10.3</jackson.version>
         <rxjava.version>2.2.19</rxjava.version>
