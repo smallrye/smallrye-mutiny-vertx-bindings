@@ -17,7 +17,7 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import static io.vertx.codegen.type.ClassKind.PRIMITIVE;
 import static java.util.stream.Collectors.joining;
@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.joining;
 public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     public static final String ID = "mutiny";
+    private List<MethodInfo> methods = new ArrayList<>();
     private List<MethodInfo> forget = new ArrayList<>();
 
     public AbstractMutinyGenerator() {
@@ -44,10 +45,15 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     @Override
     public String render(ClassModel model, int index, int size, Map<String, Object> session) {
+        initState(model);
         StringWriter sw = new StringWriter();
         PrintWriter writer = new PrintWriter(sw);
         generateClass(model, writer);
         return sw.toString();
+    }
+
+    private void initState(ClassModel model) {
+        initGenMethods(model);
     }
 
     private List<CodeWriter> generators = Arrays.asList(
@@ -80,8 +86,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                 if (model.isConcrete()) {
                     generateClassBody(model, writer);
                 } else {
-                    getGenMethods(model)
-                            .forEach(method -> genMethodDecl(model, method, Collections.emptyList(), writer));
+                    methods.forEach(method -> genMethodDecl(model, method, Collections.emptyList(), writer));
                 }
             },
 
@@ -101,8 +106,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         List<String> cacheDecls = new ArrayList<>();
 
         // This list filters out method that conflict during the generation
-        Stream<MethodInfo> list = getGenMethods(model);
-        list.forEach(method -> genMethods(model, method, cacheDecls, writer));
+        methods.forEach(method -> genMethods(model, method, cacheDecls, writer));
         // Generate AndForget method
         forget.forEach(method -> genForgetMethods(model, method, cacheDecls, writer));
 
@@ -116,12 +120,11 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     }
 
     /**
-     * Build the list of methods to generate.
+     * Build the list of methods to generate and updates {@link #forget} and {@link #methods} fields
      *
      * @param model the class model
-     * @return the list of methods as a stream
      */
-    private Stream<MethodInfo> getGenMethods(ClassModel model) {
+    private void initGenMethods(ClassModel model) {
         forget = new ArrayList<>();
         List<List<MethodInfo>> list = new ArrayList<>();
         list.add(model.getMethods());
@@ -180,7 +183,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                 }
             }
         });
-        return list.stream().flatMap(Collection::stream);
+        methods = list.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
