@@ -6,7 +6,7 @@ package io.vertx.lang.axle;
 public class Helper {
 
     /**
-     * Unwrap the type used in RxJava.
+     * Unwrap the type used in Axle.
      *
      * @param type the type to unwrap
      * @return the unwrapped type

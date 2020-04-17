@@ -1,13 +1,9 @@
 package io.vertx.axle.test;
 
+import io.vertx.lang.axle.test.TestSubscriber;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.vertx.lang.axle.test.TestSubscriber;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -59,36 +55,5 @@ public class TestUtils {
                 sub.onCompleted();
             }
         });
-    }
-
-    public static <T> void subscribe(Observable<T> obs, TestSubscriber<T> sub) {
-        obs.subscribe(sub::onNext,
-                sub::onError,
-                sub::onCompleted,
-                disposable -> {
-                    sub.onSubscribe(new TestSubscriber.Subscription() {
-                        @Override
-                        public void fetch(long val) {
-                        }
-
-                        @Override
-                        public void unsubscribe() {
-                            disposable.dispose();
-                        }
-
-                        @Override
-                        public boolean isUnsubscribed() {
-                            return disposable.isDisposed();
-                        }
-                    });
-                });
-    }
-
-    public static <T> void subscribe(Single<T> obs, TestSubscriber<T> sub) {
-        obs.subscribe(sub::onNext, sub::onError);
-    }
-
-    public static <T> void subscribe(Maybe<T> obs, TestSubscriber<T> sub) {
-        obs.subscribe(sub::onNext, sub::onError, sub::onCompleted);
     }
 }

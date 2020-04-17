@@ -1,19 +1,18 @@
 package io.vertx.axle;
 
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-
+import io.smallrye.mutiny.helpers.Subscriptions;
+import io.vertx.core.streams.ReadStream;
+import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
-import io.reactivex.Flowable;
-import io.reactivex.internal.subscriptions.EmptySubscription;
-import io.vertx.core.streams.ReadStream;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-public class FlowableReadStream<T, U> extends Flowable<U> {
+public class PublisherReadStream<T, U> implements Publisher<U> {
 
     public static final long DEFAULT_MAX_BUFFER_SIZE = 256;
 
@@ -21,7 +20,7 @@ public class FlowableReadStream<T, U> extends Flowable<U> {
     private final Function<T, U> f;
     private final AtomicReference<Subscription> current;
 
-    public FlowableReadStream(ReadStream<T> stream, long maxBufferSize, Function<T, U> f) {
+    public PublisherReadStream(ReadStream<T> stream, Function<T, U> f) {
 
         stream.pause();
 
@@ -47,7 +46,7 @@ public class FlowableReadStream<T, U> extends Flowable<U> {
     }
 
     @Override
-    protected void subscribeActual(Subscriber<? super U> subscriber) {
+    public void subscribe(Subscriber<? super U> subscriber) {
 
         Subscription sub = new Subscription() {
             @Override
@@ -63,7 +62,7 @@ public class FlowableReadStream<T, U> extends Flowable<U> {
             }
         };
         if (!current.compareAndSet(null, sub)) {
-            EmptySubscription.error(new IllegalStateException("This processor allows only a single Subscriber"), subscriber);
+            Subscriptions.fail(subscriber, new IllegalStateException("This processor allows only a single Subscriber"));
             return;
         }
 

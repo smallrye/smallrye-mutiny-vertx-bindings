@@ -24,7 +24,6 @@ class AxleGenerator extends AbstractAxleGenerator {
     @Override
     protected void genRxImports(ClassModel model, PrintWriter writer) {
         writer.println("import org.reactivestreams.Publisher;");
-        writer.println("import io.reactivex.Flowable;");
         writer.println("import java.util.function.Consumer;");
         writer.println("import java.util.concurrent.CompletionStage;");
         super.genRxImports(model, writer);
