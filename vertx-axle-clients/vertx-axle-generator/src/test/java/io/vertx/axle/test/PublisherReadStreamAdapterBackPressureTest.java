@@ -1,34 +1,33 @@
 package io.vertx.axle.test;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-
-import org.junit.Test;
-import org.reactivestreams.Publisher;
-
-import io.reactivex.Flowable;
-import io.vertx.axle.FlowableReadStream;
+import io.smallrye.mutiny.Multi;
 import io.vertx.axle.PublisherHelper;
+import io.vertx.axle.PublisherReadStream;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.lang.axle.test.ReadStreamAdapterBackPressureTest;
 import io.vertx.lang.axle.test.TestSubscriber;
 import io.vertx.test.fakestream.FakeStream;
+import org.junit.Test;
+import org.reactivestreams.Publisher;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-public class FlowableReadStreamAdapterBackPressureTest extends ReadStreamAdapterBackPressureTest<Publisher<Buffer>> {
+public class PublisherReadStreamAdapterBackPressureTest extends ReadStreamAdapterBackPressureTest<Publisher<Buffer>> {
 
     @Override
     protected long defaultMaxBufferSize() {
-        return FlowableReadStream.DEFAULT_MAX_BUFFER_SIZE;
+        return PublisherReadStream.DEFAULT_MAX_BUFFER_SIZE;
     }
 
     @Override
-    protected Publisher<Buffer> toObservable(ReadStream<Buffer> stream, int maxBufferSize) {
-        return PublisherHelper.toFlowable(stream, maxBufferSize);
+    protected Publisher<Buffer> toPublisher(ReadStream<Buffer> stream, int maxBufferSize) {
+        return PublisherHelper.toPublisher(stream);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class FlowableReadStreamAdapterBackPressureTest extends ReadStreamAdapter
 
     @Override
     protected Publisher<Buffer> flatMap(Publisher<Buffer> obs, Function<Buffer, Publisher<Buffer>> f) {
-        return Flowable.fromPublisher(obs).flatMap(f::apply);
+        return Multi.createFrom().publisher(obs).flatMap(f);
     }
 
     @Override
@@ -47,8 +46,8 @@ public class FlowableReadStreamAdapterBackPressureTest extends ReadStreamAdapter
     }
 
     @Override
-    protected Flowable<Buffer> concat(Publisher<Buffer> obs1, Publisher<Buffer> obs2) {
-        return Flowable.concat(obs1, obs2);
+    protected Publisher<Buffer> concat(Publisher<Buffer> obs1, Publisher<Buffer> obs2) {
+        return Multi.createBy().concatenating().streams(obs1, obs2);
     }
 
     @Test
@@ -75,9 +74,9 @@ public class FlowableReadStreamAdapterBackPressureTest extends ReadStreamAdapter
                 return super.handler(handler);
             }
         };
-        Flowable<Buffer> observable = Flowable.fromPublisher(toObservable(stream)).doOnSubscribe(disposable -> {
-            assertTrue(handlerSet.get());
-        });
+        Multi<Buffer> observable = Multi.createFrom().publisher(toObservable(stream))
+                .on().subscribed(s -> assertTrue(handlerSet.get())
+                );
         TestSubscriber<Buffer> subscriber = new TestSubscriber<>();
         subscribe(observable, subscriber);
         subscriber.assertEmpty();

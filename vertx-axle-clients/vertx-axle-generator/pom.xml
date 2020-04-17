@@ -25,13 +25,9 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.reactivex.rxjava2</groupId>
-            <artifactId>rxjava</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.smallrye.reactive</groupId>
-            <artifactId>smallrye-reactive-streams-operators</artifactId>
-            <version>${smallrye-reactive-streams-operators.version}</version>
+            <artifactId>mutiny-reactive-streams-operators</artifactId>
+            <version>${mutiny.version}</version>
         </dependency>
         <dependency>
             <groupId>org.reactivestreams</groupId>

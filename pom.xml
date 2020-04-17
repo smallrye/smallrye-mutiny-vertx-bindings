@@ -46,9 +46,7 @@
         <vertx.version>3.9.0</vertx.version>
         <mutiny.version>0.4.4</mutiny.version>
         <jackson.version>2.10.3</jackson.version>
-        <rxjava.version>2.2.19</rxjava.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
-        <smallrye-reactive-streams-operators.version>1.0.12</smallrye-reactive-streams-operators.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -59,11 +57,6 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.reactivex.rxjava2</groupId>
-                <artifactId>rxjava</artifactId>
-                <version>${rxjava.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.reactivestreams</groupId>

@@ -1,20 +1,16 @@
 package io.vertx.axle;
 
-import java.util.ArrayDeque;
-import java.util.function.Function;
-
+import io.vertx.core.Handler;
+import io.vertx.core.streams.ReadStream;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.vertx.core.Handler;
-import io.vertx.core.streams.ReadStream;
+import java.util.ArrayDeque;
+import java.util.function.Function;
 
 /**
- * An RxJava {@code Subscriber} that turns an {@code Observable} into a {@link ReadStream}.
+ * A Reactive Streams {@code Subscriber} that turns a {@code Publisher} into a {@link ReadStream}.
  * <p>
  * The stream implements the {@link #pause()} and {@link #resume()} operation by maintaining
  * a buffer of {@link #BUFFER_SIZE} elements between the {@code Observable} and the {@code ReadStream}.
@@ -45,24 +41,15 @@ public class ReadStreamSubscriber<R, J> implements Subscriber<R>, ReadStream<J> 
     private ArrayDeque<R> pending = new ArrayDeque<>();
     private int requested = 0;
     private Subscription subscription;
+
     public ReadStreamSubscriber(Function<R, J> adapter) {
         this.adapter = adapter;
     }
 
-    public static <R, J> ReadStream<J> asReadStream(Publisher<R> flowable, Function<R, J> adapter) {
+    public static <R, J> ReadStream<J> asReadStream(Publisher<R> publisher, Function<R, J> adapter) {
         ReadStreamSubscriber<R, J> observer = new ReadStreamSubscriber<>(adapter);
-        flowable.subscribe(observer);
+        publisher.subscribe(observer);
         return observer;
-    }
-
-    public static <R, J> ReadStream<J> asReadStream(Flowable<R> flowable, Function<R, J> adapter) {
-        ReadStreamSubscriber<R, J> observer = new ReadStreamSubscriber<>(adapter);
-        flowable.subscribe(observer);
-        return observer;
-    }
-
-    public static <R, J> ReadStream<J> asReadStream(Observable<R> observable, Function<R, J> adapter) {
-        return asReadStream(observable.toFlowable(BackpressureStrategy.BUFFER), adapter);
     }
 
     @Override

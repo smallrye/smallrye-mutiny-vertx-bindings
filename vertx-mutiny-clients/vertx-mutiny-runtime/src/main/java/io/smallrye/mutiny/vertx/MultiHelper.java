@@ -8,7 +8,7 @@ import io.vertx.core.streams.ReadStream;
 public class MultiHelper {
 
     /**
-     * Adapts an RxJava {@link Multi<T>} to a Vert.x {@link io.vertx.core.streams.ReadStream<T>}. The returned
+     * Adapts an Mutiny {@link Multi<T>} to a Vert.x {@link io.vertx.core.streams.ReadStream<T>}. The returned
      * {@code ReadStream} will be subscribed to the {@link Multi<T>}.
      * <p>
      *

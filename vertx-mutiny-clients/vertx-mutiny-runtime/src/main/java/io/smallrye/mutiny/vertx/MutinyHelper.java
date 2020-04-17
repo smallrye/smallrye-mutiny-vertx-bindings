@@ -80,7 +80,7 @@ public class MutinyHelper {
     }
 
     /**
-     * Unwrap the type used in RxJava.
+     * Unwrap the type used in Mutiny.
      *
      * @param type the type to unwrap
      * @return the unwrapped type
