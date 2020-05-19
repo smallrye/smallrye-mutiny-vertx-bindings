@@ -1,5 +1,13 @@
 package io.vertx.mutiny.postgresql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.testcontainers.containers.PostgreSQLContainer;
+
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.vertx.mutiny.core.Vertx;
@@ -9,13 +17,6 @@ import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class PostGreSQLClientTest {
 
@@ -64,10 +65,8 @@ public class PostGreSQLClientTest {
         Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
         Uni<Tuple2<RowSet<Row>, RowSet<Row>>> uni = client.getConnection()
-                .flatMap(c ->
-                        c.preparedQuery("SELECT 1").execute()
-                                .and(c.preparedQuery("SELECT 1").execute())
-                );
+                .flatMap(c -> c.preparedQuery("SELECT 1").execute()
+                        .and(c.preparedQuery("SELECT 1").execute()));
 
         Tuple2<RowSet<Row>, RowSet<Row>> results = uni.await().indefinitely();
         assertThat(results).isNotNull();
@@ -91,8 +90,7 @@ public class PostGreSQLClientTest {
                         .query("SELECT 1").execute()
                         .and(tx.query("SELECT").execute())
                         .onItem().produceUni(results -> tx.commit())
-                        .onFailure().recoverWithUni(t -> tx.rollback())
-                );
+                        .onFailure().recoverWithUni(t -> tx.rollback()));
 
         Void v = uni.await().indefinitely();
         assertThat(v).isNull();
