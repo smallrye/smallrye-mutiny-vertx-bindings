@@ -1,0 +1,4 @@
+name: SmallRye Reactive Utils
+release:
+  current-version: 0.0.17-SNAPSHOT
+  next-version: 0.0.18-SNAPSHOT

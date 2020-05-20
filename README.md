@@ -1,7 +1,9 @@
 # SmallRye Reactive Utilities
 
-[![Build Status](https://semaphoreci.com/api/v1/smallrye/smallrye-reactive-utils/branches/master/badge.svg)](https://semaphoreci.com/smallrye/smallrye-reactive-utils)
+[![Build Status](https://github.com/smallrye/smallrye-reactive-utils/workflows/SmallRye%20Build/badge.svg?branch=master)]( https://github.com/smallrye/smallrye-reactive-utils/actions?query=workflow%3A%22SmallRye+Build%22)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smallrye_smallrye-reactive-utils&metric=alert_status)](https://sonarcloud.io/dashboard?id=smallrye_smallrye-reactive-utils)
+[![License](https://img.shields.io/github/license/smallrye/smallrye-fault-tolerance.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Maven](https://img.shields.io/maven-central/v/io.smallrye.reactive/smallrye-reactive-utilities-projects?color=green)]()
 
 This contains a set of modules helping the development of reactive applications in SmallRye 
 
