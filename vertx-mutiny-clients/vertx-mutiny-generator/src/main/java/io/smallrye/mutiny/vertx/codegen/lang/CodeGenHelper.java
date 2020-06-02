@@ -8,6 +8,7 @@ import io.vertx.codegen.doc.Tag;
 import io.vertx.codegen.type.*;
 
 import javax.lang.model.element.Element;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -305,5 +306,32 @@ public class CodeGenHelper {
             }
         }
         return "{@link " + rawType.getName() + "}";
+    }
+
+    public static String renderLinkToHtml(ClassTypeInfo owner, MethodInfo method) {
+        if (owner.getModule() != null) {
+            if (owner.getKind() == DATA_OBJECT) {
+                return "{@link " + owner.getName() + "}";
+            } else {
+                if (owner.getKind() == ClassKind.API) {
+                    String ret = "{@link " + owner.translateName(ID);
+                    ret += "#" + method.getName();
+                    if (! method.getParams().isEmpty()) {
+                        ret += "(" + method.getParams().stream()
+                                .map(p -> {
+                                    TypeInfo type = p.getType();
+                                    if (type.getKind() == API) {
+                                        return type.translateName(ID);
+                                    } else {
+                                        return type.getSimpleName();
+                                    }
+                                }).collect(joining(",")) + ")";
+                    }
+                    ret += "}";
+                    return ret;
+                }
+            }
+        }
+        return "{@link " + owner.getName() + "}";
     }
 }

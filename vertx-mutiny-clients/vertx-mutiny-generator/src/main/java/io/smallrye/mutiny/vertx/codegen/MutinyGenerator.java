@@ -42,7 +42,9 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
     @Override
     protected void genConsumerMethodInfo(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
         MethodInfo futMethod = genConsumerMethodInfo(method);
-        startMethodTemplate(false, futMethod.getName(), futMethod, "", writer);
+        startMethodTemplate(false, futMethod.getName(), futMethod,
+                new MethodDescriptor("", false, false, false),
+                writer);
         if (decl) {
             writer.println(";");
             return;
@@ -76,7 +78,9 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         ClassTypeInfo raw = futMethod.getReturnType().getRaw();
         String methodSimpleName = raw.getSimpleName();
         String adapterType = AsyncResultUni.class.getName() + ".to" + methodSimpleName;
-        startMethodTemplate(false, futMethod.getName(), futMethod, "", writer);
+        startMethodTemplate(false, futMethod.getName(), futMethod,
+                new MethodDescriptor("", false, false, true),
+                writer);
         if (decl) {
             writer.println(";");
             return;
@@ -102,7 +106,9 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
     @Override
     protected void genBlockingMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
         MethodInfo blockingMethod = genBlockingMethodInfo(method);
-        startMethodTemplate(false, blockingMethod.getName() + "AndAwait", blockingMethod, "", writer);
+        startMethodTemplate(false, blockingMethod.getName() + "AndAwait", blockingMethod,
+                new MethodDescriptor("", false, true, false),
+                writer);
         if (decl) {
             writer.println(";");
             return;
