@@ -1,5 +1,6 @@
 package io.smallrye.mutiny.vertx.codegen;
 
+import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
 import io.smallrye.mutiny.vertx.TypeArg;
 import io.smallrye.mutiny.vertx.codegen.lang.*;
@@ -8,12 +9,10 @@ import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.codegen.doc.Doc;
 import io.vertx.codegen.doc.Token;
-import io.vertx.codegen.type.ClassKind;
 import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.PrimitiveTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
-import io.vertx.codegen.type.TypeVariableInfo;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,7 +22,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static io.vertx.codegen.type.ClassKind.API;
-import static io.vertx.codegen.type.ClassKind.OBJECT;
 import static io.vertx.codegen.type.ClassKind.PRIMITIVE;
 import static java.util.stream.Collectors.joining;
 
@@ -273,7 +271,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
             genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
             genUniMethod(false, model, method, writer);
-            if (!model.getMethods().stream().anyMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
+            if (model.getMethods().stream().noneMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
                 genBlockingMethod(false, model, method, writer);
             }
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
@@ -285,7 +283,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     }
 
     final void genForgetMethod(boolean decl, ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
-        startMethodTemplate(false, method.getName()+ "AndForget", method, "", writer);
+        startMethodTemplate(false, method.getName()+ "AndForget", method,
+                new MethodDescriptor("", true, false, false), writer);
         if (decl) {
             writer.println(";");
             return;
@@ -357,12 +356,49 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         }
     }
 
-    void startMethodTemplate(boolean isPrivate, String methodName, MethodInfo method, String deprecated,
+    protected static class MethodDescriptor {
+        final String deprecated;
+        final boolean andForget;
+        final boolean andAwait;
+        final boolean uni;
+
+        MethodDescriptor(String deprecated, boolean andForget, boolean andAwait, boolean uni) {
+            this.deprecated = deprecated;
+            this.andForget = andForget;
+            this.andAwait = andAwait;
+            this.uni = uni;
+        }
+    }
+
+    void startMethodTemplate(boolean isPrivate, String methodName, MethodInfo method, MethodDescriptor descriptor,
             PrintWriter writer) {
         Doc doc = method.getDoc();
+        String deprecated = descriptor.deprecated;
+        String link = getJavadocLink(method.getOwnerTypes().iterator().next(), method);
         if (doc != null) {
             writer.println("  /**");
-            Token.toHtml(doc.getTokens(), "   *", CodeGenHelper::renderLinkToHtml, "\n", writer);
+            if (descriptor.uni) {
+                Token.toHtml(doc.getTokens(), "   *", CodeGenHelper::renderLinkToHtml, "\n", writer);
+                writer.println("   * <p>");
+                writer.println("   * Unlike the <em>bare</em> Vert.x variant, this method returns a {@link " + Uni.class.getName() + " Uni}.");
+                writer.println("   * Don't forget to <em>subscribe</em> on it to trigger the operation.");
+            }
+
+            if (descriptor.andAwait) {
+                writer.println("   * Blocking variant of " + link + ".");
+                writer.println("   * <p>");
+                writer.println("   * This method waits for the completion of the underlying asynchronous operation.");
+                writer.println("   * If the operation completes successfully, the result is returned, otherwise the failure is thrown (potentially wrapped in a RuntimeException).");
+            }
+
+            if (descriptor.andForget) {
+                writer.println("   * Variant of " + link + " that ignores the result of the operation.");
+                writer.println("   * <p>");
+                writer.println("   * This method subscribes on the result of " + link + ", but discards the outcome (item or failure).");
+                writer.println("   * This method is useful to trigger the asynchronous operation from " + link + " but you don't need to compose it with other operations.");
+            }
+
+
             for (ParamInfo param : method.getParams()) {
                 writer.print("   * @param ");
                 writer.print(param.getName());
@@ -379,6 +415,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                     Token.toHtml(method.getReturnDescription().getTokens(), "",
                             CodeGenHelper::renderLinkToHtml, "",
                             writer);
+                } else if (descriptor.uni) {
+                    writer.print("the {@link " + Uni.class.getName() + " uni} firing the result of the operation when completed, or a failure if the operation failed.");
+                } else if (descriptor.andAwait) {
+                    writer.print("the " + method.getReturnType().getSimpleName() + " instance produced by the operation");
                 }
                 writer.println();
             }
@@ -389,7 +429,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             writer.println("   */");
         }
         if (method.isDeprecated() || deprecated != null && deprecated.length() > 0) {
-            writer.println("  @Deprecated()");
+            writer.println("  @Deprecated");
         }
         writer.print("  " + (isPrivate ? "private" : "public") + " ");
         if (method.isStaticMethod()) {
@@ -410,6 +450,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     }
 
+    private String getJavadocLink(ClassTypeInfo owner, MethodInfo method) {
+        return CodeGenHelper.renderLinkToHtml(owner, method);
+    }
+
     private void genSimpleMethod(boolean decl,
             ClassModel model,
             boolean isPrivate,
@@ -417,7 +461,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             MethodInfo method,
             List<String> cacheDecls,
             PrintWriter writer) {
-        startMethodTemplate(isPrivate, methodName, method, "", writer);
+        startMethodTemplate(isPrivate, methodName, method, new MethodDescriptor(
+                "", false, false, false
+        ), writer);
         if (decl) {
             writer.println(";");
             return;
