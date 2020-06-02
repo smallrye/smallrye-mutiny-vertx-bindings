@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>smallrye-axle-clients</artifactId>
-        <version>0.0.17-SNAPSHOT</version>
+        <version>0.1.0</version>
     </parent>
 
     <artifactId>smallrye-axle-amqp-client</artifactId>
