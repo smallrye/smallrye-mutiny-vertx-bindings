@@ -2,8 +2,6 @@ package io.smallrye.mutiny.vertx.core.verticle;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.concurrent.CompletionException;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,12 +51,12 @@ public class AbstractVerticleTest {
         vertx.undeploy(deploymentId).await().indefinitely();
     }
 
-    @Test(expected = CompletionException.class)
+    @Test(expected = NullPointerException.class)
     public void testVerticleFailingAsynchronouslyOnStart() {
         vertx.deployVerticle(VerticleFailingAsynchronously.class.getName()).await().indefinitely();
     }
 
-    @Test(expected = CompletionException.class)
+    @Test(expected = NullPointerException.class)
     public void testVerticleFailingAsynchronouslyOnStop() {
         String deploymentId = vertx.deployVerticle(VerticleFailingAsynchronouslyOnStop.class.getName())
                 .await().indefinitely();
