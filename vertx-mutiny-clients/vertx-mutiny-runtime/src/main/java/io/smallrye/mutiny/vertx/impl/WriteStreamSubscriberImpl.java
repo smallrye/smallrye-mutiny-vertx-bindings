@@ -67,7 +67,7 @@ public class WriteStreamSubscriberImpl<I, O> implements WriteStreamSubscriber<I>
 
     @Override
     public void onNext(I item) {
-        if (!done.get()) {
+        if (done.get()) {
             return;
         }
 
