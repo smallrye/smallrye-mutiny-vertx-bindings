@@ -14,6 +14,11 @@ The `vertx-mutiny-clients` module contains the Vert.x client API using the Mutin
 
 It also contains the Vert.x code generator.
 
+## Reactive Converters
+
+Reactive converters are a set of library to convert types uses by various libraries from/to `Publisher` and `CompletionStage`.
+Documentation is available in [the reactive-converters directory](./reactive-converters/readme.adoc).
+
 ## Vert.x Axle Clients - deprecated
 
 This module delivers Vert.x client using the _Axle_ API. 
