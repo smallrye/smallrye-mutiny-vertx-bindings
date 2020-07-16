@@ -15,7 +15,7 @@ import io.vertx.mutiny.core.Vertx;
 public class RedisClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("redis")
+    public GenericContainer<?> container = new GenericContainer<>("redis:latest")
             .withExposedPorts(6379);
 
     private Vertx vertx;

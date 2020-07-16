@@ -16,7 +16,7 @@ public class MySqlInTransactionMultiTest extends InTransactionMultiTest {
     private static final String MYSQL_DATABASE = "test";
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mysql:5")
+    public GenericContainer<?> container = new GenericContainer<>("mysql:latest")
             .withExposedPorts(3306)
             .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_ROOT_PASSWORD)
             .withEnv("MYSQL_DATABASE", MYSQL_DATABASE);

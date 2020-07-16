@@ -16,7 +16,7 @@ import io.vertx.mutiny.core.Vertx;
 public class PostGreSQLClientTest {
 
     @Rule
-    public PostgreSQLContainer container = new PostgreSQLContainer();
+    public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
 
     private Vertx vertx;
 

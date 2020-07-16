@@ -17,7 +17,7 @@ import io.vertx.core.json.JsonObject;
 public class MongoClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mongo")
+    public GenericContainer<?> container = new GenericContainer<>("mongo:latest")
             .withExposedPorts(27017);
 
     private Vertx vertx;
