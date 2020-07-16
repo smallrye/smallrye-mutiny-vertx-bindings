@@ -1,10 +1,12 @@
 package io.smallrye.reactive.converters.rxjava2;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 
 import org.reactivestreams.Publisher;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.smallrye.reactive.converters.ReactiveTypeConverter;
 
@@ -39,7 +41,6 @@ import io.smallrye.reactive.converters.ReactiveTypeConverter;
  * The {@link #toRSPublisher(Flowable)} method returns a {@link Publisher} emitting the same events as the source
  * {@link Flowable}. This operation is a pass-through for back-pressure and its behavior is determined by the
  * back-pressure behavior of the passed {@link Flowable}. This operation returns the passed {@link Flowable} directly.
- *
  */
 @SuppressWarnings("rawtypes")
 public class FlowableConverter implements ReactiveTypeConverter<Flowable> {
@@ -72,7 +73,18 @@ public class FlowableConverter implements ReactiveTypeConverter<Flowable> {
 
     @Override
     public <X> Flowable fromCompletionStage(CompletionStage<X> cs) {
-        return Flowable.generate(emitter -> ObservableConverter.toStreamEvents(cs, emitter));
+        return Flowable.create(emitter -> cs.whenComplete((X res, Throwable err) -> {
+            if (res != null) {
+                emitter.onNext(res);
+                emitter.onComplete();
+            } else {
+                if (err != null) {
+                    emitter.onError(err instanceof CompletionException ? err.getCause() : err);
+                } else {
+                    emitter.onComplete();
+                }
+            }
+        }), BackpressureStrategy.BUFFER);
     }
 
     @Override

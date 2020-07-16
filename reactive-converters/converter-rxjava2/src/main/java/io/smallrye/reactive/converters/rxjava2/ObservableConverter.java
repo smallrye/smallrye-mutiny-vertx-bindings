@@ -89,8 +89,7 @@ public class ObservableConverter implements ReactiveTypeConverter<Observable> {
 
     @Override
     public <X> Observable fromCompletionStage(CompletionStage<X> cs) {
-        return Observable.generate(emitter -> toStreamEvents(cs, emitter));
-
+        return Observable.create(emitter -> toStreamEvents(cs, emitter));
     }
 
     @Override
