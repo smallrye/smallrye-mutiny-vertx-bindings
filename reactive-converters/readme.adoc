@@ -65,6 +65,12 @@ To use the converter you need:
     <artifactId>smallrye-reactive-converter-rxjava2</artifactId>
      <version>{last.version}</version>
 </dependency>
+
+<dependency>
+    <groupId>io.smallrye</groupId>
+    <artifactId>smallrye-reactive-converter-rxjava3</artifactId>
+     <version>{last.version}</version>
+</dependency>
 ----
 
 3. In your code, lookup for a converter and apply the conversion. For instance:

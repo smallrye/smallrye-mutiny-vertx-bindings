@@ -20,6 +20,7 @@
         <module>converter-mutiny</module>
         <module>converter-rxjava1</module>
         <module>converter-rxjava2</module>
+        <module>converter-rxjava3</module>
         <module>converter-reactor</module>
     </modules>
 
