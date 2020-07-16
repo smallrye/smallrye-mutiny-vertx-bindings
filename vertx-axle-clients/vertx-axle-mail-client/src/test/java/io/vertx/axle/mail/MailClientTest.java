@@ -19,7 +19,7 @@ import io.vertx.ext.mail.MailMessage;
 public class MailClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("digiplant/fake-smtp")
+    public GenericContainer<?> container = new GenericContainer<>("digiplant/fake-smtp:latest")
             .withExposedPorts(25)
             .withFileSystemBind("target", "/tmp/fakemail", BindMode.READ_WRITE);
 
