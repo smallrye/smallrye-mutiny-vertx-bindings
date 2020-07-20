@@ -32,7 +32,7 @@ To use the converter you need:
 [source,xml]
 ----
 <dependency>
-  <groupId>io.smallrye</groupId>
+  <groupId>io.smallrye.reactive</groupId>
   <artifactId>smallrye-reactive-converter-api</artifactId>
   <version>{last.version}</version>
 </dependency>
@@ -43,33 +43,39 @@ To use the converter you need:
 [source,xml,subs=attributes+]
 ----
 <dependency>
-    <groupId>io.smallrye</groupId>
+    <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-converter-reactive-streams-operators</artifactId>
      <version>{last.version}</version>
 </dependency>
 
 <dependency>
-    <groupId>io.smallrye</groupId>
+    <groupId>io.smallrye.reactive</groupId>
+    <artifactId>smallrye-reactive-converter-mutiny</artifactId>
+    <version>{last.version}</version>
+</dependency>
+
+<dependency>
+    <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-converter-reactor</artifactId>
-     <version>{last.version}</version>
+    <version>{last.version}</version>
 </dependency>
 
 <dependency>
-    <groupId>io.smallrye</groupId>
+    <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-converter-rxjava1</artifactId>
-     <version>{last.version}</version>
+    <version>{last.version}</version>
 </dependency>
 
 <dependency>
-    <groupId>io.smallrye</groupId>
+    <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-converter-rxjava2</artifactId>
-     <version>{last.version}</version>
+    <version>{last.version}</version>
 </dependency>
 
 <dependency>
-    <groupId>io.smallrye</groupId>
+    <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-converter-rxjava3</artifactId>
-     <version>{last.version}</version>
+    <version>{last.version}</version>
 </dependency>
 ----
 
