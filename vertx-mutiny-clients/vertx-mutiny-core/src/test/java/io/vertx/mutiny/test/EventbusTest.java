@@ -1,11 +1,14 @@
 package io.vertx.mutiny.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.eventbus.EventBus;
+import io.vertx.mutiny.core.eventbus.Message;
 import io.vertx.test.core.VertxTestBase;
 
 public class EventbusTest extends VertxTestBase {
@@ -49,6 +52,24 @@ public class EventbusTest extends VertxTestBase {
         bus.consumer("address", message -> latch.countDown()).completionHandlerAndAwait();
         bus.publish("address", "hello");
         awaitLatch(latch);
+    }
+
+    @Test
+    public void testConsumingAsMulti() {
+        Vertx vertx = Vertx.vertx();
+        EventBus bus = vertx.eventBus();
+        List<Integer> items = new ArrayList<>();
+        bus.<Integer> consumer("address").toMulti()
+                .onItem().transform(Message::body)
+                .subscribe().with(items::add);
+
+        bus.sendAndForget("address", 1);
+        bus.sendAndForget("address", 2);
+        bus.sendAndForget("address", 3);
+        bus.sendAndForget("address", 4);
+
+        assertWaitUntil(() -> items.size() == 4);
+
     }
 
 }
