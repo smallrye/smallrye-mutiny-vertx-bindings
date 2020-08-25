@@ -7,3 +7,5 @@ target
 .project
 .settings
 .vscode
+.cache
+.factorypath
