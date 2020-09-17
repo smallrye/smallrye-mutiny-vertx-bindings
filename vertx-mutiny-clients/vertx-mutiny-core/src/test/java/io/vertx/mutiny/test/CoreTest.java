@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,11 +15,14 @@ import org.junit.rules.TemporaryFolder;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.OpenOptions;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.impl.Utils;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import io.vertx.mutiny.core.file.AsyncFile;
+import io.vertx.mutiny.core.http.HttpClient;
+import io.vertx.mutiny.core.http.WebSocket;
 import io.vertx.test.core.TestUtils;
 import io.vertx.test.core.VertxTestBase;
 
@@ -75,6 +79,32 @@ public class CoreTest extends VertxTestBase {
         eventBus.consumer("my-address").handler(m -> m.getDelegate().reply(m.body() + " world"));
         Message<Object> message = eventBus.requestAndAwait("my-address", "hello");
         assertEquals("hello world", message.body());
+    }
+
+    @Test
+    public void testWebSocket() {
+        waitFor(2);
+        AtomicLong serverReceived = new AtomicLong();
+        // Set a 2 seconds timeout to force a TCP connection close
+        vertx.createHttpServer(new HttpServerOptions().setIdleTimeout(2)).webSocketHandler(ws -> {
+            ws.toMulti()
+                    .subscribe().with(msg -> {
+                        serverReceived.incrementAndGet();
+                        ws.writeTextMessage("pong");
+                    }, err -> {
+                        assertEquals(1, serverReceived.get());
+                        complete();
+                    }, this::fail);
+        }).listenAndAwait(8080, "localhost");
+
+        HttpClient client = vertx.createHttpClient();
+        AtomicLong clientReceived = new AtomicLong();
+        client.webSocket(8080, "localhost", "/")
+                .onItem().invokeUni(ws -> ws.writeTextMessage("ping"))
+                .onItem().transformToMulti(WebSocket::toMulti)
+                .subscribe().with(
+                        msg -> clientReceived.incrementAndGet(), err -> complete(), this::fail);
+        await();
     }
 
     private void subscribe(byte[] expected, AsyncFile file, int times) {
