@@ -35,13 +35,13 @@ public abstract class SqlClientHelperTestBase {
 
     protected static Multi<String> uniqueNames(SqlClient client) {
         return client.query(UNIQUE_NAMES_SQL).execute()
-                .onItem().produceMulti(rows -> Multi.createFrom().iterable(rows))
-                .onItem().apply(row -> row.getString(0));
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(row -> row.getString(0));
     }
 
     protected static Uni<Void> insertExtraFolks(SqlClient client) {
         return client.query(String.format(INSERT_FOLK_SQL, "Georges")).execute()
-                .onItem().produceUni(v -> client.query(String.format(INSERT_FOLK_SQL, "Henry")).execute())
+                .onItem().transformToUni(v -> client.query(String.format(INSERT_FOLK_SQL, "Henry")).execute())
                 .onItem().ignore().andContinueWithNull();
     }
 

@@ -100,7 +100,7 @@ public class CoreTest extends VertxTestBase {
         HttpClient client = vertx.createHttpClient();
         AtomicLong clientReceived = new AtomicLong();
         client.webSocket(8080, "localhost", "/")
-                .onItem().invokeUni(ws -> ws.writeTextMessage("ping"))
+                .onItem().call(ws -> ws.writeTextMessage("ping"))
                 .onItem().transformToMulti(WebSocket::toMulti)
                 .subscribe().with(
                         msg -> clientReceived.incrementAndGet(), err -> complete(), this::fail);
@@ -111,7 +111,7 @@ public class CoreTest extends VertxTestBase {
         file.setReadPos(0);
         Buffer actual = Buffer.buffer();
         file.toMulti()
-                .onItem().apply(io.vertx.mutiny.core.buffer.Buffer::getDelegate)
+                .onItem().transform(io.vertx.mutiny.core.buffer.Buffer::getDelegate)
                 .onItem().invoke(actual::appendBuffer)
                 .onItem().ignoreAsUni()
                 .subscribeAsCompletionStage()

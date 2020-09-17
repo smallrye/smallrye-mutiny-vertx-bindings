@@ -42,7 +42,7 @@ public class MongoClientTest {
 
         JsonObject document = new JsonObject().put("title", "The Hobbit");
         List<JsonObject> list = client.save("books", document)
-                .onItem().produceUni(x -> client.find("books", new JsonObject().put("title", "The Hobbit")))
+                .onItem().transformToUni(x -> client.find("books", new JsonObject().put("title", "The Hobbit")))
                 .subscribeAsCompletionStage()
                 .toCompletableFuture()
                 .join();

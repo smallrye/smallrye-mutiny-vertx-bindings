@@ -47,13 +47,13 @@ public class AMQPClientTest {
 
         AmqpClient client = AmqpClient.create(vertx, options);
         Multi<AmqpMessage> stream = client.createReceiver("my-address")
-                .onItem().apply(AmqpReceiver::toMulti)
+                .onItem().transform(AmqpReceiver::toMulti)
                 .await().indefinitely();
 
         Uni<AmqpMessage> first = stream.collectItems().first();
 
         client.createSender("my-address")
-                .onItem().produceUni(sender -> sender.write(AmqpMessage.create().withBody(payload).build()))
+                .onItem().transformToUni(sender -> sender.write(AmqpMessage.create().withBody(payload).build()))
                 .await().indefinitely();
 
         Optional<String> optional = first.map(AmqpMessage::bodyAsString).await().asOptional().indefinitely();

@@ -57,7 +57,7 @@ public class RabbitMQClientTest {
         createQueue(uri);
         RabbitMQConsumer consumer = client.basicConsumer(QUEUE).subscribeAsCompletionStage().join();
         Uni<String> stage = consumer.toMulti()
-                .onItem().apply(m -> m.body().toString())
+                .onItem().transform(m -> m.body().toString())
                 .collectItems().first();
 
         client.basicPublish("", QUEUE, new JsonObject().put("body", uuid))

@@ -38,7 +38,7 @@ public class RedisClientTest {
                 .put("host", container.getContainerIpAddress()));
 
         JsonObject object = client.hset("book", "title", "The Hobbit")
-                .onItem().produceUni(x -> client.hgetall("book"))
+                .onItem().transformToUni(x -> client.hgetall("book"))
                 .subscribeAsCompletionStage()
                 .join();
         assertThat(object).contains(entry("title", "The Hobbit"));

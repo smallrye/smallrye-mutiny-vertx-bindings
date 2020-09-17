@@ -88,8 +88,8 @@ public class PostGreSQLClientTest {
         Uni<Void> uni = client.begin()
                 .flatMap(tx -> tx
                         .query("SELECT 1").execute()
-                        .and(tx.query("SELECT").execute())
-                        .onItem().produceUni(results -> tx.commit())
+                        .call(() -> tx.query("SELECT").execute())
+                        .onItem().transformToUni(results -> tx.commit())
                         .onFailure().recoverWithUni(t -> tx.rollback()));
 
         Void v = uni.await().indefinitely();
