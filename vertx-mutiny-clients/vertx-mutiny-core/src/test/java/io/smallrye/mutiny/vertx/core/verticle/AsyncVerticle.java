@@ -27,7 +27,7 @@ public class AsyncVerticle extends AbstractVerticle {
     public Uni<Void> asyncStop() {
         assertThat(vertx).isNotNull().isInstanceOf(Vertx.class);
         return Uni.createFrom().completionStage(() -> CompletableFuture.supplyAsync(() -> null))
-                .onItem().apply(x -> {
+                .onItem().transform(x -> {
                     DEPLOYED = false;
                     return null;
                 });

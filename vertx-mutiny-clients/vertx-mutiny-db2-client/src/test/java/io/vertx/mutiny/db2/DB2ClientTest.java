@@ -90,8 +90,8 @@ public class DB2ClientTest {
         Uni<Void> uni = client.begin()
                 .flatMap(tx -> tx
                         .query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute()
-                        .and(tx.query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute())
-                        .onItem().produceUni(results -> tx.commit())
+                        .call(() -> tx.query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute())
+                        .onItem().transformToUni(results -> tx.commit())
                         .onFailure().recoverWithUni(t -> tx.rollback()));
 
         Void v = uni.await().indefinitely();

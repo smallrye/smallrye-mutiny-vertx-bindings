@@ -42,8 +42,8 @@ public class ConsulClientTest {
 
         String uuid = UUID.randomUUID().toString();
         String stored = client.putValue("key", uuid)
-                .onItem().produceUni(x -> client.getValue("key"))
-                .onItem().apply(KeyValue::getValue)
+                .onItem().transformToUni(x -> client.getValue("key"))
+                .onItem().transform(KeyValue::getValue)
                 .subscribeAsCompletionStage()
                 .toCompletableFuture()
                 .join();

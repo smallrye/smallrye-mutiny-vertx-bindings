@@ -37,7 +37,7 @@ public abstract class InTransactionMultiTest extends SqlClientHelperTestBase {
     private Multi<String> inTransaction(Exception e) throws Exception {
         return SqlClientHelper.inTransactionMulti(pool, transaction -> {
             Multi<String> upstream = insertExtraFolks(transaction)
-                    .onItem().produceMulti(v -> uniqueNames(transaction));
+                    .onItem().transformToMulti(v -> uniqueNames(transaction));
             if (e == null) {
                 return upstream;
             }
