@@ -28,7 +28,11 @@ public class MqttServerTest {
     @Test
     public void test() {
         MqttServer server = MqttServer.create(vertx, new MqttServerOptions()
-                .setPort(0).setHost("0.0.0.0")).listen().await().indefinitely();
+                .setPort(0).setHost("0.0.0.0"))
+                .endpointHandler(e -> {
+                    // do nothing.
+                })
+                .listen().await().indefinitely();
         assertThat(server, is(notNullValue()));
         assertThat(server.actualPort(), is(not(0)));
     }
