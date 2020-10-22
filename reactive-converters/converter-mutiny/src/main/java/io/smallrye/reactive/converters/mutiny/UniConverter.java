@@ -26,7 +26,7 @@ public class UniConverter implements ReactiveTypeConverter<Uni> {
     @Override
     public <X> Uni fromCompletionStage(CompletionStage<X> cs) {
         return Uni.createFrom().completionStage(cs)
-                .onFailure(CompletionException.class).apply(Throwable::getCause);
+                .onFailure(CompletionException.class).transform(Throwable::getCause);
     }
 
     @Override

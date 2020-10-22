@@ -2,13 +2,11 @@ package io.smallrye.mutiny.vertx.codegen.lang;
 
 import io.smallrye.mutiny.vertx.MutinyHelper;
 import io.smallrye.mutiny.vertx.TypeArg;
-import io.smallrye.mutiny.vertx.codegen.AbstractMutinyGenerator;
 import io.vertx.codegen.*;
 import io.vertx.codegen.doc.Tag;
 import io.vertx.codegen.type.*;
 
 import javax.lang.model.element.Element;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

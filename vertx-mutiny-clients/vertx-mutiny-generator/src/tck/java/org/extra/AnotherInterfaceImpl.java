@@ -10,7 +10,7 @@ public class AnotherInterfaceImpl implements AnotherInterface {
     public <T> T methodWithClassParam(Class<T> tClass) {
         Objects.requireNonNull(tClass);
         try {
-            return tClass.newInstance();
+            return tClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -72,9 +72,7 @@ public class PublisherReadStreamAdapterBackPressureTest extends ReadStreamAdapte
             }
         };
         Multi<Buffer> observable = Multi.createFrom().publisher(toObservable(stream))
-        .on().subscribed(s ->
-            assertTrue(handlerSet.get()
-        ));
+                .onSubscribe().invoke(s -> assertTrue(handlerSet.get()));
         TestSubscriber<Buffer> subscriber = new TestSubscriber<>();
         subscribe(observable, subscriber);
         subscriber.assertEmpty();

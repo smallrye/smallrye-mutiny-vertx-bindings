@@ -26,7 +26,7 @@ public class MultiConverter implements ReactiveTypeConverter<Multi> {
     @Override
     public <X> Multi fromCompletionStage(CompletionStage<X> cs) {
         return Multi.createFrom().completionStage(cs)
-                .onFailure(CompletionException.class).apply(Throwable::getCause);
+                .onFailure(CompletionException.class).transform(Throwable::getCause);
     }
 
     @Override
