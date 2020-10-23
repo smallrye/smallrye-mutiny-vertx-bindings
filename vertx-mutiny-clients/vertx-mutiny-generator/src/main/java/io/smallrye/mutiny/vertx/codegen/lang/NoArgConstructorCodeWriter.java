@@ -1,7 +1,6 @@
 package io.smallrye.mutiny.vertx.codegen.lang;
 
 import io.vertx.codegen.ClassModel;
-import io.vertx.codegen.Helper;
 import io.vertx.codegen.TypeParamInfo;
 
 import java.io.PrintWriter;
