@@ -19,12 +19,6 @@ It also contains the Vert.x code generator.
 Reactive converters are a set of library to convert types uses by various libraries from/to `Publisher` and `CompletionStage`.
 Documentation is available in [the reactive-converters directory](./reactive-converters/readme.adoc).
 
-## Vert.x Axle Clients - deprecated
-
-This module delivers Vert.x client using the _Axle_ API. 
-
-The _Axle_ API is based on `CompletionStage` and `Publisher`.
-
 ## Build
 
 `mvn clean install`

@@ -141,7 +141,6 @@
     </build>
 
     <modules>
-        <module>vertx-axle-clients</module>
         <module>vertx-mutiny-clients</module>
         <module>reactive-converters</module>
     </modules>
