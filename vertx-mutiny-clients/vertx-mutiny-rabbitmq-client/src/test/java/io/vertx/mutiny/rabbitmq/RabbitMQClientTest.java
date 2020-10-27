@@ -21,8 +21,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 
 import io.smallrye.mutiny.Uni;
-import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.core.buffer.Buffer;
 import io.vertx.rabbitmq.RabbitMQOptions;
 
 public class RabbitMQClientTest {
@@ -60,7 +60,7 @@ public class RabbitMQClientTest {
                 .onItem().transform(m -> m.body().toString())
                 .collectItems().first();
 
-        client.basicPublish("", QUEUE, new JsonObject().put("body", uuid))
+        client.basicPublish("", QUEUE, Buffer.buffer(uuid))
                 .subscribeAsCompletionStage().join();
 
         Optional<String> object = stage.await().asOptional().indefinitely();
