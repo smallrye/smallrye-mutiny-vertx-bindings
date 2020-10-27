@@ -41,7 +41,7 @@ public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
 
     @After
     public void tearDown() {
-        pool.close();
+        pool.closeAndAwait();
         vertx.closeAndAwait();
     }
 }
