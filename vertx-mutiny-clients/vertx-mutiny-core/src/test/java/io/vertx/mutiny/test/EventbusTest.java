@@ -17,7 +17,7 @@ public class EventbusTest extends VertxTestBase {
     public void testReply() {
         Vertx vertx = Vertx.vertx();
         EventBus bus = vertx.eventBus();
-        bus.consumer("address", message -> message.replyAndForget("world")).completionHandlerAndAwait();
+        bus.consumer("address", message -> message.reply("world")).completionHandlerAndAwait();
         bus.request("address", "hello").subscribeAsCompletionStage().whenComplete((a, b) -> testComplete());
         await();
     }
@@ -31,7 +31,7 @@ public class EventbusTest extends VertxTestBase {
                         message -> message.replyAndRequest("world").subscribe().with(m -> testComplete(), this::fail))
                 .completionHandlerAndAwait();
         bus.request("address", "hello")
-                .subscribe().with(m -> m.replyAndForget("done"), this::fail);
+                .subscribe().with(m -> m.reply("done"), this::fail);
         await();
     }
 
@@ -40,7 +40,7 @@ public class EventbusTest extends VertxTestBase {
         Vertx vertx = Vertx.vertx();
         EventBus bus = vertx.eventBus();
         bus.consumer("address", message -> testComplete()).completionHandlerAndAwait();
-        bus.sendAndForget("address", "hello");
+        bus.send("address", "hello");
     }
 
     @Test
@@ -63,10 +63,10 @@ public class EventbusTest extends VertxTestBase {
                 .onItem().transform(Message::body)
                 .subscribe().with(items::add);
 
-        bus.sendAndForget("address", 1);
-        bus.sendAndForget("address", 2);
-        bus.sendAndForget("address", 3);
-        bus.sendAndForget("address", 4);
+        bus.send("address", 1);
+        bus.send("address", 2);
+        bus.send("address", 3);
+        bus.send("address", 4);
 
         assertWaitUntil(() -> items.size() == 4);
 
