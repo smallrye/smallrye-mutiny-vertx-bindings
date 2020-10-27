@@ -9,10 +9,8 @@ import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.codegen.doc.Doc;
 import io.vertx.codegen.doc.Token;
-import io.vertx.codegen.type.ClassTypeInfo;
-import io.vertx.codegen.type.ParameterizedTypeInfo;
-import io.vertx.codegen.type.PrimitiveTypeInfo;
-import io.vertx.codegen.type.TypeInfo;
+import io.vertx.codegen.type.*;
+import io.vertx.core.Future;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -140,8 +138,17 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     private void initGenMethods(ClassModel model) {
         forget = new ArrayList<>();
         List<List<MethodInfo>> list = new ArrayList<>();
-        list.add(model.getMethods());
+
+
+        // Remove method returning Future as it conflicts with method returning Uni
+        List<MethodInfo> infos = model.getMethods().stream()
+                .filter(mi -> {
+                    return ! mi.getReturnType().getName().equals(Future.class.getName());
+                }).collect(Collectors.toList());
+
+        list.add(infos);
         list.add(model.getAnyJavaTypeMethods());
+
         list.forEach(methods -> {
 
             // First pass: filter conflicting overrides, that will partly filter it

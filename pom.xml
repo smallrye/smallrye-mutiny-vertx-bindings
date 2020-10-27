@@ -43,7 +43,7 @@
     </scm>
 
     <properties>
-        <vertx.version>3.9.4</vertx.version>
+        <vertx.version>4.0.0-milestone5</vertx.version>
         <mutiny.version>0.10.1</mutiny.version>
         <jackson.version>2.11.3</jackson.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>

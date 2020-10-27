@@ -38,20 +38,53 @@ public class CodeGenHelper {
     }
 
     public static String genTypeName(TypeInfo type) {
-        if (type.isParameterized()) {
-            ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
-            return genTypeName(pt.getRaw())
-                    + pt.getArgs().stream().map(CodeGenHelper::genTypeName).collect(joining(", ", "<", ">"));
-        } else if (type.getKind() == ClassKind.API) {
-            return type.translateName(ID);
-        } else {
-            return type.getSimpleName();
+        return genTypeName(type, false);
+    }
+
+    public static String genTranslatedTypeName(TypeInfo type) {
+        return genTypeName(type, true);
+    }
+
+    protected static boolean isImported(TypeInfo type) {
+        switch (type.getKind()) {
+            case JSON_OBJECT:
+            case JSON_ARRAY:
+            case ASYNC_RESULT:
+            case HANDLER:
+            case LIST:
+            case SET:
+            case BOXED_PRIMITIVE:
+            case STRING:
+            case VOID:
+            case FUNCTION:
+                return true;
+            default:
+                return false;
         }
     }
 
+
+    public static String genTypeName(TypeInfo type, boolean translate) {
+        if (type.isParameterized()) {
+            ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
+            return genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate)).collect(joining(", ", "<", ">"));
+        } else {
+            if (type.getKind() == ClassKind.API && translate) {
+                return type.translateName(ID);
+            } else {
+                if (isImported(type)) {
+                    return type.getSimpleName();
+                } else {
+                    return type.getName();
+                }
+            }
+        }
+    }
+
+
     private static boolean isSameType(TypeInfo type, MethodInfo method) {
         ClassKind kind = type.getKind();
-        if (kind.basic || kind.json || kind == DATA_OBJECT || kind == ENUM || kind == OTHER || kind == THROWABLE
+        if (type.isDataObjectHolder() || kind.basic || kind.json || kind == ENUM || kind == OTHER || kind == THROWABLE
                 || kind == VOID) {
             return true;
         } else if (kind == OBJECT) {
@@ -167,8 +200,9 @@ public class CodeGenHelper {
         ClassKind argKind = arg.getKind();
         if (argKind == API) {
             sb.append("new ").append(TypeArg.class.getName()).append("<").append(arg.translateName(ID))
-                .append(">(o").append(depth).append(" -> ");
-            sb.append(arg.getRaw().translateName(ID)).append(".newInstance((").append(arg.getRaw()).append(")o").append(depth);
+                    .append(">(o").append(depth).append(" -> ");
+            sb.append(arg.getRaw().translateName(ID)).append(".newInstance((").append(arg.getRaw()).append(")o")
+                    .append(depth);
             if (arg instanceof ParameterizedTypeInfo) {
                 ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) arg;
                 List<TypeInfo> args = parameterizedType.getArgs();
@@ -284,51 +318,41 @@ public class CodeGenHelper {
         ClassTypeInfo rawType = link.getTargetType().getRaw();
         if (rawType.getModule() != null) {
             String label = link.getLabel().trim();
-            if (rawType.getKind() == DATA_OBJECT) {
-                return "{@link " + rawType.getName() + "}";
-            } else {
-                if (rawType.getKind() == ClassKind.API) {
-                    Element elt = link.getTargetElement();
-                    String eltKind = elt.getKind().name();
-                    String ret = "{@link " + rawType.translateName(ID);
-                    if ("METHOD".equals(eltKind)) {
-                        /* todo find a way for translating the complete signature */
-                        ret += "#" + elt.getSimpleName().toString();
-                    }
-                    if (label.length() > 0) {
-                        ret += " " + label;
-                    }
-                    ret += "}";
-                    return ret;
+            if (rawType.getKind() == ClassKind.API) {
+                Element elt = link.getTargetElement();
+                String eltKind = elt.getKind().name();
+                String ret = "{@link " + rawType.translateName(ID);
+                if ("METHOD".equals(eltKind)) {
+                    /* todo find a way for translating the complete signature */
+                    ret += "#" + elt.getSimpleName().toString();
                 }
+                if (label.length() > 0) {
+                    ret += " " + label;
+                }
+                ret += "}";
+                return ret;
             }
         }
         return "{@link " + rawType.getName() + "}";
     }
 
     public static String renderLinkToHtml(ClassTypeInfo owner, MethodInfo method) {
-        if (owner.getModule() != null) {
-            if (owner.getKind() == DATA_OBJECT) {
-                return "{@link " + owner.getName() + "}";
-            } else {
-                if (owner.getKind() == ClassKind.API) {
-                    String ret = "{@link " + owner.translateName(ID);
-                    ret += "#" + method.getName();
-                    if (! method.getParams().isEmpty()) {
-                        ret += "(" + method.getParams().stream()
-                                .map(p -> {
-                                    TypeInfo type = p.getType();
-                                    if (type.getKind() == API) {
-                                        return type.translateName(ID);
-                                    } else {
-                                        return type.getSimpleName();
-                                    }
-                                }).collect(joining(",")) + ")";
-                    }
-                    ret += "}";
-                    return ret;
-                }
+        if (owner.getKind() == ClassKind.API) {
+            String ret = "{@link " + owner.translateName(ID);
+            ret += "#" + method.getName();
+            if (!method.getParams().isEmpty()) {
+                ret += "(" + method.getParams().stream()
+                        .map(p -> {
+                            TypeInfo type = p.getType();
+                            if (type.getKind() == API) {
+                                return type.translateName(ID);
+                            } else {
+                                return type.getSimpleName();
+                            }
+                        }).collect(joining(",")) + ")";
             }
+            ret += "}";
+            return ret;
         }
         return "{@link " + owner.getName() + "}";
     }
