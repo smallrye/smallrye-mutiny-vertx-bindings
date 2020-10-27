@@ -85,12 +85,14 @@ public class PostGreSQLClientTest {
                 .setPassword(container.getPassword());
         Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
-        Uni<Void> uni = client.begin()
-                .flatMap(tx -> tx
-                        .query("SELECT 1").execute()
-                        .call(() -> tx.query("SELECT").execute())
-                        .onItem().transformToUni(results -> tx.commit())
-                        .onFailure().recoverWithUni(t -> tx.rollback()));
+        Uni<Void> uni = client
+                .getConnection()
+                .flatMap(c -> c.begin()
+                        .flatMap(tx -> c
+                                .query("SELECT 1").execute()
+                                .call(() -> c.query("SELECT").execute())
+                                .onItem().transformToUni(results -> tx.commit())
+                                .onFailure().recoverWithUni(t -> tx.rollback())));
 
         Void v = uni.await().indefinitely();
         assertThat(v).isNull();
