@@ -1,7 +1,8 @@
 package io.vertx.mutiny.redis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -9,8 +10,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 
-import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.redis.client.Redis;
+import io.vertx.mutiny.redis.client.RedisAPI;
+import io.vertx.mutiny.redis.client.Response;
+import io.vertx.redis.client.RedisOptions;
 
 public class RedisClientTest {
 
@@ -33,14 +37,14 @@ public class RedisClientTest {
 
     @Test
     public void testMutinyAPI() {
-        RedisClient client = RedisClient.create(vertx, new JsonObject()
-                .put("port", container.getMappedPort(6379))
-                .put("host", container.getContainerIpAddress()));
+        Redis client = Redis.createClient(vertx, new RedisOptions()
+                .setConnectionString("redis://" + container.getContainerIpAddress() + ":" + container.getMappedPort(6379)));
+        RedisAPI redis = RedisAPI.api(client);
 
-        JsonObject object = client.hset("book", "title", "The Hobbit")
-                .onItem().transformToUni(x -> client.hgetall("book"))
+        Response object = redis.hset(Arrays.asList("book", "title", "The Hobbit"))
+                .onItem().transformToUni(x -> redis.hgetall("book"))
                 .subscribeAsCompletionStage()
                 .join();
-        assertThat(object).contains(entry("title", "The Hobbit"));
+        assertThat(object.get("title").toString()).isEqualTo("The Hobbit");
     }
 }
