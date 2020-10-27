@@ -87,13 +87,15 @@ public class DB2ClientTest {
                 .setPassword(container.getPassword());
         Pool client = DB2Pool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
-        Uni<Void> uni = client.begin()
-                .flatMap(tx -> tx
-                        .query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute()
-                        .call(() -> tx.query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute())
-                        .onItem().transformToUni(results -> tx.commit())
-                        .onFailure().recoverWithUni(t -> tx.rollback()));
-
+        Uni<Void> uni = client.getConnection()
+                .onItem().transformToUni(c -> {
+                    return c.begin()
+                            .onItem().transformToUni(tx -> c
+                                    .query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute()
+                                    .call(() -> c.query("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute())
+                                    .onItem().transformToUni(results -> tx.commit())
+                                    .onFailure().recoverWithUni(t -> tx.rollback()));
+                });
         Void v = uni.await().indefinitely();
         assertThat(v).isNull();
     }
