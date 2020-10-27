@@ -31,7 +31,6 @@
         <module>vertx-mutiny-pg-client</module>
         <module>vertx-mutiny-mysql-client</module>
         <module>vertx-mutiny-mqtt</module>
-        <module>reactiverse-mutiny-postgres-client</module>
         <module>vertx-mutiny-auth-common</module>
         <module>vertx-mutiny-auth-jwt</module>
         <module>vertx-mutiny-auth-oauth2</module>
