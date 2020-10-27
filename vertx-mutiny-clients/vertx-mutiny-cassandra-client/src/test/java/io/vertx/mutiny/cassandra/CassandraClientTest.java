@@ -33,8 +33,7 @@ public class CassandraClientTest {
 
     @Test
     public void testMutinyAPI() {
-        CassandraClient client = CassandraClient.createNonShared(vertx, new CassandraClientOptions()
-                .addContactPoint(container.getContainerIpAddress())
-                .setPort(container.getMappedPort(9042)));
+        CassandraClient client = CassandraClient.create(vertx, new CassandraClientOptions()
+                .addContactPoint(container.getContainerIpAddress(), container.getMappedPort(9042)));
     }
 }
