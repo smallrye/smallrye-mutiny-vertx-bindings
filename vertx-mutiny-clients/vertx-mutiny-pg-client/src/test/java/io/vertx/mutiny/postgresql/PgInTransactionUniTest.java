@@ -2,6 +2,7 @@ package io.vertx.mutiny.postgresql;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -11,6 +12,7 @@ import io.vertx.mutiny.sqlclient.InTransactionUniTest;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
+@Ignore // FIX ME
 public class PgInTransactionUniTest extends InTransactionUniTest {
 
     @Rule
