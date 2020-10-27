@@ -63,11 +63,11 @@ public class CodeGenHelper {
         }
     }
 
-
     public static String genTypeName(TypeInfo type, boolean translate) {
         if (type.isParameterized()) {
             ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
-            return genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate)).collect(joining(", ", "<", ">"));
+            return genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate))
+                    .collect(joining(", ", "<", ">"));
         } else {
             if (type.getKind() == ClassKind.API && translate) {
                 return type.translateName(ID);
@@ -80,7 +80,6 @@ public class CodeGenHelper {
             }
         }
     }
-
 
     private static boolean isSameType(TypeInfo type, MethodInfo method) {
         ClassKind kind = type.getKind();
@@ -109,7 +108,8 @@ public class CodeGenHelper {
         return false;
     }
 
-    public static String genConvParam(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type, MethodInfo method, String expr) {
+    public static String genConvParam(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type,
+            MethodInfo method, String expr) {
         ClassKind kind = type.getKind();
         if (isSameType(type, method)) {
             return expr;
@@ -143,29 +143,30 @@ public class CodeGenHelper {
                             "      }\n" +
                             "    }";
                 } else {
-                    return "new Handler<" + eventType.getName() + ">() {\n" +
-                            "      public void handle(" + eventType.getName() + " event) {\n" +
-                            "        " + expr + ".handle(" + genConvReturn(methodTypeArgMap, eventType, method, "event") + ");\n" +
+                    return "new Handler<" + genTypeName(eventType) + ">() {\n" +
+                            "      public void handle(" + genTypeName(eventType) + " event) {\n" +
+                            "        " + expr + ".handle(" + genConvReturn(methodTypeArgMap, eventType, method, "event")
+                            + ");\n" +
                             "      }\n" +
                             "    }";
                 }
             } else if (kind == FUNCTION) {
                 TypeInfo argType = parameterizedTypeInfo.getArg(0);
                 TypeInfo retType = parameterizedTypeInfo.getArg(1);
-                return "new java.util.function.Function<" + argType.getName() + "," + retType.getName() + ">() {\n" +
-                        "      public " + retType.getName() + " apply(" + argType.getName() + " arg) {\n" +
-                        "        " + genTypeName(retType) + " ret = " + expr + ".apply(" + genConvReturn(methodTypeArgMap,
-                        argType, method, "arg")
-                        + ");\n" +
+                return "new java.util.function.Function<" + genTypeName(argType) + "," + retType.getName() + ">() {\n" +
+                        "      public " + genTypeName(retType) + " apply(" + genTypeName(argType) + " arg) {\n" +
+                        "        " + genTranslatedTypeName(retType) + " ret = " + expr + ".apply(" + genConvReturn(methodTypeArgMap, argType, method, "arg") + ");\n" +
                         "        return " + genConvParam(methodTypeArgMap, retType, method, "ret") + ";\n" +
                         "      }\n" +
                         "    }";
             } else if (kind == LIST || kind == SET) {
-                return expr + ".stream().map(elt -> " + genConvParam(methodTypeArgMap, parameterizedTypeInfo.getArg(0), method, "elt")
+                return expr + ".stream().map(elt -> " + genConvParam(methodTypeArgMap, parameterizedTypeInfo.getArg(0),
+                        method, "elt")
                         + ").collect(java.util.stream.Collectors.to" + type.getRaw().getSimpleName() + "())";
             } else if (kind == MAP) {
                 return expr + ".entrySet().stream().collect(java.util.stream.Collectors.toMap(e -> e.getKey(), e -> "
-                        + genConvParam(methodTypeArgMap, parameterizedTypeInfo.getArg(1), method, "e.getValue()") + "))";
+                        + genConvParam(methodTypeArgMap, parameterizedTypeInfo.getArg(1), method, "e.getValue()")
+                        + "))";
             }
         }
         return expr;
@@ -199,7 +200,7 @@ public class CodeGenHelper {
     public static void genTypeArg(TypeInfo arg, MethodInfo method, int depth, StringBuilder sb) {
         ClassKind argKind = arg.getKind();
         if (argKind == API) {
-            sb.append("new ").append(TypeArg.class.getName()).append("<").append(arg.translateName(ID))
+            sb.append("new TypeArg<").append(arg.translateName(ID))
                     .append(">(o").append(depth).append(" -> ");
             sb.append(arg.getRaw().translateName(ID)).append(".newInstance((").append(arg.getRaw()).append(")o")
                     .append(depth);
@@ -214,7 +215,7 @@ public class CodeGenHelper {
             sb.append(")");
             sb.append(", o").append(depth).append(" -> o").append(depth).append(".getDelegate())");
         } else {
-            String typeArg = TypeArg.class.getName() + ".unknown()";
+            String typeArg = "TypeArg.unknown()";
             if (argKind == OBJECT && arg.isVariable()) {
                 String resolved = genTypeArg((TypeVariableInfo) arg, method);
                 if (resolved != null) {
@@ -225,7 +226,8 @@ public class CodeGenHelper {
         }
     }
 
-    private static String genTypeArg(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo arg, MethodInfo method) {
+    private static String genTypeArg(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo arg,
+            MethodInfo method) {
         Map<TypeInfo, String> typeArgMap = methodTypeArgMap.get(method);
         if (typeArgMap != null) {
             String typeArgRef = typeArgMap.get(arg);
@@ -233,24 +235,35 @@ public class CodeGenHelper {
                 return typeArgRef;
             }
         }
-        ClassKind kind = arg.getKind();
-        if (kind == ClassKind.API) {
-            StringBuilder sb = new StringBuilder();
-            genTypeArg(arg, method, 0, sb);
-            return sb.toString();
-        } else {
-            String typeArg = TypeArg.class.getName() + ".unknown()";
-            if (arg.isVariable()) {
-                String resolved = genTypeArg((TypeVariableInfo) arg, method);
-                if (resolved != null) {
-                    typeArg = resolved;
-                }
-            }
-            return typeArg;
-        }
+        StringBuilder sb = new StringBuilder();
+        genTypeArg(arg, method, 0, sb);
+        return sb.toString();
     }
 
-    public static String genConvReturn(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type, MethodInfo method, String expr) {
+    private static void fail(String m) {
+        //        throw new RuntimeException(m);
+    }
+
+    public static String writeReturnStatementForApi(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap,
+            TypeInfo type, MethodInfo method, String expr) {
+        StringBuilder tmp = new StringBuilder(type.getRaw().translateName(ID));
+        tmp.append(".newInstance((");
+        tmp.append(type.getRaw());
+        tmp.append(")");
+        tmp.append(expr);
+        if (type.isParameterized()) {
+            ParameterizedTypeInfo parameterizedTypeInfo = (ParameterizedTypeInfo) type;
+            for (TypeInfo arg : parameterizedTypeInfo.getArgs()) {
+                tmp.append(", ");
+                tmp.append(genTypeArg(methodTypeArgMap, arg, method));
+            }
+        }
+        tmp.append(")");
+        return tmp.toString();
+    }
+
+    public static String genConvReturn(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type,
+            MethodInfo method, String expr) {
         ClassKind kind = type.getKind();
         if (kind == OBJECT) {
             if (type.isVariable()) {
@@ -263,26 +276,15 @@ public class CodeGenHelper {
         } else if (isSameType(type, method)) {
             return expr;
         } else if (kind == API) {
-            StringBuilder tmp = new StringBuilder(type.getRaw().translateName(ID));
-            tmp.append(".newInstance(");
-            tmp.append(expr);
-            if (type.isParameterized()) {
-                ParameterizedTypeInfo parameterizedTypeInfo = (ParameterizedTypeInfo) type;
-                for (TypeInfo arg : parameterizedTypeInfo.getArgs()) {
-                    tmp.append(", ");
-                    tmp.append(genTypeArg(methodTypeArgMap, arg, method));
-                }
-            }
-            tmp.append(")");
-            return tmp.toString();
+            return writeReturnStatementForApi(methodTypeArgMap, type, method, expr);
         } else if (type.isParameterized()) {
             ParameterizedTypeInfo parameterizedTypeInfo = (ParameterizedTypeInfo) type;
             if (kind == HANDLER) {
                 TypeInfo abc = parameterizedTypeInfo.getArg(0);
                 if (abc.getKind() == ASYNC_RESULT) {
                     TypeInfo tutu = ((ParameterizedTypeInfo) abc).getArg(0);
-                    return "new Handler<AsyncResult<" + genTypeName(tutu) + ">>() {\n" +
-                            "      public void handle(AsyncResult<" + genTypeName(tutu) + "> ar) {\n" +
+                    return "new Handler<AsyncResult<" + genTranslatedTypeName(tutu) + ">>() {\n" +
+                            "      public void handle(AsyncResult<" + genTranslatedTypeName(tutu) + "> ar) {\n" +
                             "        if (ar.succeeded()) {\n" +
                             "          " + expr + ".handle(io.vertx.core.Future.succeededFuture("
                             + genConvParam(methodTypeArgMap, tutu, method, "ar.result()") + "));\n" +
@@ -292,15 +294,20 @@ public class CodeGenHelper {
                             "      }\n" +
                             "    }";
                 } else {
-                    return "new Handler<" + genTypeName(abc) + ">() {\n" +
-                            "      public void handle(" + genTypeName(abc) + " event) {\n" +
-                            "          " + expr + ".handle(" + genConvParam(methodTypeArgMap, abc, method, "event") + ");\n" +
+                    return "new Handler<" + genTranslatedTypeName(abc) + ">() {\n" +
+                            "      public void handle(" + genTranslatedTypeName(abc) + " event) {\n" +
+                            "          " + expr + ".handle(" + genConvParam(methodTypeArgMap, abc, method, "event")
+                            + ");\n" +
                             "      }\n" +
                             "    }";
                 }
             } else if (kind == LIST || kind == SET) {
-                return expr + ".stream().map(elt -> " + genConvReturn(methodTypeArgMap, parameterizedTypeInfo.getArg(0), method, "elt")
+                return expr + ".stream().map(elt -> " + genConvReturn(methodTypeArgMap, parameterizedTypeInfo.getArg(0),
+                        method, "elt")
                         + ").collect(java.util.stream.Collectors.to" + type.getRaw().getSimpleName() + "())";
+            } else if (kind == MAP) {
+                return expr + ".entrySet().stream().collect(Collectors.toMap(_e -> _e.getKey(), _e -> " + genConvReturn(
+                        methodTypeArgMap, parameterizedTypeInfo.getArg(1), method, "_e.getValue()") + "))";
             }
         }
         return expr;

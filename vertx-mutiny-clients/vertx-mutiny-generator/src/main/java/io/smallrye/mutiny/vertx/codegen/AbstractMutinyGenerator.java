@@ -28,7 +28,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     public static final String ID = "mutiny";
     private List<MethodInfo> methods = new ArrayList<>();
     private List<MethodInfo> forget = new ArrayList<>();
-    private Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap = new HashMap<>();
+    private final Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap = new HashMap<>();
 
     public AbstractMutinyGenerator() {
         this.kinds = Collections.singleton("class");
@@ -71,6 +71,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             new DelegateFieldCodeWriter(),
 
             new ConstructorWithDelegateParameterCodeWriter(),
+            new ConstructorWithObjectDelegateCodeWriter(),
             new ConstructorWithGenericTypesCodeWriter(),
             new NoArgConstructorCodeWriter(),
             new GetDelegateMethodCodeWriter(),
@@ -142,9 +143,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
         // Remove method returning Future as it conflicts with method returning Uni
         List<MethodInfo> infos = model.getMethods().stream()
-                .filter(mi -> {
-                    return ! mi.getReturnType().getName().equals(Future.class.getName());
-                }).collect(Collectors.toList());
+                .filter(mi -> ! mi.getReturnType().getName().equals(Future.class.getName()))
+                .collect(Collectors.toList());
 
         list.add(infos);
         list.add(model.getAnyJavaTypeMethods());
@@ -329,10 +329,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             if (method.getReturnType().getKind() == PRIMITIVE) {
                 cachedType = ((PrimitiveTypeInfo) returnType).getBoxed().getName();
             } else {
-                cachedType = CodeGenHelper.genTypeName(returnType);
+                cachedType = CodeGenHelper.genTranslatedTypeName(returnType);
             }
             writer.print("    ");
-            writer.print(CodeGenHelper.genTypeName(returnType));
+            writer.print(CodeGenHelper.genTranslatedTypeName(returnType));
             writer.print(" ret = ");
             writer.print(CodeGenHelper.genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
             writer.println(";");
@@ -447,11 +447,11 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                     method.getTypeParams().stream().map(TypeParamInfo::getName).collect(joining(", ", "<", ">")));
             writer.print(" ");
         }
-        writer.print(CodeGenHelper.genTypeName(method.getReturnType()));
+        writer.print(CodeGenHelper.genTranslatedTypeName(method.getReturnType()));
         writer.print(" ");
         writer.print(methodName);
         writer.print("(");
-        writer.print(method.getParams().stream().map(it -> CodeGenHelper.genTypeName(it.getType()) + " " + it.getName())
+        writer.print(method.getParams().stream().map(it -> CodeGenHelper.genTranslatedTypeName(it.getType()) + " " + it.getName())
                 .collect(joining(", ")));
         writer.print(")");
 
@@ -507,10 +507,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             if (method.getReturnType().getKind() == PRIMITIVE) {
                 cachedType = ((PrimitiveTypeInfo) returnType).getBoxed().getName();
             } else {
-                cachedType = CodeGenHelper.genTypeName(returnType);
+                cachedType = CodeGenHelper.genTranslatedTypeName(returnType);
             }
             writer.print("    ");
-            writer.print(CodeGenHelper.genTypeName(returnType));
+            writer.print(CodeGenHelper.genTranslatedTypeName(returnType));
             writer.print(" ret = ");
             writer.print(CodeGenHelper.genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
             writer.println(";");
@@ -575,5 +575,28 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         writer.print(" = ");
         writer.print(sb);
         writer.println(";");
+    }
+
+    private static TypeInfo unwrap(TypeInfo type) {
+        if (type instanceof ParameterizedTypeInfo) {
+            return type.getRaw();
+        } else {
+            return type;
+        }
+    }
+
+    private boolean foo(MethodInfo m1, MethodInfo m2) {
+        int numParams = m1.getParams().size();
+        if (m1.getName().equals(m2.getName()) && numParams == m2.getParams().size()) {
+            for (int index = 0; index < numParams; index++) {
+                TypeInfo t1 = unwrap(m1.getParam(index).getType());
+                TypeInfo t2 = unwrap(m2.getParam(index).getType());
+                if (!t1.equals(t2)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -114,7 +114,7 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
             return;
         }
         writer.println(" { ");
-        writer.print("    return (" + CodeGenHelper.genTypeName(blockingMethod.getReturnType()) + ") ");
+        writer.print("    return (" + CodeGenHelper.genTranslatedTypeName(blockingMethod.getReturnType()) + ") ");
         writer.print(blockingMethod.getName());
         writer.print("(");
         List<ParamInfo> params = blockingMethod.getParams();
