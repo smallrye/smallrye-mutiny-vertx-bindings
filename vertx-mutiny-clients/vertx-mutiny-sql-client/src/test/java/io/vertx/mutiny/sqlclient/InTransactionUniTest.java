@@ -15,7 +15,7 @@ public abstract class InTransactionUniTest extends SqlClientHelperTestBase {
     @Test
     public void inTransactionSuccess() throws Exception {
         List<String> actual = inTransaction(null).await().indefinitely();
-        assertThat(actual).isEqualTo(namesWithExtraFolks());
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
     }
 
     @Test

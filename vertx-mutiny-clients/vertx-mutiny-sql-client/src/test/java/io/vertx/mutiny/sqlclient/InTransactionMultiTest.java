@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
@@ -17,19 +16,18 @@ public abstract class InTransactionMultiTest extends SqlClientHelperTestBase {
     @Test
     public void inTransactionSuccess() throws Exception {
         List<String> actual = inTransaction(null).collectItems().asList().await().indefinitely();
-        assertThat(actual).isEqualTo(namesWithExtraFolks());
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
     }
 
     @Test
     public void inTransactionFailure() throws Exception {
         Exception failure = new Exception();
         List<String> emitted = Collections.synchronizedList(new ArrayList<>());
-        CountDownLatch latch = new CountDownLatch(1);
         try {
             inTransaction(failure).onItem().invoke(emitted::add).collectItems().asList().await().indefinitely();
         } catch (Exception e) {
             assertThat(e).isInstanceOf(CompletionException.class).getCause().isEqualTo(failure);
-            assertThat(emitted).isEqualTo(namesWithExtraFolks());
+            assertThat(emitted).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
         }
         assertTableContainsInitDataOnly();
     }

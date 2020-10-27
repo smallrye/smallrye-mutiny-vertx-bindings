@@ -21,13 +21,24 @@ public class SqlClientHelper {
      */
     public static <T> Multi<T> inTransactionMulti(Pool pool, Function<SqlClient, Multi<T>> sourceSupplier) {
         return usingConnectionMulti(pool, conn -> {
-            Transaction transaction = conn.begin();
-            return Multi.createBy().concatenating().streams(
-                    sourceSupplier.apply(transaction),
-                    transaction.commit().toMulti().onItem().transform(aVoid -> (T) aVoid))
-                    .onFailure().recoverWithMulti(throwable -> {
-                        return transaction.rollback().onFailure().recoverWithItem((Void) null)
-                                .onItem().transformToMulti(v -> Multi.createFrom().failure(throwable));
+            return conn
+                    .begin()
+                    .onItem().transformToMulti(transaction -> {
+                        Multi<T> multi = sourceSupplier.apply(pool)
+                                .onCompletion().call(() -> transaction.commit())
+                                .onFailure().call(() -> transaction.rollback());
+                        return multi;
+                        //                        return multi.onTermination()
+                        //                                .call((failure, cancellation) -> {
+                        //                                    System.out.println("Failing or cancelling " + failure);
+                        //                                    if (cancellation || failure != null) {
+                        //                                        // The failure will be propagated downstream
+                        //                                        System.out.println("rollback");
+                        //                                        return transaction.rollback();
+                        //                                    } else {
+                        //                                        return transaction.commit();
+                        //                                    }
+                        //                                });
                     });
         });
     }
@@ -42,16 +53,16 @@ public class SqlClientHelper {
      * @return a {@link Uni} generated from operations executed inside a {@link Transaction}
      */
     public static <T> Uni<T> inTransactionUni(Pool pool, Function<SqlClient, Uni<T>> sourceSupplier) {
-        return usingConnectionUni(pool, conn -> {
-            Transaction transaction = conn.begin();
-            return sourceSupplier.apply(transaction)
-                    .onItem()
-                    .transformToUni(item -> transaction.commit().onItem().transformToUni(v -> Uni.createFrom().item(item)))
-                    .onFailure().recoverWithUni(throwable -> {
-                        return transaction.rollback().onFailure().recoverWithItem((Void) null)
-                                .onItem().transformToUni(v -> Uni.createFrom().failure(throwable));
-                    });
-        });
+        return usingConnectionUni(pool, conn -> conn.begin()
+                .onItem().transformToUni(tx -> sourceSupplier.apply(pool)
+                        .onItemOrFailure().transformToUni((res, fail) -> {
+                            if (fail != null) {
+                                //noinspection unchecked
+                                return (Uni<T>) tx.rollback().onItem().failWith(x -> fail);
+                            } else {
+                                return tx.commit().onItem().transform(x -> res);
+                            }
+                        })));
     }
 
     /**
@@ -67,10 +78,10 @@ public class SqlClientHelper {
         return pool.getConnection().onItem().transformToMulti(conn -> {
             try {
                 return sourceSupplier.apply(conn)
-                        .onTermination().invoke(conn::close);
+                        .onTermination().call(conn::close);
             } catch (Throwable t) {
-                conn.close();
-                return Multi.createFrom().failure(t);
+                return conn.close()
+                        .onItem().transformToMulti(x -> Multi.createFrom().failure(t));
             }
         });
     }
@@ -87,10 +98,11 @@ public class SqlClientHelper {
     public static <T> Uni<T> usingConnectionUni(Pool pool, Function<SqlConnection, Uni<T>> sourceSupplier) {
         return pool.getConnection().onItem().transformToUni(conn -> {
             try {
-                return sourceSupplier.apply(conn).onTermination().invoke(conn::close);
+                return sourceSupplier.apply(conn).onTermination().call(conn::close);
             } catch (Throwable t) {
-                conn.close();
-                return Uni.createFrom().failure(t);
+                //noinspection unchecked
+                return (Uni<T>) conn.close()
+                        .onItem().failWith(x -> t);
             }
         });
     }
