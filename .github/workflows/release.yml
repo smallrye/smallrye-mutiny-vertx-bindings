@@ -26,9 +26,20 @@ jobs:
         with:
           token: ${{secrets.RELEASE_TOKEN}}
 
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: maven
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - uses: actions/setup-java@v1.3.0
         with:
-          java-version: 8
+          java-version: 11
 
       - name: maven release ${{steps.metadata.outputs.current-version}}
         run: |
