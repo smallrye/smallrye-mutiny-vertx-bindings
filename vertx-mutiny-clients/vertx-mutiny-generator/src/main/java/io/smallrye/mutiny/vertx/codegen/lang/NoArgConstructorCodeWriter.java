@@ -32,7 +32,7 @@ public class NoArgConstructorCodeWriter implements ConditionalCodeWriter {
         writer.print("  ");
         writer.print(cst);
         writer.print("() {");
-        if (model.isConcrete() && model.getConcreteSuperType() != null) {
+        if (model.isConcrete() && CodeGenHelper.hasParentClass(model)) {
             writer.println("    super(null);");
         }
         writer.println("    this.delegate = null;");

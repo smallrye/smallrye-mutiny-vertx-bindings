@@ -7,9 +7,7 @@ import io.smallrye.mutiny.vertx.codegen.lang.CodeGenHelper;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
-import io.vertx.codegen.type.ClassTypeInfo;
-import io.vertx.codegen.type.ParameterizedTypeInfo;
-import io.vertx.codegen.type.TypeInfo;
+import io.vertx.codegen.type.*;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -17,6 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static io.vertx.codegen.type.ClassKind.API;
+import static io.vertx.codegen.type.ClassKind.PRIMITIVE;
 
 public class MutinyGenerator extends AbstractMutinyGenerator {
 
@@ -35,9 +36,21 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
     }
 
     @Override
-    protected void genForgetMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
-            PrintWriter writer) {
-        genForgetMethod(false, model, method, cacheDecls, writer);
+    protected void genForgetMethod(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
+        MethodInfo forgetMethod = genForgetMethodInfo(method);
+
+        startMethodTemplate(false, forgetMethod.getName() + "AndForget", forgetMethod,
+                new MethodDescriptor("", true, false, false),
+                writer);
+
+        writer.println(" { ");
+        writer.print(forgetMethod.getName());
+        writer.print("(");
+        List<ParamInfo> params = forgetMethod.getParams();
+        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
+        writer.println(").subscribe().with(x -> {});");
+        writer.println("  }");
+        writer.println();
     }
 
     @Override
@@ -126,7 +139,11 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         writer.print("(");
         List<ParamInfo> params = uniMethod.getParams();
         writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
-        writer.print("));");
+        if (itemType.getKind() == API) {
+            writer.print(").map(x -> newInstance(x)));");
+        } else {
+            writer.print("));");
+        }
         writer.println("}");
         writer.println("");
     }
@@ -203,8 +220,19 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         }
         ParamInfo futParam = method.getParam(size);
         TypeInfo futType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) futParam.getType()).getArg(0)).getArg(0);
-        TypeInfo futReturnType = futType;
-        return method.copy().setReturnType(futReturnType).setParams(futParams);
+        return method.copy().setReturnType(futType).setParams(futParams);
+    }
+
+    private MethodInfo genForgetMethodInfo(MethodInfo method) {
+        List<ParamInfo> futParams = new ArrayList<>();
+        int count = 0;
+        int size = method.getParams().size() - 1;
+        while (count < size) {
+            ParamInfo param = method.getParam(count);
+            futParams.add(param);
+            count = count + 1;
+        }
+        return method.copy().setReturnType(VoidTypeInfo.INSTANCE).setParams(futParams);
     }
 
     private MethodInfo genOverloadedMethod(MethodInfo method, Class streamType) {

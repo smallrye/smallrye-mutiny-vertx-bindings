@@ -13,6 +13,7 @@ import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.PrimitiveTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
 import java.io.PrintWriter;
@@ -30,8 +31,12 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     public static final String ID = "mutiny";
     private List<MethodInfo> methods = new ArrayList<>();
-    private List<MethodInfo> forget = new ArrayList<>();
     private final Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap = new HashMap<>();
+
+    public static List<String> IGNORED_TYPES = Arrays.asList(
+            Future.class.getName(),
+            CompositeFuture.class.getName()
+    );
 
     public AbstractMutinyGenerator() {
         this.kinds = Collections.singleton("class");
@@ -50,6 +55,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     @Override
     public String render(ClassModel model, int index, int size, Map<String, Object> session) {
+        if (IGNORED_TYPES.contains(model.getFqn())) {
+            return null;
+        }
+
         initState(model);
         StringWriter sw = new StringWriter();
         PrintWriter writer = new PrintWriter(sw);
@@ -122,8 +131,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
         // This list filters out method that conflict during the generation
         methods.forEach(method -> genMethods(model, method, cacheDecls, writer));
-        // Generate AndForget method
-        forget.forEach(method -> genForgetMethods(model, method, cacheDecls, writer));
+
 
         new ConstantCodeWriter(methodTypeArgMap).apply(model, writer);
 
@@ -135,24 +143,35 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     }
 
     /**
-     * Build the list of methods to generate and updates {@link #forget} and {@link #methods} fields
+     * Compute the list of methods.
      *
      * @param model the class model
      */
     private void initGenMethods(ClassModel model) {
-        forget = new ArrayList<>();
         List<List<MethodInfo>> list = new ArrayList<>();
 
-        // Remove method returning Future as it conflicts with method returning Uni
+
         List<MethodInfo> infos = model.getMethods().stream()
+                // Remove method returning Future as it conflicts with method returning Uni
                 .filter(mi -> !mi.getReturnType().getName().equals(Future.class.getName()))
+                // Remove methods coming from ignored type
+                .filter(mi -> {
+                    for (ClassTypeInfo ownerType : mi.getOwnerTypes()) {
+                        if (IGNORED_TYPES.contains(ownerType.getName())) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList());
+
+
 
         list.add(infos);
         list.add(model.getAnyJavaTypeMethods());
 
-        list.forEach(methods -> {
 
+        list.forEach(methods -> {
             // First pass: filter conflicting overrides, that will partly filter it
             ListIterator<MethodInfo> it = methods.listIterator();
             while (it.hasNext()) {
@@ -168,9 +187,6 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                     if (methods.stream()
                             .filter(m -> CodeGenHelper.methodKind(m) == MethodKind.FUTURE)
                             .anyMatch(pred)) {
-                        // These methods are removed because it generated a signature conflict.
-                        // We store them in a specific list and generate "andForget" methods
-                        forget.add(method);
                         it.remove();
                     }
                 }
@@ -253,7 +269,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer);
 
-    protected abstract void genForgetMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
+    protected abstract void genForgetMethod(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer);
 
     protected abstract void genUniMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
@@ -286,6 +302,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             genUniMethod(false, model, method, writer);
             if (model.getMethods().stream().noneMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
                 genBlockingMethod(false, model, method, writer);
+            }
+            if (model.getMethods().stream().noneMatch(mi -> mi.getName().equals(method.getName() + "AndForget"))) {
+                genForgetMethod(model, method, cacheDecls, writer);
             }
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
             genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
@@ -464,7 +483,11 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                     method.getTypeParams().stream().map(TypeParamInfo::getName).collect(joining(", ", "<", ">")));
             writer.print(" ");
         }
-        writer.print(CodeGenHelper.genTranslatedTypeName(method.getReturnType()));
+        if (descriptor.andForget) {
+            writer.print("void");
+        } else {
+            writer.print(CodeGenHelper.genTranslatedTypeName(method.getReturnType()));
+        }
         writer.print(" ");
         writer.print(methodName);
         writer.print("(");
@@ -546,7 +569,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         writer.println();
     }
 
-    private String genInvokeDelegate(ClassModel model, MethodInfo method) {
+    public String genInvokeDelegate(ClassModel model, MethodInfo method) {
         StringBuilder ret;
         if (method.isStaticMethod()) {
             ret = new StringBuilder(Helper.getNonGenericType(model.getIfaceFQCN()));

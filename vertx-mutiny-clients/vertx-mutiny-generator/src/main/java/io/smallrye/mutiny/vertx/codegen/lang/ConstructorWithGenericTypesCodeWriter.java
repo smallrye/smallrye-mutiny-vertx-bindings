@@ -38,7 +38,7 @@ public class ConstructorWithGenericTypesCodeWriter implements ConditionalCodeWri
                 writer.print(typeParam.getIndex());
             }
             writer.println(") {");
-            if (model.isConcrete() && model.getConcreteSuperType() != null) {
+            if (model.isConcrete() && CodeGenHelper.hasParentClass(model)) {
                 writer.println("    super(delegate);");
             }
             writer.println("    this.delegate = delegate;");

@@ -38,7 +38,7 @@ public class ConstructorWithObjectDelegateCodeWriter implements ConditionalCodeW
             writer.print(typeParam.getIndex());
         }
         writer.println(") {");
-        if (model.getConcreteSuperType() != null) {
+        if (CodeGenHelper.hasParentClass(model)) {
             // This is incorrect it will not pass the generic type in some case
             // we haven't yet ran into that bug
             writer.print("    super((");

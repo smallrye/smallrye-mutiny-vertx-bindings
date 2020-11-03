@@ -34,7 +34,7 @@ public class ConstructorWithDelegateParameterCodeWriter implements ConditionalCo
         writer.print(Helper.getNonGenericType(model.getIfaceFQCN()));
         writer.println(" delegate) {");
 
-        if (model.isConcrete() && model.getConcreteSuperType() != null) {
+        if (model.isConcrete() && CodeGenHelper.hasParentClass(model)) {
             writer.println("    super(delegate);");
         }
         writer.println("    this.delegate = delegate;");

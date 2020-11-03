@@ -4,6 +4,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.MutinyHelper;
 import io.smallrye.mutiny.vertx.TypeArg;
+import io.smallrye.mutiny.vertx.codegen.MutinyGenerator;
 import io.vertx.codegen.*;
 import io.vertx.codegen.doc.Tag;
 import io.vertx.codegen.type.*;
@@ -21,6 +22,18 @@ public class CodeGenHelper {
 
     private CodeGenHelper() {
         // avoid direct instantiation
+    }
+
+    public static boolean hasParentClass(ClassModel model) {
+        TypeInfo concreteSuperType = model.getConcreteSuperType();
+        if (concreteSuperType == null) {
+            return false;
+        }
+        if (concreteSuperType.isParameterized()) {
+            return ! MutinyGenerator.IGNORED_TYPES.contains(concreteSuperType.getRaw().getName());
+        } else {
+            return ! MutinyGenerator.IGNORED_TYPES.contains(concreteSuperType.getName());
+        }
     }
 
     public static MethodKind methodKind(MethodInfo methodInfo) {
@@ -125,8 +138,15 @@ public class CodeGenHelper {
             ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
             String adapterFunction = "obj -> " + genConvParam(methodTypeArgMap, parameterizedType.getArg(0), method, "obj");
             return "io.smallrye.mutiny.vertx.ReadStreamSubscriber.asReadStream(" + expr + ", " + adapterFunction + ").resume()";
-        } else if (type.isParameterized() && (type.getRaw().getName().equals(Future.class.getName()))) {
-            return "io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ")";
+        } else if (type.isParameterized()
+                && (type.getRaw().getName().equals(Future.class.getName()))) {
+            ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
+            TypeInfo arg = parameterizedType.getArg(0);
+            if (arg.getKind() == API) {
+                return "io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ".map(r -> r.getDelegate()))";
+            } else {
+                return "io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ")";
+            }
         }
 
         ClassKind kind = type.getKind();
