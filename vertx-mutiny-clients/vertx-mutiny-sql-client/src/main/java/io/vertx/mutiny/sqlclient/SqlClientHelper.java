@@ -24,7 +24,7 @@ public class SqlClientHelper {
             return conn
                     .begin()
                     .onItem().transformToMulti(transaction -> {
-                        Multi<T> multi = sourceSupplier.apply(pool)
+                        Multi<T> multi = sourceSupplier.apply(conn)
                                 .onCompletion().call(() -> transaction.commit())
                                 .onFailure().call(() -> transaction.rollback());
                         return multi;
@@ -54,7 +54,7 @@ public class SqlClientHelper {
      */
     public static <T> Uni<T> inTransactionUni(Pool pool, Function<SqlClient, Uni<T>> sourceSupplier) {
         return usingConnectionUni(pool, conn -> conn.begin()
-                .onItem().transformToUni(tx -> sourceSupplier.apply(pool)
+                .onItem().transformToUni(tx -> sourceSupplier.apply(conn)
                         .onItemOrFailure().transformToUni((res, fail) -> {
                             if (fail != null) {
                                 //noinspection unchecked
