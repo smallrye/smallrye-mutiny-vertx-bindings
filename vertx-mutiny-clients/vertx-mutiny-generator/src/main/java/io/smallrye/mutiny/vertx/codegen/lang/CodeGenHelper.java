@@ -1,10 +1,13 @@
 package io.smallrye.mutiny.vertx.codegen.lang;
 
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.MutinyHelper;
 import io.smallrye.mutiny.vertx.TypeArg;
 import io.vertx.codegen.*;
 import io.vertx.codegen.doc.Tag;
 import io.vertx.codegen.type.*;
+import io.vertx.core.Future;
 
 import javax.lang.model.element.Element;
 import java.util.List;
@@ -64,12 +67,20 @@ public class CodeGenHelper {
     }
 
     public static String genTypeName(TypeInfo type, boolean translate) {
+        if (!translate && type.isParameterized() && type.getRaw().getName().equals(Uni.class.getName())) {
+            ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
+            return "io.vertx.core.Future<" + genTypeName(parameterizedType.getArg(0), translate) + ">";
+        }
+
         if (type.isParameterized()) {
             ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
             return genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate))
                     .collect(joining(", ", "<", ">"));
         } else {
             if (type.getKind() == ClassKind.API && translate) {
+                if (type.getName().equals(Future.class.getName())) {
+                    return Uni.class.getName();
+                }
                 return type.translateName(ID);
             } else {
                 if (isImported(type)) {
@@ -110,6 +121,14 @@ public class CodeGenHelper {
 
     public static String genConvParam(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type,
             MethodInfo method, String expr) {
+        if (type.isParameterized() && (type.getRaw().getName().equals(Multi.class.getName()))) {
+            ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
+            String adapterFunction = "obj -> " + genConvParam(methodTypeArgMap, parameterizedType.getArg(0), method, "obj");
+            return "io.smallrye.mutiny.vertx.ReadStreamSubscriber.asReadStream(" + expr + ", " + adapterFunction + ").resume()";
+        } else if (type.isParameterized() && (type.getRaw().getName().equals(Future.class.getName()))) {
+            return "io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ")";
+        }
+
         ClassKind kind = type.getKind();
         if (isSameType(type, method)) {
             return expr;

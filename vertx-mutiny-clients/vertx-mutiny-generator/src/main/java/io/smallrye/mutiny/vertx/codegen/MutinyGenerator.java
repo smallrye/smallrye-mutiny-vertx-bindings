@@ -1,14 +1,8 @@
 package io.smallrye.mutiny.vertx.codegen;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.AsyncResultUni;
+import io.smallrye.mutiny.vertx.UniHelper;
 import io.smallrye.mutiny.vertx.codegen.lang.CodeGenHelper;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.MethodInfo;
@@ -16,6 +10,13 @@ import io.vertx.codegen.ParamInfo;
 import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class MutinyGenerator extends AbstractMutinyGenerator {
 
@@ -74,11 +75,11 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
 
     @Override
     protected void genUniMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
-        MethodInfo futMethod = genUniMethodInfo(method);
-        ClassTypeInfo raw = futMethod.getReturnType().getRaw();
+        MethodInfo uniMethod = genUniMethodInfo(method);
+        ClassTypeInfo raw = uniMethod.getReturnType().getRaw();
         String methodSimpleName = raw.getSimpleName();
         String adapterType = AsyncResultUni.class.getName() + ".to" + methodSimpleName;
-        startMethodTemplate(false, futMethod.getName(), futMethod,
+        startMethodTemplate(false, uniMethod.getName(), uniMethod,
                 new MethodDescriptor("", false, false, true),
                 writer);
         if (decl) {
@@ -92,7 +93,7 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         writer.print("      __");
         writer.print(method.getName());
         writer.print("(");
-        List<ParamInfo> params = futMethod.getParams();
+        List<ParamInfo> params = uniMethod.getParams();
         writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
         if (params.size() > 0) {
             writer.print(", ");
@@ -101,6 +102,33 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
         writer.println("    });");
         writer.println("  }");
         writer.println();
+    }
+
+    @Override
+    protected void genUniMethodForOther(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer) {
+
+        TypeInfo itemType = ((ParameterizedTypeInfo) method.getReturnType()).getArg(0);
+        TypeInfo uniReturnType = new io.vertx.codegen.type.ParameterizedTypeInfo(
+                io.vertx.codegen.type.TypeReflectionFactory.create(Uni.class).getRaw(),
+                true, Collections.singletonList(itemType));
+        MethodInfo uniMethod = method.copy().setReturnType(uniReturnType);
+
+        startMethodTemplate(false, uniMethod.getName(), uniMethod,
+                new MethodDescriptor("", false, false, true),
+                writer);
+        if (decl) {
+            writer.println(";");
+            return;
+        }
+        writer.println(" { ");
+        writer.print("    return " + UniHelper.class.getName() + ".toUni(delegate.");
+        writer.print(method.getName());
+        writer.print("(");
+        List<ParamInfo> params = uniMethod.getParams();
+        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
+        writer.print("));");
+        writer.println("}");
+        writer.println("");
     }
 
     @Override
@@ -145,23 +173,23 @@ public class MutinyGenerator extends AbstractMutinyGenerator {
     }
 
     private MethodInfo genUniMethodInfo(MethodInfo method) {
-        List<ParamInfo> futParams = new ArrayList<>();
+        List<ParamInfo> params = new ArrayList<>();
         int count = 0;
         int size = method.getParams().size() - 1;
         while (count < size) {
             ParamInfo param = method.getParam(count);
-            futParams.add(param);
+            params.add(param);
             count = count + 1;
         }
-        ParamInfo futParam = method.getParam(size);
-        TypeInfo futType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) futParam.getType()).getArg(0)).getArg(0);
-        TypeInfo futUnresolvedType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) futParam.getUnresolvedType())
+        ParamInfo pi = method.getParam(size);
+        TypeInfo uniType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) pi.getType()).getArg(0)).getArg(0);
+        TypeInfo uniUnresolvedType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) pi.getUnresolvedType())
                 .getArg(0))
-                        .getArg(0);
-        TypeInfo futReturnType = new io.vertx.codegen.type.ParameterizedTypeInfo(
+                .getArg(0);
+        TypeInfo uniReturnType = new io.vertx.codegen.type.ParameterizedTypeInfo(
                 io.vertx.codegen.type.TypeReflectionFactory.create(Uni.class).getRaw(),
-                futUnresolvedType.isNullable(), Collections.singletonList(futType));
-        return method.copy().setReturnType(futReturnType).setParams(futParams);
+                uniUnresolvedType.isNullable(), Collections.singletonList(uniType));
+        return method.copy().setReturnType(uniReturnType).setParams(params);
     }
 
     private MethodInfo genBlockingMethodInfo(MethodInfo method) {

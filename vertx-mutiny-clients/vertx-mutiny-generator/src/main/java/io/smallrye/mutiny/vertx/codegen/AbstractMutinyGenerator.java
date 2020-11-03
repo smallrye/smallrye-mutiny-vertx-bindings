@@ -9,7 +9,10 @@ import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.codegen.doc.Doc;
 import io.vertx.codegen.doc.Token;
-import io.vertx.codegen.type.*;
+import io.vertx.codegen.type.ClassTypeInfo;
+import io.vertx.codegen.type.ParameterizedTypeInfo;
+import io.vertx.codegen.type.PrimitiveTypeInfo;
+import io.vertx.codegen.type.TypeInfo;
 import io.vertx.core.Future;
 
 import java.io.PrintWriter;
@@ -59,7 +62,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         initCachedTypeArgs();
     }
 
-    private List<CodeWriter> generators = Arrays.asList(
+    private final List<CodeWriter> generators = Arrays.asList(
             new PackageDeclarationCodeWriter(),
             new ImportDeclarationCodeWriter(),
             new ClassJavadocCodeWriter(),
@@ -140,10 +143,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         forget = new ArrayList<>();
         List<List<MethodInfo>> list = new ArrayList<>();
 
-
         // Remove method returning Future as it conflicts with method returning Uni
         List<MethodInfo> infos = model.getMethods().stream()
-                .filter(mi -> ! mi.getReturnType().getName().equals(Future.class.getName()))
+                .filter(mi -> !mi.getReturnType().getName().equals(Future.class.getName()))
                 .collect(Collectors.toList());
 
         list.add(infos);
@@ -215,7 +217,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         for (MethodInfo method : methods) {
             TypeInfo returnType = method.getReturnType();
             if (returnType instanceof ParameterizedTypeInfo) {
-                ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo)returnType;
+                ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) returnType;
                 List<TypeInfo> typeArgs = parameterizedType.getArgs();
                 Map<TypeInfo, String> typeArgMap = new HashMap<>();
                 for (TypeInfo typeArg : typeArgs) {
@@ -236,7 +238,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         if (type.isVariable()) {
             return true;
         } else if (type.isParameterized()) {
-            List<TypeInfo> typeArgs = ((ParameterizedTypeInfo)type).getArgs();
+            List<TypeInfo> typeArgs = ((ParameterizedTypeInfo) type).getArgs();
             for (TypeInfo typeArg : typeArgs) {
                 if (typeArg.isVariable()) {
                     return true;
@@ -255,6 +257,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             PrintWriter writer);
 
     protected abstract void genUniMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
+
+    protected abstract void genUniMethodForOther(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
+
+
     protected abstract void genBlockingMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     protected abstract MethodInfo genConsumerMethodInfo(MethodInfo method);
@@ -284,13 +290,18 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
             genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
             genConsumerMethodInfo(false, model, method, writer);
-        } else {
-            genSimpleMethod(false, model, false, method.getName(), method, cacheDecls, writer);
+        } else if (CodeGenHelper.methodKind(method) == MethodKind.OTHER) {
+            if (method.getReturnType() != null  && method.getReturnType().getRaw() != null  && method.getReturnType().getRaw().getName().equals(Future.class.getName())) {
+                genUniMethodForOther(false, model, method, writer);
+            } else {
+                genSimpleMethod(false, model, false, method.getName(), method, cacheDecls, writer);
+            }
         }
     }
 
-    final void genForgetMethod(boolean decl, ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
-        startMethodTemplate(false, method.getName()+ "AndForget", method,
+    final void genForgetMethod(boolean decl, ClassModel model, MethodInfo method, List<String> cacheDecls,
+            PrintWriter writer) {
+        startMethodTemplate(false, method.getName() + "AndForget", method,
                 new MethodDescriptor("", true, false, false), writer);
         if (decl) {
             writer.println(";");
@@ -334,7 +345,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             writer.print("    ");
             writer.print(CodeGenHelper.genTranslatedTypeName(returnType));
             writer.print(" ret = ");
-            writer.print(CodeGenHelper.genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
+            writer.print(CodeGenHelper
+                    .genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
             writer.println(";");
             if (method.isCacheReturn()) {
                 writer.print("    cached_");
@@ -387,7 +399,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             if (descriptor.uni) {
                 Token.toHtml(doc.getTokens(), "   *", CodeGenHelper::renderLinkToHtml, "\n", writer);
                 writer.println("   * <p>");
-                writer.println("   * Unlike the <em>bare</em> Vert.x variant, this method returns a {@link " + Uni.class.getName() + " Uni}.");
+                writer.println("   * Unlike the <em>bare</em> Vert.x variant, this method returns a {@link " + Uni.class
+                        .getName() + " Uni}.");
                 writer.println("   * Don't forget to <em>subscribe</em> on it to trigger the operation.");
             }
 
@@ -395,16 +408,18 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                 writer.println("   * Blocking variant of " + link + ".");
                 writer.println("   * <p>");
                 writer.println("   * This method waits for the completion of the underlying asynchronous operation.");
-                writer.println("   * If the operation completes successfully, the result is returned, otherwise the failure is thrown (potentially wrapped in a RuntimeException).");
+                writer.println(
+                        "   * If the operation completes successfully, the result is returned, otherwise the failure is thrown (potentially wrapped in a RuntimeException).");
             }
 
             if (descriptor.andForget) {
                 writer.println("   * Variant of " + link + " that ignores the result of the operation.");
                 writer.println("   * <p>");
-                writer.println("   * This method subscribes on the result of " + link + ", but discards the outcome (item or failure).");
-                writer.println("   * This method is useful to trigger the asynchronous operation from " + link + " but you don't need to compose it with other operations.");
+                writer.println("   * This method subscribes on the result of " + link
+                        + ", but discards the outcome (item or failure).");
+                writer.println("   * This method is useful to trigger the asynchronous operation from " + link
+                        + " but you don't need to compose it with other operations.");
             }
-
 
             for (ParamInfo param : method.getParams()) {
                 writer.print("   * @param ");
@@ -423,9 +438,11 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                             CodeGenHelper::renderLinkToHtml, "",
                             writer);
                 } else if (descriptor.uni) {
-                    writer.print("the {@link " + Uni.class.getName() + " uni} firing the result of the operation when completed, or a failure if the operation failed.");
+                    writer.print("the {@link " + Uni.class.getName()
+                            + " uni} firing the result of the operation when completed, or a failure if the operation failed.");
                 } else if (descriptor.andAwait) {
-                    writer.print("the " + method.getReturnType().getSimpleName() + " instance produced by the operation");
+                    writer.print(
+                            "the " + method.getReturnType().getSimpleName() + " instance produced by the operation");
                 }
                 writer.println();
             }
@@ -451,7 +468,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         writer.print(" ");
         writer.print(methodName);
         writer.print("(");
-        writer.print(method.getParams().stream().map(it -> CodeGenHelper.genTranslatedTypeName(it.getType()) + " " + it.getName())
+        writer.print(method.getParams().stream()
+                .map(it -> CodeGenHelper.genTranslatedTypeName(it.getType()) + " " + it.getName())
                 .collect(joining(", ")));
         writer.print(")");
 
@@ -512,7 +530,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             writer.print("    ");
             writer.print(CodeGenHelper.genTranslatedTypeName(returnType));
             writer.print(" ret = ");
-            writer.print(CodeGenHelper.genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
+            writer.print(CodeGenHelper
+                    .genConvReturn(methodTypeArgMap, returnType, method, genInvokeDelegate(model, method)));
             writer.println(";");
             if (method.isCacheReturn()) {
                 writer.print("    cached_");
