@@ -31,12 +31,6 @@ jobs:
           path: ~/.m2/repository
           key: maven
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - uses: actions/setup-java@v1.3.0
         with:
           java-version: 11
