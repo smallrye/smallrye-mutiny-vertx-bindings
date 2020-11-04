@@ -105,7 +105,7 @@ public class ObservableConverter implements ReactiveTypeConverter<Observable> {
 
     @Override
     public boolean emitAtMostOneItem() {
-        return true;
+        return false;
     }
 
     @Override
