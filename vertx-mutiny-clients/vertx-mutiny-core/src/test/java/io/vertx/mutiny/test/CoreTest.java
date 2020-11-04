@@ -8,8 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -83,7 +83,6 @@ public class CoreTest extends VertxTestBase {
     }
 
     @Test
-    @Ignore // FIX ME - does not work anymore
     public void testWebSocket() {
         waitFor(2);
         AtomicLong serverReceived = new AtomicLong();
@@ -92,12 +91,9 @@ public class CoreTest extends VertxTestBase {
             ws.toMulti()
                     .subscribe().with(msg -> {
                         serverReceived.incrementAndGet();
-                        ws.writeTextMessage("pong").subscribe().with(x -> {
-                        }); // TODO Fix this!
-                    }, err -> {
-                        assertEquals(1, serverReceived.get());
+                        ws.writeTextMessageAndForget("pong");
                         complete();
-                    }, this::fail);
+                    }, (Consumer<Throwable>) this::fail);
         }).listenAndAwait(8080, "localhost");
 
         HttpClient client = vertx.createHttpClient();
@@ -106,8 +102,13 @@ public class CoreTest extends VertxTestBase {
                 .onItem().call(ws -> ws.writeTextMessage("ping"))
                 .onItem().transformToMulti(WebSocket::toMulti)
                 .subscribe().with(
-                        msg -> clientReceived.incrementAndGet(), err -> complete(), this::fail);
+                        msg -> {
+                            clientReceived.incrementAndGet();
+                            complete();
+                        }, (Consumer<Throwable>) this::fail);
         await();
+        assertEquals(1, serverReceived.get());
+        assertEquals(1, clientReceived.get());
     }
 
     private void subscribe(byte[] expected, AsyncFile file, int times) {
