@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import io.smallrye.mutiny.vertx.TypeArg;
+import io.vertx.codegen.annotations.Fluent;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 
@@ -26,6 +27,7 @@ public class ImportDeclarationCodeWriter implements CodeWriter {
         writer.println("import " + Subscriber.class.getName() + ";");
         writer.println("import " + Publisher.class.getName() + ";");
         writer.println("import " + TypeArg.class.getName() + ";");
+        writer.println("import " + Fluent.class.getName() + ";");
 
         for (ClassTypeInfo importedType : model.getImportedTypes()) {
             if (importedType.getKind() != ClassKind.API) {

@@ -9,10 +9,7 @@ import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.codegen.doc.Doc;
 import io.vertx.codegen.doc.Token;
-import io.vertx.codegen.type.ClassTypeInfo;
-import io.vertx.codegen.type.ParameterizedTypeInfo;
-import io.vertx.codegen.type.PrimitiveTypeInfo;
-import io.vertx.codegen.type.TypeInfo;
+import io.vertx.codegen.type.*;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
@@ -269,15 +266,20 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
     protected abstract void genMethods(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer);
 
-    protected abstract void genForgetMethod(ClassModel model, MethodInfo method, List<String> cacheDecls,
+    protected abstract void genAndForgetMethod(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer);
 
     protected abstract void genUniMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     protected abstract void genUniMethodForOther(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
+    protected abstract void genAndAwaitMethodForOther(boolean decl, ClassModel model, MethodInfo method,
+            PrintWriter writer);
 
-    protected abstract void genBlockingMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
+    protected abstract void genAndForgetMethodForOther(boolean decl, ClassModel model, MethodInfo method,
+            PrintWriter writer);
+
+    protected abstract void genAndAwaitMethod(boolean decl, ClassModel model, MethodInfo method, PrintWriter writer);
 
     protected abstract MethodInfo genConsumerMethodInfo(MethodInfo method);
 
@@ -298,30 +300,29 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
 
     final void genMethod(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
-            genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
+            genSimpleMethod(false, model, true, ""
+                    + "__" + method.getName(), method, cacheDecls, writer);
             genUniMethod(false, model, method, writer);
-            if (model.getMethods().stream().noneMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
-                genBlockingMethod(false, model, method, writer);
-            }
-            if (model.getMethods().stream().noneMatch(mi -> mi.getName().equals(method.getName() + "AndForget"))) {
-                genForgetMethod(model, method, cacheDecls, writer);
-            }
+            genAndAwaitMethod(false, model, method, writer);
+            genAndForgetMethod(model, method, cacheDecls, writer);
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
             genSimpleMethod(false, model, true, "__" + method.getName(), method, cacheDecls, writer);
             genConsumerMethodInfo(false, model, method, writer);
         } else if (CodeGenHelper.methodKind(method) == MethodKind.OTHER) {
             if (method.getReturnType() != null  && method.getReturnType().getRaw() != null  && method.getReturnType().getRaw().getName().equals(Future.class.getName())) {
                 genUniMethodForOther(false, model, method, writer);
+                genAndAwaitMethodForOther(false, model, method, writer);
+                genAndForgetMethodForOther(false, model, method, writer);
             } else {
                 genSimpleMethod(false, model, false, method.getName(), method, cacheDecls, writer);
             }
         }
     }
 
-    final void genForgetMethod(boolean decl, ClassModel model, MethodInfo method, List<String> cacheDecls,
+    final void genAndForgetMethod(boolean decl, ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer) {
         startMethodTemplate(false, method.getName() + "AndForget", method,
-                new MethodDescriptor("", true, false, false), writer);
+                new MethodDescriptor("", true, false, false, false), writer);
         if (decl) {
             writer.println(";");
             return;
@@ -385,7 +386,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
             genUniMethod(true, model, method, writer);
             if (!model.getMethods().stream().anyMatch(mi -> mi.getName().equals(method.getName() + "AndAwait"))) {
-                genBlockingMethod(true, model, method, writer);
+                genAndAwaitMethod(true, model, method, writer);
             }
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
             genConsumerMethodInfo(true, model, method, writer);
@@ -399,12 +400,14 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         final boolean andForget;
         final boolean andAwait;
         final boolean uni;
+        final boolean fluent;
 
-        MethodDescriptor(String deprecated, boolean andForget, boolean andAwait, boolean uni) {
+        MethodDescriptor(String deprecated, boolean andForget, boolean andAwait, boolean uni, boolean fluent) {
             this.deprecated = deprecated;
             this.andForget = andForget;
             this.andAwait = andAwait;
             this.uni = uni;
+            this.fluent = fluent;
         }
     }
 
@@ -450,9 +453,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                 }
                 writer.println();
             }
-            if (!method.getReturnType().getName().equals("void")) {
+            if (!method.getReturnType().getName().equalsIgnoreCase("void")) {
                 writer.print("   * @return ");
-                if (method.getReturnDescription() != null) {
+                if (method.getReturnDescription() != null  && ! descriptor.uni  && ! descriptor.andAwait  && ! descriptor.andForget) {
                     Token.toHtml(method.getReturnDescription().getTokens(), "",
                             CodeGenHelper::renderLinkToHtml, "",
                             writer);
@@ -461,7 +464,10 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                             + " uni} firing the result of the operation when completed, or a failure if the operation failed.");
                 } else if (descriptor.andAwait) {
                     writer.print(
-                            "the " + method.getReturnType().getSimpleName() + " instance produced by the operation");
+                            "the " + method.getReturnType().getSimpleName() + " instance produced by the operation.");
+                } else if (descriptor.fluent) {
+                    writer.print(
+                            "the instance of " + method.getReturnType().getSimpleName() + " to chain method calls.");
                 }
                 writer.println();
             }
@@ -474,6 +480,9 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
         if (method.isDeprecated() || deprecated != null && deprecated.length() > 0) {
             writer.println("  @Deprecated");
         }
+        if (descriptor.fluent) {
+            writer.println("  @Fluent");
+        }
         writer.print("  " + (isPrivate ? "private" : "public") + " ");
         if (method.isStaticMethod()) {
             writer.print("static ");
@@ -483,7 +492,7 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
                     method.getTypeParams().stream().map(TypeParamInfo::getName).collect(joining(", ", "<", ">")));
             writer.print(" ");
         }
-        if (descriptor.andForget) {
+        if (descriptor.andForget  && !descriptor.fluent) {
             writer.print("void");
         } else {
             writer.print(CodeGenHelper.genTranslatedTypeName(method.getReturnType()));
@@ -510,8 +519,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             List<String> cacheDecls,
             PrintWriter writer) {
         startMethodTemplate(isPrivate, methodName, method, new MethodDescriptor(
-                "", false, false, false
-        ), writer);
+                "", false, false, false,
+                false), writer);
         if (decl) {
             writer.println(";");
             return;
