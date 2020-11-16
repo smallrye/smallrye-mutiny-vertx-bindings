@@ -40,6 +40,7 @@ public class ConsumerMethodGenerator extends MutinyMethodGenerator {
         if (!method.getReturnType().isVoid()) {
             writer.print("return ");
         }
+
         // TODO Inline method body here.
         writer.print("__" + method.getName() + "(");
         List<ParamInfo> params = method.getParams();

@@ -2,9 +2,11 @@ package io.smallrye.mutiny.vertx.codegen.methods;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.AsyncResultUni;
+import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
 import io.smallrye.mutiny.vertx.UniHelper;
 import io.smallrye.mutiny.vertx.codegen.lang.CodeGenHelper;
 import io.vertx.codegen.ClassModel;
+import io.vertx.codegen.Helper;
 import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
 import io.vertx.codegen.type.ClassTypeInfo;
@@ -15,21 +17,26 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.vertx.codegen.type.ClassKind.API;
 
 public class UniMethodGenerator extends MutinyMethodGenerator {
 
-    public UniMethodGenerator(PrintWriter writer) {
+    private final Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap;
+
+    public UniMethodGenerator(PrintWriter writer,
+            Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap) {
         super(writer);
+        this.methodTypeArgMap = methodTypeArgMap;
     }
 
-    public void generate(MethodInfo method) {
+    public void generate(ClassModel model, MethodInfo method) {
         MutinyMethodDescriptor uniMethod = computeMethodInfo(method);
         generateJavadoc(uniMethod);
         generateMethodDeclaration(uniMethod);
-        generateBody(uniMethod);
+        generateBody(model, uniMethod);
         writer.println();
     }
 
@@ -49,27 +56,59 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         writer.println();
     }
 
-    private void generateBody(MutinyMethodDescriptor descriptor) {
+    private void generateBody(ClassModel model, MutinyMethodDescriptor descriptor) {
         MethodInfo method = descriptor.getMethod();
 
         ClassTypeInfo raw = method.getReturnType().getRaw();
         String methodSimpleName = raw.getSimpleName();
         String adapterType = AsyncResultUni.class.getName() + ".to" + methodSimpleName;
+        List<ParamInfo> params = descriptor.getOriginalMethod().getParams();
+        String handlerParameterName = params.get(params.size() - 1).getName();
 
         writer.println(" { ");
         writer.print("    return ");
         writer.print(adapterType);
-        writer.println("(handler -> {");
-        // TODO Inline method body here.
-        writer.print("      __" + method.getName() + "(");
-        List<ParamInfo> params = method.getParams();
-        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
-        if (params.size() > 0) {
-            writer.print(", ");
-        }
-        writer.println("handler);");
+        writer.println("(" + handlerParameterName + " -> {");
+        writer.println("        " + invokeDelegate(methodTypeArgMap, model, descriptor.getOriginalMethod()) + ";");
         writer.println("    });");
         writer.println("  }");
+    }
+
+    public static String invokeDelegate(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, ClassModel model, MethodInfo method) {
+        StringBuilder object;
+        if (method.isStaticMethod()) {
+            object = new StringBuilder(Helper.getNonGenericType(model.getIfaceFQCN()));
+        } else {
+            object = new StringBuilder("delegate");
+        }
+
+        object.append(".").append(method.getName()).append("(");
+        int index = 0;
+        for (ParamInfo param : method.getParams()) {
+            if (index > 0) {
+                object.append(", ");
+            }
+            TypeInfo type = param.getType();
+            if (type.isParameterized() && (type.getRaw().getName().equals("org.reactivestreams.Publisher"))) {
+                String adapterFunction;
+                ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
+                if (parameterizedType.getArg(0).isVariable()) {
+                    adapterFunction = "java.util.function.Function.identity()";
+                } else {
+                    adapterFunction =
+                            "obj -> (" + parameterizedType.getArg(0).getRaw().getName() + ") obj.getDelegate()";
+                }
+                object.append(ReadStreamSubscriber.class.getName()).append(".asReadStream(")
+                        .append(param.getName())
+                        .append(",")
+                        .append(adapterFunction).append(").resume()");
+            } else {
+                object.append(CodeGenHelper.genConvParam(methodTypeArgMap, type, method, param.getName()));
+            }
+            index = index + 1;
+        }
+        object.append(")");
+        return object.toString();
     }
 
     private void generateBodyOther(MutinyMethodDescriptor descriptor) {

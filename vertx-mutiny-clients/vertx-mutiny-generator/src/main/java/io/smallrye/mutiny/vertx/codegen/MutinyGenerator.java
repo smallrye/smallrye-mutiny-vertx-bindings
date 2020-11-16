@@ -302,14 +302,13 @@ public class MutinyGenerator extends Generator<ClassModel> {
     }
 
     final void generateMethod(ClassModel model, MethodInfo method, List<String> cacheDecls, PrintWriter writer) {
-        UniMethodGenerator uni = new UniMethodGenerator(writer);
+        UniMethodGenerator uni = new UniMethodGenerator(writer, methodTypeArgMap);
         ForgetMethodGenerator forget = new ForgetMethodGenerator(writer);
         AwaitMethodGenerator await = new AwaitMethodGenerator(writer);
         ConsumerMethodGenerator consumer = new ConsumerMethodGenerator(writer);
         SimpleMethodGenerator simple = new SimpleMethodGenerator(writer, cacheDecls, methodTypeArgMap);
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
-            simple.generate(model, method);
-            uni.generate(method);
+            uni.generate(model, method);
             await.generate(method);
             forget.generate(model, method);
         } else if (CodeGenHelper.methodKind(method) == MethodKind.HANDLER) {
@@ -334,7 +333,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
     private void generateMethodDeclaration(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer) {
         if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
-            new UniMethodGenerator(writer).generateDeclaration(method);
+            new UniMethodGenerator(writer, methodTypeArgMap).generateDeclaration(method);
             if (model.getMethods().stream()
                     .noneMatch(mi -> mi.getName().equals(method.getName() + AwaitMethodGenerator.SUFFIX_AND_AWAIT))) {
                 new AwaitMethodGenerator(writer).generateDeclaration(method);
