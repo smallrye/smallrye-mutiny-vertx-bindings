@@ -51,7 +51,7 @@ public class ForgetMethodGenerator extends MutinyMethodGenerator {
         writer.print("(");
         List<ParamInfo> params = forgetMethod.getMethod().getParams();
         writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
-        writer.println(").subscribe().with(x -> {});");
+        writer.println(").subscribe().with(io.smallrye.mutiny.vertx.UniHelper.NOOP);");
         if (forgetMethod.isFluent()) {
             writer.println("    return this;");
         }
@@ -65,7 +65,7 @@ public class ForgetMethodGenerator extends MutinyMethodGenerator {
         writer.print("(");
         List<ParamInfo> params = forgetMethod.getMethod().getParams();
         writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
-        writer.print(")).subscribe().with(x -> {});\n");
+        writer.print(")).subscribe().with(io.smallrye.mutiny.vertx.UniHelper.NOOP);\n");
         if (forgetMethod.isFluent()) {
             writer.print("    return this;\n");
         }

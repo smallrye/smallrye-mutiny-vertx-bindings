@@ -12,6 +12,15 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 
 public class UniHelper {
+
+    @SuppressWarnings({ "rawtypes", "Convert2Lambda" })
+    public static Consumer NOOP = new Consumer<Object>() {
+        @Override
+        public void accept(Object o) {
+            // Do nothing
+        }
+    };
+
     /**
      * Returns a {@link Uni} that, when subscribed, uses the provided {@code handler} to adapt a callback-based
      * asynchronous method.
