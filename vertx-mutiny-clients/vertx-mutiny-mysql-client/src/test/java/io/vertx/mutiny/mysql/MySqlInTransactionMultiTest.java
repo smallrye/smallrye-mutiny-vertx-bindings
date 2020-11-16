@@ -7,11 +7,11 @@ import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
-import io.vertx.mutiny.sqlclient.InTransactionMultiTest;
+import io.vertx.mutiny.sqlclient.TransactionMultiTest;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
-public class MySqlInTransactionMultiTest extends InTransactionMultiTest {
+public class MySqlInTransactionMultiTest extends TransactionMultiTest {
     private static final String MYSQL_ROOT_PASSWORD = "my-secret-pw";
     private static final String MYSQL_DATABASE = "test";
 

@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import io.smallrye.mutiny.Multi;
 
-public abstract class InTransactionMultiTest extends SqlClientHelperTestBase {
+public abstract class TransactionMultiTest extends SqlClientHelperTestBase {
 
     @Test
     public void inTransactionSuccess() throws Exception {

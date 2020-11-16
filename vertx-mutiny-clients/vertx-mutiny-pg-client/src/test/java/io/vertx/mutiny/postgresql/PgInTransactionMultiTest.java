@@ -5,11 +5,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.pgclient.PgPool;
-import io.vertx.mutiny.sqlclient.InTransactionMultiTest;
+import io.vertx.mutiny.sqlclient.TransactionMultiTest;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
-public class PgInTransactionMultiTest extends InTransactionMultiTest {
+public class PgInTransactionMultiTest extends TransactionMultiTest {
 
     @Rule
     public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
