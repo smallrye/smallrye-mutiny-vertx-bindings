@@ -1,6 +1,6 @@
 package io.smallrye.mutiny.vertx.codegen.lang;
 
-import io.smallrye.mutiny.vertx.codegen.AbstractMutinyGenerator;
+import io.smallrye.mutiny.vertx.codegen.MutinyGenerator;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.Helper;
 import io.vertx.codegen.type.ClassTypeInfo;
@@ -8,9 +8,9 @@ import io.vertx.codegen.type.ClassTypeInfo;
 import java.io.PrintWriter;
 
 public class ImplClassCodeWriter implements ConditionalCodeWriter {
-    private final AbstractMutinyGenerator generator;
+    private final MutinyGenerator generator;
 
-    public ImplClassCodeWriter(AbstractMutinyGenerator mutinyGenerator) {
+    public ImplClassCodeWriter(MutinyGenerator mutinyGenerator) {
         this.generator = mutinyGenerator;
     }
 

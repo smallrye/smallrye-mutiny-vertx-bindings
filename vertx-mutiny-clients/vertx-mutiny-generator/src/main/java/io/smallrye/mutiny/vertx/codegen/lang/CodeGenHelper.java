@@ -14,7 +14,7 @@ import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Map;
 
-import static io.smallrye.mutiny.vertx.codegen.AbstractMutinyGenerator.ID;
+import static io.smallrye.mutiny.vertx.codegen.MutinyGenerator.ID;
 import static io.vertx.codegen.type.ClassKind.*;
 import static java.util.stream.Collectors.joining;
 
