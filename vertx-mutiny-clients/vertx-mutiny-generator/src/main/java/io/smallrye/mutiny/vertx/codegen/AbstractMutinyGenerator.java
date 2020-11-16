@@ -13,6 +13,7 @@ import io.vertx.codegen.type.*;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 
+import javax.tools.Diagnostic;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
@@ -310,6 +311,8 @@ public abstract class AbstractMutinyGenerator extends Generator<ClassModel> {
             genConsumerMethodInfo(false, model, method, writer);
         } else if (CodeGenHelper.methodKind(method) == MethodKind.OTHER) {
             if (method.getReturnType() != null  && method.getReturnType().getRaw() != null  && method.getReturnType().getRaw().getName().equals(Future.class.getName())) {
+                env.getMessager().printMessage(Diagnostic.Kind.WARNING,
+                        "A method returning a 'Future' has been found - missing handler method for '" + method.getName() + "' declared in " + method.getOwnerTypes().stream().map(TypeInfo::getName).collect(joining()));
                 genUniMethodForOther(false, model, method, writer);
                 genAndAwaitMethodForOther(false, model, method, writer);
                 genAndForgetMethodForOther(false, model, method, writer);
