@@ -98,7 +98,6 @@
 
         <profile>
             <!-- Generate the revapi report with mvn verify -Prevapi -DskipTests -->
-            <!-- The report is generated in target/site/revapi-aggregate-report.html -->
             <id>revapi</id>
             <build>
                 <plugins>
@@ -112,15 +111,60 @@
                                 <artifactId>revapi-java</artifactId>
                                 <version>0.22.1</version>
                             </dependency>
+
+                            <dependency>
+                                <groupId>org.revapi</groupId>
+                                <artifactId>revapi-reporter-text</artifactId>
+                                <version>0.12.1</version>
+                            </dependency>
+
+                            <dependency>
+                                <groupId>org.revapi</groupId>
+                                <artifactId>revapi-reporter-json</artifactId>
+                                <version>0.2.1</version>
+                            </dependency>
+
                         </dependencies>
+
                         <executions>
                             <execution>
-                                <phase>verify</phase>
+                                <id>revapi-check</id>
                                 <goals>
-                                    <goal>report-aggregate</goal>
+                                    <goal>report</goal>
                                 </goals>
                             </execution>
                         </executions>
+
+                        <configuration>
+                            <!-- Do not check for Vert.x, only focus on the client API -->
+                            <checkDependencies>false</checkDependencies>
+                            <generateSiteReport>false</generateSiteReport>
+                            <oldVersion>1.2.0</oldVersion>
+                            <newVersion>${project.version}</newVersion>
+
+                            <analysisConfiguration>
+                                <revapi.java>
+                                    <missing-classes>
+                                        <behavior>error</behavior>
+                                        <ignoreMissingAnnotations>true</ignoreMissingAnnotations>
+                                    </missing-classes>
+                                    <filter>
+                                        <packages>
+                                            <regex>true</regex>
+                                            <include>
+                                                <item>io\.vertx\.mutiny\..*</item>
+                                            </include>
+                                        </packages>
+                                    </filter>
+                                </revapi.java>
+                                <revapi.reporter.json>
+                                    <minSeverity>NON_BREAKING</minSeverity>
+                                    <output>${project.build.directory}/compatibility-report.json</output>
+                                    <indent>true</indent>
+                                    <keepEmptyFile>true</keepEmptyFile>
+                                </revapi.reporter.json>
+                            </analysisConfiguration>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
