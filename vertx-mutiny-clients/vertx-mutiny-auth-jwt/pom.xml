@@ -24,11 +24,6 @@
             <artifactId>${gen-source-artifactId}</artifactId>
             <version>${vertx.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${gen-source-groupId}</groupId>
-            <artifactId>vertx-web-common</artifactId>
-            <version>${vertx.version}</version>
-        </dependency>
 
         <!-- Vert.x Mutiny Core -->
         <dependency>
@@ -54,7 +49,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <configuration>
                     <includeGroupIds>${gen-source-groupId}</includeGroupIds>
-                    <includeArtifactIds>${gen-source-artifactId},vertx-web-common</includeArtifactIds>
+                    <includeArtifactIds>${gen-source-artifactId}</includeArtifactIds>
                     <classifier>sources</classifier>
                     <includeTypes>jar</includeTypes>
                 </configuration>

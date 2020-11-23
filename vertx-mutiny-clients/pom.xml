@@ -18,6 +18,9 @@
         <module>vertx-mutiny-generator</module>
         <module>vertx-mutiny-core</module>
         <module>vertx-mutiny-mail-client</module>
+        <module>vertx-mutiny-bridge-common</module>
+        <module>vertx-mutiny-web-common</module>
+        <module>vertx-mutiny-web</module>
         <module>vertx-mutiny-web-client</module>
         <module>vertx-mutiny-mongo-client</module>
         <module>vertx-mutiny-redis-client</module>
@@ -35,6 +38,8 @@
         <module>vertx-mutiny-auth-common</module>
         <module>vertx-mutiny-auth-jwt</module>
         <module>vertx-mutiny-auth-oauth2</module>
+        <module>vertx-mutiny-auth-htdigest</module>
+        <module>vertx-mutiny-health-checks</module>
     </modules>
 
     <build>
