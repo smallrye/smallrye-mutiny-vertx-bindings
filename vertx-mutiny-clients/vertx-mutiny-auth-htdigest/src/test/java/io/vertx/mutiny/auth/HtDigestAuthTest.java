@@ -7,9 +7,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.htdigest.HtdigestCredentials;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.auth.User;
+import io.vertx.mutiny.ext.auth.authentication.Credentials;
 import io.vertx.mutiny.ext.auth.htdigest.HtdigestAuth;
 
 public class HtDigestAuthTest {
@@ -30,39 +31,35 @@ public class HtDigestAuthTest {
 
     @Test
     public void testValidDigestWithQOP() {
-        JsonObject authInfo = new JsonObject()
-                .put("method", "GET")
+        HtdigestCredentials authInfo = new HtdigestCredentials()
+                .setMethod("GET")
+                .setUsername("Mufasa")
+                .setRealm("testrealm@host.com")
+                .setNonce("dcd98b7102dd2f0e8b11d0f600bfb0c093")
+                .setUri("/dir/index.html")
+                .setQop("auth")
+                .setNc("00000001")
+                .setCnonce("0a4f113b")
+                .setResponse("6629fae49393a05397450978507c4ef1");
 
-                .put("username", "Mufasa")
-                .put("realm", "testrealm@host.com")
-                .put("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093")
-                .put("uri", "/dir/index.html")
-                .put("qop", "auth")
-                .put("nc", "00000001")
-                .put("cnonce", "0a4f113b")
-                .put("response", "6629fae49393a05397450978507c4ef1")
-                .put("opaque", "5ccc069c403ebaf9f0171e9517f40e41");
-
-        User user = authProvider.authenticate(authInfo).await().indefinitely();
+        User user = authProvider.authenticate(Credentials.newInstance(authInfo)).await().indefinitely();
         assertNotNull(user);
         assertEquals("Mufasa", user.principal().getString("username"));
     }
 
     @Test
     public void testValidDigestWithoutQOP() {
-        JsonObject authInfo = new JsonObject()
-                .put("method", "GET")
+        HtdigestCredentials authInfo = new HtdigestCredentials()
+                .setMethod("GET")
+                .setUsername("Mufasa")
+                .setRealm("testrealm@host.com")
+                .setNonce("dcd98b7102dd2f0e8b11d0f600bfb0c093")
+                .setUri("/dir/index.html")
+                .setNc("00000001")
+                .setCnonce("0a4f113b")
+                .setResponse("670fd8c2df070c60b045671b8b24ff02");
 
-                .put("username", "Mufasa")
-                .put("realm", "testrealm@host.com")
-                .put("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093")
-                .put("uri", "/dir/index.html")
-                .put("nc", "00000001")
-                .put("cnonce", "0a4f113b")
-                .put("response", "670fd8c2df070c60b045671b8b24ff02")
-                .put("opaque", "5ccc069c403ebaf9f0171e9517f40e41");
-
-        User user = authProvider.authenticate(authInfo).await().indefinitely();
+        User user = authProvider.authenticate(Credentials.newInstance(authInfo)).await().indefinitely();
         assertNotNull(user);
         assertNotNull(user);
         assertEquals("Mufasa", user.principal().getString("username"));
