@@ -91,10 +91,13 @@ public class CodeGenHelper {
                     .collect(joining(", ", "<", ">"));
         } else {
             if (type.getKind() == ClassKind.API && translate) {
+                // TODO Is this still a thing? Future is not API anymore
                 if (type.getName().equals(Future.class.getName())) {
                     return Uni.class.getName();
                 }
                 return type.translateName(ID);
+            } else if (translate  && type.getName().equals(Future.class.getName())) {
+                    return Uni.class.getName();
             } else {
                 if (isImported(type)) {
                     return type.getSimpleName();
@@ -192,12 +195,19 @@ public class CodeGenHelper {
             } else if (kind == FUNCTION) {
                 TypeInfo argType = parameterizedTypeInfo.getArg(0);
                 TypeInfo retType = parameterizedTypeInfo.getArg(1);
-                return "new java.util.function.Function<" + genTypeName(argType) + "," + retType.getName() + ">() {\n" +
-                        "      public " + genTypeName(retType) + " apply(" + genTypeName(argType) + " arg) {\n" +
-                        "        " + genTranslatedTypeName(retType) + " ret = " + expr + ".apply(" + genConvReturn(methodTypeArgMap, argType, method, "arg") + ");\n" +
-                        "        return " + genConvParam(methodTypeArgMap, retType, method, "ret") + ";\n" +
-                        "      }\n" +
-                        "    }";
+                String translatedReturnedType = genTranslatedTypeName(retType);
+                if (translatedReturnedType.startsWith("io.smallrye.mutiny.Uni<")) {
+                    return generatingAFunctionReturningAFuture(methodTypeArgMap, method, expr, argType, retType);
+                } else {
+                    return "new java.util.function.Function<" + genTypeName(argType) + "," + retType.getName() + ">() {\n" +
+                            "      public " + genTypeName(retType) + " apply(" + genTypeName(argType) + " arg) {\n" +
+                            "        " + translatedReturnedType + " ret = " + expr + ".apply("
+                            + genConvReturn(methodTypeArgMap, argType, method, "arg") + ");\n" +
+                            "        return " + genConvParam(methodTypeArgMap, retType, method, "ret") + ";\n" +
+                            "      }\n" +
+                            "    }";
+                }
+
             } else if (kind == LIST || kind == SET) {
                 return expr + ".stream().map(elt -> " + genConvParam(methodTypeArgMap, parameterizedTypeInfo.getArg(0),
                         method, "elt")
@@ -209,6 +219,20 @@ public class CodeGenHelper {
             }
         }
         return expr;
+    }
+
+    private static String generatingAFunctionReturningAFuture(
+            Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, MethodInfo method, String expr,
+            TypeInfo argType, TypeInfo retType) {
+
+        return "new java.util.function.Function<" + genTypeName(argType) + "," + retType.getName() + ">() {\n" +
+                "      public " + genTypeName(retType) + " apply(" + genTypeName(argType) + " arg) {\n" +
+                "            return io.smallrye.mutiny.vertx.UniHelper.toFuture(\n" +
+                "                 " + expr + ".apply(" + genConvReturn(methodTypeArgMap, argType, method, "arg") + ")\n" +
+                "            );\n" +
+                "         }\n" +
+                "     }";
+
     }
 
     private static boolean isReified(TypeVariableInfo typeVar, MethodInfo method) {
