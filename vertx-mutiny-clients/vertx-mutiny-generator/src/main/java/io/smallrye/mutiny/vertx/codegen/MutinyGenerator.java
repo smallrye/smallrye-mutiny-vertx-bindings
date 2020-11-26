@@ -143,6 +143,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
             },
 
             new ToMultiMethodCodeWriter(),
+            new ConsumerMethodCodeWriter(),
             new NewInstanceMethodCodeWriter(),
             new NewInstanceWithGenericsMethodCodeWriter(),
 

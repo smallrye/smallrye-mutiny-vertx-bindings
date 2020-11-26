@@ -1,7 +1,5 @@
 package io.smallrye.mutiny.vertx.codegen.lang;
 
-import io.smallrye.mutiny.vertx.codegen.MutinyGenerator;
-import io.smallrye.mutiny.vertx.codegen.lang.CodeWriter;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.Helper;
 import io.vertx.codegen.type.ClassTypeInfo;
@@ -29,8 +27,8 @@ public class ClassDeclarationCodeWriter implements CodeWriter {
         writer.print(Helper.getSimpleName(model.getIfaceFQCN()));
 
         if (model.isConcrete() && CodeGenHelper.hasParentClass(model)) {
-                writer.print(" extends ");
-                writer.print(genTypeName(model.getConcreteSuperType()));
+            writer.print(" extends ");
+            writer.print(genTypeName(model.getConcreteSuperType()));
         }
 
         List<String> interfaces = new ArrayList<>();
@@ -40,6 +38,7 @@ public class ClassDeclarationCodeWriter implements CodeWriter {
         interfaces.addAll(model.getAbstractSuperTypes().stream().map(this::genTypeName).collect(toList()));
         if (model.isHandler()) {
             interfaces.add("io.vertx.core.Handler<" + genTypeName(model.getHandlerArg()) + ">");
+            interfaces.add("java.util.function.Consumer<" + genTypeName(model.getHandlerArg()) + ">");
         }
         if (model.isIterable()) {
             interfaces.add("java.lang.Iterable<" + genTypeName(model.getIterableArg()) + ">");
