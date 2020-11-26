@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.http.RequestOptions;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.buffer.Buffer;
 import io.vertx.mutiny.core.http.HttpClient;
@@ -43,8 +44,8 @@ public class RouterTest {
         router.get("/").handler(rc -> {
             rc.response().endAndForget("hello");
         });
-        router.get("/assets/*").handler(rc -> StaticHandler.create("src/test/resources/assets").handle(rc));
-        router.post().handler(rc -> BodyHandler.create().handle(rc));
+        router.get("/assets/*").handler(StaticHandler.create("src/test/resources/assets"));
+        router.post().handler(BodyHandler.create());
         router.post("/post").handler(rc -> rc.response().endAndForget(rc.getBodyAsString()));
 
         vertx.createHttpServer()
@@ -54,8 +55,10 @@ public class RouterTest {
         HttpClient client = vertx.createHttpClient();
 
         CountDownLatch latch1 = new CountDownLatch(1);
-        HttpClientRequest request1 = client.getAbs("http://localhost:8085/");
-        request1.toMulti().subscribe().with(
+        RequestOptions req1 = new RequestOptions()
+                .setAbsoluteURI("http://localhost:8085");
+        HttpClientRequest request1 = client.requestAndAwait(req1);
+        request1.response().subscribe().with(
                 resp -> resp.toMulti().subscribe().with(buffer -> {
                     assertEquals(buffer.toString(), "hello");
                     latch1.countDown();
@@ -66,8 +69,10 @@ public class RouterTest {
         assertTrue(latch1.await(1, TimeUnit.SECONDS));
 
         CountDownLatch latch2 = new CountDownLatch(1);
-        HttpClientRequest request2 = client.getAbs("http://localhost:8085/assets/test.txt");
-        request2.toMulti().subscribe().with(
+        RequestOptions req2 = new RequestOptions()
+                .setAbsoluteURI("http://localhost:8085/assets/test.txt");
+        HttpClientRequest request2 = client.requestAndAwait(req2);
+        request2.response().subscribe().with(
                 resp -> {
                     resp.toMulti().subscribe().with(buffer -> {
                         assertEquals(buffer.toString(), "This is a test.");
