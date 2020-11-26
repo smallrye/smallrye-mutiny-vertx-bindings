@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.vertx.codegen.type.ClassKind.API;
+
 public class ForgetMethodGenerator extends MutinyMethodGenerator {
 
     public static final String SUFFIX_AND_FORGET = "AndForget";
@@ -64,7 +66,13 @@ public class ForgetMethodGenerator extends MutinyMethodGenerator {
         writer.print(forgetMethod.getOriginalMethodName());
         writer.print("(");
         List<ParamInfo> params = forgetMethod.getMethod().getParams();
-        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
+        writer.print(params.stream().map(pi -> {
+            if (pi.getType().getKind() == API) {
+                return pi.getName() + ".getDelegate()";
+            } else {
+                return pi.getName();
+            }
+        }).collect(Collectors.joining(", ")));
         writer.print(")).subscribe().with(io.smallrye.mutiny.vertx.UniHelper.NOOP);\n");
         if (forgetMethod.isFluent()) {
             writer.print("    return this;\n");

@@ -72,7 +72,13 @@ public class AwaitMethodGenerator extends MutinyMethodGenerator {
         writer.print(method.getOriginalMethodName());
         writer.print("(");
         List<ParamInfo> params = method.getMethod().getParams();
-        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
+        writer.print(params.stream().map(pi -> {
+            if (pi.getType().getKind() == API) {
+                return pi.getName() + ".getDelegate()";
+            } else {
+                return pi.getName();
+            }
+        }).collect(Collectors.joining(", ")));
         if (method.getMethod().getReturnType().getKind() == API) {
             writer.println(").map(x -> newInstance(x))).await().indefinitely();");
         } else {

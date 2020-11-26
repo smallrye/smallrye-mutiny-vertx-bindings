@@ -9,6 +9,7 @@ import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.Helper;
 import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
+import io.vertx.codegen.type.ClassKind;
 import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
@@ -119,7 +120,13 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         writer.print(method.getName());
         writer.print("(");
         List<ParamInfo> params = method.getParams();
-        writer.print(params.stream().map(ParamInfo::getName).collect(Collectors.joining(", ")));
+        writer.print(params.stream().map(pi -> {
+            if (pi.getType().getKind() == API) {
+                return pi.getName() + ".getDelegate()";
+            } else {
+                return pi.getName();
+            }
+        }).collect(Collectors.joining(", ")));
         TypeInfo arg = ((ParameterizedTypeInfo) (descriptor.getOriginalMethod().getReturnType())).getArg(0);
         if (arg.getKind() == API) {
             writer.print(").map(x -> newInstance(x)));");
