@@ -40,6 +40,7 @@
         <module>vertx-mutiny-auth-htdigest</module>
         <module>vertx-mutiny-auth-webauthn</module>
         <module>vertx-mutiny-health-checks</module>
+        <module>vertx-mutiny-jdbc-client</module>
     </modules>
 
     <build>
