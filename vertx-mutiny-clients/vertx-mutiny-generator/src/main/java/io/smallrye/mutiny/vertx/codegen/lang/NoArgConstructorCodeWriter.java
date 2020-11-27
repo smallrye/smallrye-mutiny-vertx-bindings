@@ -27,11 +27,11 @@ public class NoArgConstructorCodeWriter implements ConditionalCodeWriter {
         List<TypeParamInfo.Class> typeParams = model.getTypeParams();
         // Constructor without parameter, used by CDI
         writer.println("  /**");
-        writer.println("  * Empty constructor used by CDI, do not use this constructor directly.");
-        writer.println("  **/");
+        writer.println("   * Empty constructor used by CDI, do not use this constructor directly.");
+        writer.println("   **/");
         writer.print("  ");
         writer.print(cst);
-        writer.print("() {");
+        writer.println("() {");
         if (model.isConcrete() && CodeGenHelper.hasParentClass(model)) {
             writer.println("    super(null);");
         }
