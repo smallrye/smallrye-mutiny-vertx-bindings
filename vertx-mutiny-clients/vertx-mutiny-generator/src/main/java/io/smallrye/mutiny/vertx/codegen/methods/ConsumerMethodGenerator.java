@@ -6,6 +6,7 @@ import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
+import io.vertx.codegen.type.TypeReflectionFactory;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -56,6 +57,8 @@ public class ConsumerMethodGenerator extends MutinyMethodGenerator {
             } else {
                 if (param.getType().getName().startsWith(Uni.class.getName())) {
                     writer.print(param.getName());
+                } else if(param.getType().getName().equals(Runnable.class.getName())) {
+                    writer.println("ignored -> " + param.getName() + ".run()");
                 } else {
                     writer.print(param.getName() + " != null ? " + param.getName() + "::accept : null");
                 }
@@ -82,6 +85,8 @@ public class ConsumerMethodGenerator extends MutinyMethodGenerator {
             consumer = new io.vertx.codegen.type.ParameterizedTypeInfo(
                     io.vertx.codegen.type.TypeReflectionFactory.create(Uni.class).getRaw(),
                     false, Collections.singletonList(inner));
+        } else if (TypeHelper.isConsumerOfVoid(consumer)) {
+            consumer = TypeReflectionFactory.create(Runnable.class);
         }
 
         // Replace the removed Handler<T> by the computed Consumer<T>

@@ -37,4 +37,16 @@ public class TypeHelper {
         TypeInfo arg = parameterized.getArg(0);
         return arg.isParameterized() && arg.getRaw().getName().equals(Promise.class.getName());
     }
+
+    public static boolean isConsumerOfVoid(TypeInfo type) {
+        if (! type.isParameterized()) {
+            return false;
+        }
+        ParameterizedTypeInfo parameterized = (ParameterizedTypeInfo) type;
+        if (! parameterized.getRaw().getName().equals(Consumer.class.getName())) {
+            return false;
+        }
+        TypeInfo arg = parameterized.getArg(0);
+        return arg.isVoid() || arg.getName().equals(Void.class.getName());
+    }
 }
