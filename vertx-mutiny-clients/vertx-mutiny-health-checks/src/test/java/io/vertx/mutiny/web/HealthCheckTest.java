@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.smallrye.mutiny.Uni;
 import io.vertx.ext.healthchecks.CheckResult;
 import io.vertx.ext.healthchecks.Status;
 import io.vertx.mutiny.core.Vertx;
@@ -34,7 +35,7 @@ public class HealthCheckTest {
     @Test
     public void testHealthCheck() {
         HealthChecks hc = HealthChecks.create(vertx);
-        hc.register("health", p -> p.complete(Status.OK()));
+        hc.register("health", Uni.createFrom().item(Status::OK));
 
         CheckResult health = hc.checkStatusAndAwait("health");
         assertEquals(health.getId(), "health");
@@ -45,7 +46,7 @@ public class HealthCheckTest {
     public void testHealthCheckWithVertxWeb() {
         HealthChecks hc = HealthChecks.create(vertx);
         HealthCheckHandler handler = HealthCheckHandler.createWithHealthChecks(hc);
-        hc.register("test", p -> p.complete(Status.OK()));
+        hc.register("test", Uni.createFrom().item(Status::OK));
 
         Router router = Router.router(vertx);
         router.get("/health*").handler(handler::handle);
