@@ -101,8 +101,11 @@ public class MutinyMethodGenerator {
         if (descriptor.isFluent()) {
             writer.println("  @Fluent");
         }
-
-        writer.print("  public ");
+        if (descriptor.isPrivate()) {
+            writer.print("  private ");
+        } else {
+            writer.print("  public ");
+        }
         if (method.isStaticMethod()) {
             writer.print("static ");
         }

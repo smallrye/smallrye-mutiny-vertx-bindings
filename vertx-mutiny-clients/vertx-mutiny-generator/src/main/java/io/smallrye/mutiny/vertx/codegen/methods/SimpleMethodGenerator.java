@@ -103,7 +103,7 @@ public class SimpleMethodGenerator extends MutinyMethodGenerator {
 
     private MutinyMethodDescriptor computeMethodInfo(MethodInfo method) {
         return new MutinyMethodDescriptor(method.copy().setName("__" + method.getName()), method,
-                MutinyMethodDescriptor.MutinyKind.SIMPLE, method.isFluent());
+                MutinyMethodDescriptor.MutinyKind.SIMPLE, method.isFluent(), true);
     }
 
     private MutinyMethodDescriptor computeMethodInfoOther(MethodInfo method) {

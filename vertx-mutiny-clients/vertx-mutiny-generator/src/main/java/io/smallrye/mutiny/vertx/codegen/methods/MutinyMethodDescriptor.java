@@ -12,16 +12,23 @@ public class MutinyMethodDescriptor {
     private final MutinyKind kind;
     private final MethodInfo method;
     private final MethodInfo original;
+    private final boolean isPrivate;
 
     public static MutinyMethodDescriptor createAndForgetMethod(MethodInfo method, MethodInfo delegate, boolean fluent) {
         return new MutinyMethodDescriptor(method, delegate, MutinyKind.FORGET, fluent);
     }
 
     public MutinyMethodDescriptor(MethodInfo method, MethodInfo original, MutinyKind kind, boolean fluent) {
+        this(method, original, kind, fluent, false);
+    }
+
+    public MutinyMethodDescriptor(MethodInfo method, MethodInfo original, MutinyKind kind, boolean fluent,
+            boolean isPrivate) {
         this.kind = kind;
         this.fluent = fluent;
         this.method = method;
         this.original = original;
+        this.isPrivate = isPrivate;
     }
 
     public MutinyMethodDescriptor(MethodInfo method, MethodInfo original, MutinyKind kind) {
@@ -80,5 +87,8 @@ public class MutinyMethodDescriptor {
         return kind == MutinyKind.SIMPLE;
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+    }
 
 }
