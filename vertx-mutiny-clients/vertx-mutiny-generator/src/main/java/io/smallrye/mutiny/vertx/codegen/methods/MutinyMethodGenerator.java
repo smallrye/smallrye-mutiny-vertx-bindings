@@ -7,9 +7,13 @@ import io.vertx.codegen.ParamInfo;
 import io.vertx.codegen.TypeParamInfo;
 import io.vertx.codegen.doc.Doc;
 import io.vertx.codegen.doc.Token;
+import io.vertx.codegen.type.ParameterizedTypeInfo;
+import io.vertx.codegen.type.TypeInfo;
 
 import java.io.PrintWriter;
 
+import static io.smallrye.mutiny.vertx.codegen.lang.TypeHelper.isConsumerOfPromise;
+import static io.smallrye.mutiny.vertx.codegen.lang.TypeHelper.isHandlerOfPromise;
 import static java.util.stream.Collectors.joining;
 
 public class MutinyMethodGenerator {
@@ -21,11 +25,12 @@ public class MutinyMethodGenerator {
     }
 
     public void generateJavadoc(MutinyMethodDescriptor descriptor) {
-        MethodInfo original  = descriptor.getOriginalMethod();
+        MethodInfo original = descriptor.getOriginalMethod();
         MethodInfo method = descriptor.getMethod();
         Doc doc = original.getDoc();
         boolean deprecated = descriptor.isDeprecated();
-        String link = CodeGenHelper.renderLinkToHtml(descriptor.getMethod().getOwnerTypes().iterator().next(), descriptor.getMethod());
+        String link = CodeGenHelper
+                .renderLinkToHtml(descriptor.getMethod().getOwnerTypes().iterator().next(), descriptor.getMethod());
         if (doc != null) {
             writer.println("  /**");
             if (descriptor.isUniMethod()) {
@@ -61,7 +66,7 @@ public class MutinyMethodGenerator {
             }
             if (!method.getReturnType().getName().equalsIgnoreCase("void")) {
                 writer.print("   * @return ");
-                if (method.getReturnDescription() != null  && descriptor.isSimple()) {
+                if (method.getReturnDescription() != null && descriptor.isSimple()) {
                     Token.toHtml(method.getReturnDescription().getTokens(), "",
                             CodeGenHelper::renderLinkToHtml, "",
                             writer);
@@ -106,9 +111,9 @@ public class MutinyMethodGenerator {
                     method.getTypeParams().stream().map(TypeParamInfo::getName).collect(joining(", ", "<", ">")));
             writer.print(" ");
         }
-        if (descriptor.isForgetMethod()  && !descriptor.fluent) {
+        if (descriptor.isForgetMethod() && !descriptor.fluent) {
             writer.print("void");
-        } else if (descriptor.isAwaitMethod()  && descriptor.getMethod().getReturnType().isVoid()) {
+        } else if (descriptor.isAwaitMethod() && descriptor.getMethod().getReturnType().isVoid()) {
             writer.print("void");
         } else {
             writer.print(CodeGenHelper.genTranslatedTypeName(method.getReturnType()));
@@ -117,7 +122,16 @@ public class MutinyMethodGenerator {
         writer.print(method.getName());
         writer.print("(");
         writer.print(method.getParams().stream()
-                .map(it -> CodeGenHelper.genTranslatedTypeName(it.getType()) + " " + it.getName())
+                .map(it -> {
+                    if (isHandlerOfPromise(it) || isConsumerOfPromise(it)) {
+                        ParameterizedTypeInfo type = (ParameterizedTypeInfo) it.getType();
+                        TypeInfo promise = type.getArg(0);
+                        TypeInfo inner = ((ParameterizedTypeInfo) promise).getArg(0);
+                        return Uni.class.getName() + "<" + CodeGenHelper.genTranslatedTypeName(inner) + ">";
+                    } else {
+                        return CodeGenHelper.genTranslatedTypeName(it.getType()) + " " + it.getName();
+                    }
+                })
                 .collect(joining(", ")));
         writer.print(")");
     }

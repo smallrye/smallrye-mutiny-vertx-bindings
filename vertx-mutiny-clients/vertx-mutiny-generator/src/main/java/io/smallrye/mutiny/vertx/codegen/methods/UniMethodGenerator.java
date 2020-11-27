@@ -13,6 +13,7 @@ import io.vertx.codegen.type.ClassKind;
 import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
+import io.vertx.core.Handler;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -160,5 +161,10 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         MethodInfo newMethod = method.copy().setReturnType(uniReturnType).setParams(params);
         return new MutinyMethodDescriptor(newMethod, method, MutinyMethodDescriptor.MutinyKind.UNI);
     }
+
+    private boolean hasHandlerAsParameter(MethodInfo method) {
+        return method.getParams().stream().anyMatch(pi -> pi.getType().getSimpleName().contains(Handler.class.getName()));
+    }
+
 
 }

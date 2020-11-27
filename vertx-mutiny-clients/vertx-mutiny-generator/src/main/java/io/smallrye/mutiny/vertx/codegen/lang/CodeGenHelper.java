@@ -9,10 +9,14 @@ import io.vertx.codegen.*;
 import io.vertx.codegen.doc.Tag;
 import io.vertx.codegen.type.*;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 
 import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static io.smallrye.mutiny.vertx.codegen.MutinyGenerator.ID;
 import static io.vertx.codegen.type.ClassKind.*;
@@ -87,6 +91,10 @@ public class CodeGenHelper {
 
         if (type.isParameterized()) {
             ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
+            if (translate  && type.getRaw().getName().equals(Handler.class.getName())  && pt.getArg(0).getName().startsWith(Promise.class.getName())) {
+                TypeInfo arg = ((ParameterizedTypeInfo) pt.getArg(0)).getArg(0);
+                return Uni.class.getName() + "<" + genTypeName(arg, true) + ">";
+            }
             return genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate))
                     .collect(joining(", ", "<", ">"));
         } else {
@@ -184,6 +192,12 @@ public class CodeGenHelper {
                             "        }\n" +
                             "      }\n" +
                             "    }";
+                } else if (eventType.isParameterized()  && eventType.getRaw().getName().equals(Promise.class.getName())) {
+                    return "new Handler<" + genTypeName(eventType) + ">() {\n" +
+                            "          public void handle(" + genTypeName(eventType) + " event) {\n" +
+                            "            " + expr + ".subscribe().with(it -> event.complete(it), failure -> event.fail(failure));\n" +
+                            "          }\n" +
+                            "      }";
                 } else {
                     return "new Handler<" + genTypeName(eventType) + ">() {\n" +
                             "      public void handle(" + genTypeName(eventType) + " event) {\n" +

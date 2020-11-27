@@ -1,5 +1,7 @@
 package io.smallrye.mutiny.vertx.codegen.methods;
 
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.vertx.codegen.lang.TypeHelper;
 import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
@@ -52,7 +54,11 @@ public class ConsumerMethodGenerator extends MutinyMethodGenerator {
             if (i < params.size() - 1) {
                 writer.print(param.getName());
             } else {
-                writer.print(param.getName() + " != null ? " + param.getName() + "::accept : null");
+                if (param.getType().getName().startsWith(Uni.class.getName())) {
+                    writer.print(param.getName());
+                } else {
+                    writer.print(param.getName() + " != null ? " + param.getName() + "::accept : null");
+                }
             }
         }
         writer.println(");");
@@ -70,6 +76,13 @@ public class ConsumerMethodGenerator extends MutinyMethodGenerator {
         TypeInfo consumer = new io.vertx.codegen.type.ParameterizedTypeInfo(
                 io.vertx.codegen.type.TypeReflectionFactory.create(Consumer.class).getRaw(),
                 consumerUnresolvedType.isNullable(), Collections.singletonList(consumerType));
+
+        if (TypeHelper.isConsumerOfPromise(consumer)) {
+            TypeInfo inner = ((ParameterizedTypeInfo) consumerType).getArg(0);
+            consumer = new io.vertx.codegen.type.ParameterizedTypeInfo(
+                    io.vertx.codegen.type.TypeReflectionFactory.create(Uni.class).getRaw(),
+                    false, Collections.singletonList(inner));
+        }
 
         // Replace the removed Handler<T> by the computed Consumer<T>
         params.add(
