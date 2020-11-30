@@ -48,6 +48,9 @@
         <module>vertx-mutiny-auth-sql-client</module>
         <module>vertx-mutiny-health-checks</module>
         <module>vertx-mutiny-jdbc-client</module>
+        <module>vertx-mutiny-json-schema</module>
+        <module>vertx-mutiny-web-validation</module>
+        <module>vertx-mutiny-web-openapi</module>
     </modules>
 
     <build>
