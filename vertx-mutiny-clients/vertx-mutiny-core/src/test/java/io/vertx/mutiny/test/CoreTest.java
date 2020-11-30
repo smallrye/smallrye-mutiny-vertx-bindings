@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -109,6 +111,22 @@ public class CoreTest extends VertxTestBase {
         await();
         assertEquals(1, serverReceived.get());
         assertEquals(1, clientReceived.get());
+    }
+
+    @Test
+    public void testTimer() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        vertx.setTimer(10, x -> latch.countDown());
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testPeriodicTimer() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(5);
+        vertx.setPeriodic(10, x -> latch.countDown());
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS));
     }
 
     private void subscribe(byte[] expected, AsyncFile file, int times) {
