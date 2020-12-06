@@ -63,6 +63,8 @@
         <module>vertx-mutiny-stomp</module>
         <module>vertx-mutiny-config</module>
         <module>vertx-mutiny-sql-client-templates</module>
+        <module>vertx-mutiny-shell</module>
+        <module>vertx-mutiny-micrometer-metrics</module>
     </modules>
 
     <build>
