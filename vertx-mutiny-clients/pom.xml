@@ -58,6 +58,10 @@
         <module>vertx-mutiny-web-templ-pebble</module>
         <module>vertx-mutiny-web-templ-rocker</module>
         <module>vertx-mutiny-web-templ-thymeleaf</module>
+        <module>vertx-mutiny-web-graphql</module>
+        <module>vertx-mutiny-circuit-breaker</module>
+        <module>vertx-mutiny-stomp</module>
+        <module>vertx-mutiny-config</module>
     </modules>
 
     <build>
