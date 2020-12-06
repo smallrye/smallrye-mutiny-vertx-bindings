@@ -65,6 +65,7 @@
         <module>vertx-mutiny-sql-client-templates</module>
         <module>vertx-mutiny-shell</module>
         <module>vertx-mutiny-micrometer-metrics</module>
+        <module>vertx-mutiny-tcp-eventbus-bridge</module>
     </modules>
 
     <build>
