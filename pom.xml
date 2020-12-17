@@ -44,7 +44,7 @@
 
     <properties>
         <vertx.version>3.9.4</vertx.version>
-        <mutiny.version>0.11.0</mutiny.version>
+        <mutiny.version>0.12.5</mutiny.version>
         <jackson.version>2.12.0</jackson.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
 
