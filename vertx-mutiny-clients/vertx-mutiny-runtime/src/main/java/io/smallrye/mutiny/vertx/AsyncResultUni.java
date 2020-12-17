@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.operators.AbstractUni;
-import io.smallrye.mutiny.operators.UniSerializedSubscriber;
+import io.smallrye.mutiny.subscription.UniSubscriber;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -21,7 +21,7 @@ public class AsyncResultUni<T> extends AbstractUni<T> implements Uni<T> {
     }
 
     @Override
-    protected void subscribing(UniSerializedSubscriber<? super T> downstream) {
+    protected void subscribing(UniSubscriber<? super T> downstream) {
         AtomicBoolean terminated = new AtomicBoolean();
         downstream.onSubscribe(() -> terminated.set(true));
 
