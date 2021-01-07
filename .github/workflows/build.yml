@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [8, 11]
+        java: [8, 11, 15]
     name: build with jdk ${{matrix.java}}
 
     steps:
