@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -16,16 +17,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.OpenOptions;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.RequestOptions;
 import io.vertx.core.impl.Utils;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import io.vertx.mutiny.core.file.AsyncFile;
-import io.vertx.mutiny.core.http.HttpClient;
-import io.vertx.mutiny.core.http.WebSocket;
+import io.vertx.mutiny.core.http.*;
 import io.vertx.test.core.TestUtils;
 import io.vertx.test.core.VertxTestBase;
 
@@ -166,5 +168,41 @@ public class CoreTest extends VertxTestBase {
                 throw new RuntimeException(e.getMessage());
             }
         }
+    }
+
+    @Test
+    public void testFollowRedirect() {
+        HttpServerOptions options = new HttpServerOptions().setPort(8081).setHost("localhost");
+        AtomicInteger redirects = new AtomicInteger();
+        HttpServer server = vertx.createHttpServer(options)
+                .requestHandler(req -> {
+                    redirects.incrementAndGet();
+                    req.response().setStatusCode(301)
+                            .putHeader(HttpHeaders.LOCATION, "http://localhost:" + 8082 + "/whatever").endAndForget();
+                });
+        server.listenAndAwait();
+
+        HttpServer server2 = vertx.createHttpServer(options.setPort(8082));
+        server2.requestHandler(req -> {
+            assertEquals(1, redirects.get());
+            assertEquals("http://localhost:" + 8082 + "/custom", req.absoluteURI());
+            req.response().endAndForget();
+            complete();
+        });
+        server2.listenAndAwait();
+
+        HttpClient client = vertx.createHttpClient();
+        client.redirectHandler(resp -> Uni.createFrom().emitter(e -> vertx.setTimer(25,
+                id -> e.complete(
+                        new RequestOptions().setAbsoluteURI("http://localhost:" + 8082 + "/custom")))));
+
+        HttpClientResponse response = client.request(new RequestOptions().setHost("localhost").setPort(8081))
+                .onItem().transformToUni(req -> {
+                    req.setFollowRedirects(true);
+                    return req.send();
+                })
+                .await().indefinitely();
+        assertEquals("http://localhost:" + 8082 + "/custom", response.request().absoluteURI());
+
     }
 }
