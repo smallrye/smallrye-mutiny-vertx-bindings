@@ -19,7 +19,12 @@ public class TypeHelper {
         if (! type.getRaw().getName().equals(Handler.class.getName())) {
             return false;
         }
-        return type.getArg(0).getName().equals(Promise.class.getName());
+        TypeInfo arg = type.getArg(0);
+        if (arg.isParameterized()) {
+            return arg.getRaw().getName().equals(Promise.class.getName());
+        } else {
+            return arg.getName().equals(Promise.class.getName());
+        }
     }
 
     public static boolean isConsumerOfPromise(ParamInfo it) {
@@ -35,7 +40,11 @@ public class TypeHelper {
             return false;
         }
         TypeInfo arg = parameterized.getArg(0);
-        return arg.isParameterized() && arg.getRaw().getName().equals(Promise.class.getName());
+        if (arg.isParameterized()) {
+            return arg.getRaw().getName().equals(Promise.class.getName());
+        } else {
+            return arg.getName().equals(Promise.class.getName());
+        }
     }
 
     public static boolean isConsumerOfVoid(TypeInfo type) {

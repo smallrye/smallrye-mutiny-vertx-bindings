@@ -316,8 +316,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
             simple.generate(model, method);
             consumer.generate(method);
         } else if (CodeGenHelper.methodKind(method) == MethodKind.OTHER) {
-            if (method.getReturnType() != null && method.getReturnType().getRaw() != null && method.getReturnType()
-                    .getRaw().getName().equals(Future.class.getName())) {
+            if (isMethodReturningAFuture(method)) {
                 env.getMessager().printMessage(Diagnostic.Kind.WARNING,
                         "A method returning a 'Future' has been found - missing handler method for '" + method.getName()
                                 + "' declared in " + method.getOwnerTypes().stream().map(TypeInfo::getName)
@@ -329,6 +328,11 @@ public class MutinyGenerator extends Generator<ClassModel> {
                 simple.generateOther(model, method);
             }
         }
+    }
+
+    private boolean isMethodReturningAFuture(MethodInfo method) {
+        return method.getReturnType() != null && method.getReturnType().getRaw() != null && method.getReturnType()
+                .getRaw().getName().equals(Future.class.getName());
     }
 
     private void generateMethodDeclaration(ClassModel model, MethodInfo method, List<String> cacheDecls,

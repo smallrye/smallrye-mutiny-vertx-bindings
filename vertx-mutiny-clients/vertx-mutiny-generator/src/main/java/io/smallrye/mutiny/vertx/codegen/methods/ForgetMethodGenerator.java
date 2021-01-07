@@ -105,9 +105,12 @@ public class ForgetMethodGenerator extends MutinyMethodGenerator {
 
         // The last parameter is the Handler<AsyncResult<T>> - removing it.
         params.remove(method.getParams().size() - 1);
+
+        List<ParamInfo> paramInfos = UniMethodGenerator.updateParamInfoIfNeeded(params);
+
         return MutinyMethodDescriptor.createAndForgetMethod(method.copy()
                 .setName(method.getName() + SUFFIX_AND_FORGET)
-                .setReturnType(returnType).setParams(params), method, fluent);
+                .setReturnType(returnType).setParams(paramInfos), method, fluent);
     }
 
     /**

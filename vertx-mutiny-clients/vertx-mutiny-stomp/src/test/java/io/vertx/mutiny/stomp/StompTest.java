@@ -37,9 +37,7 @@ public class StompTest {
         StompClient client = StompClient.create(vertx);
         client
                 .connectAndAwait()
-                .subscribeAndAwait("/q", frame -> {
-                    future.complete(frame.getBodyAsString());
-                });
+                .subscribeAndAwait("/q", frame -> future.complete(frame.getBodyAsString()));
 
         StompClient client2 = StompClient.create(vertx);
         client2

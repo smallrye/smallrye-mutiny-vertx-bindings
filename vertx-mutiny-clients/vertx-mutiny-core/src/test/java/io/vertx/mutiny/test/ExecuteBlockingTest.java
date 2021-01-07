@@ -39,6 +39,18 @@ public class ExecuteBlockingTest {
     }
 
     @Test
+    public void testExecuteBlockingNotOrdered() {
+        AtomicInteger count = new AtomicInteger();
+        Uni<Integer> uni = vertx.executeBlocking(
+                Uni.createFrom().item(count::incrementAndGet).onItem().delayIt().by(Duration.ofMillis(10)),
+                false);
+
+        assertThat(uni.await().indefinitely()).isEqualTo(1);
+        assertThat(uni.await().indefinitely()).isEqualTo(2);
+        assertThat(uni.await().indefinitely()).isEqualTo(3);
+    }
+
+    @Test
     public void testExecuteBlockingWithFailure() {
         AtomicInteger count = new AtomicInteger();
         Uni<Integer> uni = vertx.executeBlocking(Uni.createFrom().item(count::incrementAndGet)

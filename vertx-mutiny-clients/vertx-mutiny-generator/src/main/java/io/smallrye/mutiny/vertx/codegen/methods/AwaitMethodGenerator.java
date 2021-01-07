@@ -102,9 +102,12 @@ public class AwaitMethodGenerator extends MutinyMethodGenerator {
         ParamInfo handler = params.remove(method.getParams().size() - 1);
         // Extract the <T> -> It's the return type
         TypeInfo returnType = ((ParameterizedTypeInfo) ((ParameterizedTypeInfo) handler.getType()).getArg(0)).getArg(0);
+
+        List<ParamInfo> paramInfos = UniMethodGenerator.updateParamInfoIfNeeded(params);
+
         return new MutinyMethodDescriptor(method.copy()
                 .setName(method.getName() + SUFFIX_AND_AWAIT)
-                .setReturnType(returnType).setParams(params), method, MutinyMethodDescriptor.MutinyKind.AWAIT);
+                .setReturnType(returnType).setParams(paramInfos), method, MutinyMethodDescriptor.MutinyKind.AWAIT);
     }
 
 

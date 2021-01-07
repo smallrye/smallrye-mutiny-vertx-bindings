@@ -14,14 +14,18 @@ import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
 import io.vertx.core.Handler;
+import org.reactivestreams.Publisher;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static io.smallrye.mutiny.vertx.codegen.lang.TypeHelper.isConsumerOfPromise;
+import static io.smallrye.mutiny.vertx.codegen.lang.TypeHelper.isHandlerOfPromise;
 import static io.vertx.codegen.type.ClassKind.API;
 
 public class UniMethodGenerator extends MutinyMethodGenerator {
@@ -91,7 +95,7 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
                 object.append(", ");
             }
             TypeInfo type = param.getType();
-            if (type.isParameterized() && (type.getRaw().getName().equals("org.reactivestreams.Publisher"))) {
+            if (type.isParameterized() && (type.getRaw().getName().equals(Publisher.class.getName()))) {
                 String adapterFunction;
                 ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
                 if (parameterizedType.getArg(0).isVariable()) {
@@ -104,6 +108,10 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
                         .append(param.getName())
                         .append(",")
                         .append(adapterFunction).append(").resume()");
+            } else if (index < method.getParams().size() - 1 && type.isParameterized() && (type.getRaw().getName().equals(Handler.class.getName()))
+                    && ! (isHandlerOfPromise(param) || isConsumerOfPromise(param))) {
+                System.out.println(method.getName() + " ===> " + param.getName() + " : " + param.getType().getRaw() + " / " + param.getType().toString());
+                object.append(param.getName()).append("::accept");
             } else {
                 object.append(CodeGenHelper.genConvParam(methodTypeArgMap, type, method, param.getName()));
             }
@@ -111,6 +119,10 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         }
         object.append(")");
         return object.toString();
+    }
+
+    private static boolean isUni(ParamInfo param) {
+        return param.getType().isParameterized()  && param.getType().getRaw().getName().equals(Uni.class.getName());
     }
 
     private void generateBodyOther(MutinyMethodDescriptor descriptor) {
@@ -158,12 +170,37 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         TypeInfo uniReturnType = new io.vertx.codegen.type.ParameterizedTypeInfo(
                 io.vertx.codegen.type.TypeReflectionFactory.create(Uni.class).getRaw(),
                 uniUnresolvedType.isNullable(), Collections.singletonList(uniType));
-        MethodInfo newMethod = method.copy().setReturnType(uniReturnType).setParams(params);
+
+        List<ParamInfo> updatedParameters = updateParamInfoIfNeeded(params);
+
+        MethodInfo newMethod = method.copy().setReturnType(uniReturnType).setParams(updatedParameters);
         return new MutinyMethodDescriptor(newMethod, method, MutinyMethodDescriptor.MutinyKind.UNI);
     }
 
-    private boolean hasHandlerAsParameter(MethodInfo method) {
-        return method.getParams().stream().anyMatch(pi -> pi.getType().getSimpleName().contains(Handler.class.getName()));
+    static List<ParamInfo> updateParamInfoIfNeeded(List<ParamInfo> params) {
+        // Check if any other parameter need to be updated (like Handler<X> -> Consumer<X>)
+        List<ParamInfo> updatedParameters = new ArrayList<>();
+        for (ParamInfo param : params) {
+            if (isHandler(param)) {
+                TypeInfo consumerType = ((ParameterizedTypeInfo) param.getType()).getArg(0);
+                TypeInfo consumerUnresolvedType = ((ParameterizedTypeInfo) param.getUnresolvedType()).getArg(0);
+
+                TypeInfo consumer = new ParameterizedTypeInfo(
+                        io.vertx.codegen.type.TypeReflectionFactory.create(Consumer.class).getRaw(),
+                        consumerUnresolvedType.isNullable(), Collections.singletonList(consumerType));
+
+                ParamInfo pi = new ParamInfo(param.getIndex(), param.getName(), param.getDescription(), consumer);
+                updatedParameters.add(pi);
+            } else {
+                updatedParameters.add(param);
+            }
+        }
+        return updatedParameters;
+    }
+
+    private static boolean isHandler(ParamInfo param) {
+        TypeInfo type = param.getType();
+        return type.isParameterized()  && type.getRaw().getName().equals(Handler.class.getName());
     }
 
 
