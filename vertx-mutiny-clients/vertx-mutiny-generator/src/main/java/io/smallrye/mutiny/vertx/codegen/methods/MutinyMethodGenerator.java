@@ -40,17 +40,17 @@ public class MutinyMethodGenerator {
                         .getName() + " Uni}.");
                 writer.println("   * Don't forget to <em>subscribe</em> on it to trigger the operation.");
             } else if (descriptor.isAwaitMethod()) {
-                writer.println("   * Blocking variant of " + link + ".");
+                writer.println("   * Blocking variant of " + sanitize(link) + ".");
                 writer.println("   * <p>");
                 writer.println("   * This method waits for the completion of the underlying asynchronous operation.");
                 writer.println(
                         "   * If the operation completes successfully, the result is returned, otherwise the failure is thrown (potentially wrapped in a RuntimeException).");
             } else if (descriptor.isForgetMethod()) {
-                writer.println("   * Variant of " + link + " that ignores the result of the operation.");
+                writer.println("   * Variant of " + sanitize(link) + " that ignores the result of the operation.");
                 writer.println("   * <p>");
-                writer.println("   * This method subscribes on the result of " + link
+                writer.println("   * This method subscribes on the result of " + sanitize(link)
                         + ", but discards the outcome (item or failure).");
-                writer.println("   * This method is useful to trigger the asynchronous operation from " + link
+                writer.println("   * This method is useful to trigger the asynchronous operation from " + sanitize(link)
                         + " but you don't need to compose it with other operations.");
             }
 
@@ -92,6 +92,12 @@ public class MutinyMethodGenerator {
         }
     }
 
+    private String sanitize(String link) {
+        return link
+                .replace("AndAwait", "")
+                .replace("AndForget", "");
+    }
+
     public void generateMethodDeclaration(MutinyMethodDescriptor descriptor) {
         MethodInfo method = descriptor.getMethod();
         if (descriptor.isDeprecated()) {
@@ -130,7 +136,7 @@ public class MutinyMethodGenerator {
                         ParameterizedTypeInfo type = (ParameterizedTypeInfo) it.getType();
                         TypeInfo promise = type.getArg(0);
                         TypeInfo inner = ((ParameterizedTypeInfo) promise).getArg(0);
-                        return Uni.class.getName() + "<" + CodeGenHelper.genTranslatedTypeName(inner) + ">";
+                        return Uni.class.getName() + "<" + CodeGenHelper.genTranslatedTypeName(inner) + "> " + it.getName();
                     } else {
                         return CodeGenHelper.genTranslatedTypeName(it.getType()) + " " + it.getName();
                     }
