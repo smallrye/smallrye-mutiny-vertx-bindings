@@ -10,7 +10,7 @@
 
     <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-reactive-utilities-projects</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -39,7 +39,7 @@
         <connection>scm:git:git@github.com:smallrye/smallrye-reactive-utils.git</connection>
         <developerConnection>scm:git:git@github.com:smallrye/smallrye-reactive-utils.git</developerConnection>
         <url>https://github.com/smallrye/smallrye-reactive-utils</url>
-        <tag>1.4.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
