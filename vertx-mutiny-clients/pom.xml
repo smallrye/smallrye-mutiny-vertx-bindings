@@ -144,24 +144,24 @@
                     <plugin>
                         <groupId>org.revapi</groupId>
                         <artifactId>revapi-maven-plugin</artifactId>
-                        <version>0.13.1</version>
+                        <version>0.13.2</version>
                         <dependencies>
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-java</artifactId>
-                                <version>0.23.1</version>
+                                <version>0.23.2</version>
                             </dependency>
 
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-reporter-text</artifactId>
-                                <version>0.13.1</version>
+                                <version>0.13.2</version>
                             </dependency>
 
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-reporter-json</artifactId>
-                                <version>0.3.1</version>
+                                <version>0.3.2</version>
                             </dependency>
 
                         </dependencies>
