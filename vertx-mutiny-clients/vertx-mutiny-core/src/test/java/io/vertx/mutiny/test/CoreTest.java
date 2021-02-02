@@ -90,7 +90,8 @@ public class CoreTest extends VertxTestBase {
             ws.toMulti()
                     .subscribe().with(msg -> {
                         serverReceived.incrementAndGet();
-                        ws.writeTextMessage("pong");
+                        ws.writeTextMessage("pong").subscribe().with(v -> {
+                        });
                     }, err -> {
                         assertEquals(1, serverReceived.get());
                         complete();
@@ -103,7 +104,10 @@ public class CoreTest extends VertxTestBase {
                 .onItem().call(ws -> ws.writeTextMessage("ping"))
                 .onItem().transformToMulti(WebSocket::toMulti)
                 .subscribe().with(
-                        msg -> clientReceived.incrementAndGet(), err -> complete(), this::fail);
+                        msg -> clientReceived.incrementAndGet(), err -> {
+                            assertEquals(1, clientReceived.get());
+                            complete();
+                        }, this::fail);
         await();
     }
 
