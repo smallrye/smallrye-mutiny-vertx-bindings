@@ -179,7 +179,7 @@
                             <!-- Do not check for Vert.x, only focus on the client API -->
                             <checkDependencies>false</checkDependencies>
                             <generateSiteReport>false</generateSiteReport>
-                            <oldVersion>1.2.0</oldVersion>
+                            <oldVersion>2.0.0</oldVersion>
                             <newVersion>${project.version}</newVersion>
 
                             <analysisConfiguration>
