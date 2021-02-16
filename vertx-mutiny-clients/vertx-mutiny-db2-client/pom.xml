@@ -15,6 +15,8 @@
         <gen-source-groupId>io.vertx</gen-source-groupId>
         <gen-source-artifactId>vertx-db2-client</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
+
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <dependencies>
