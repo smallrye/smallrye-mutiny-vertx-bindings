@@ -43,6 +43,14 @@ jobs:
           gpg --fast-import --no-tty --batch --yes smallrye-sign.asc
           git config --global user.name "SmallRye CI"
           git config --global user.email "smallrye@googlegroups.com"
+
+          # Re-claim some disk space
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt-get clean
+          docker rmi $(docker image ls -aq)
+          df -h
+
           git checkout -b release
           mvn -B release:prepare -Prelease -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -s maven-settings.xml
           git checkout ${{github.base_ref}}
