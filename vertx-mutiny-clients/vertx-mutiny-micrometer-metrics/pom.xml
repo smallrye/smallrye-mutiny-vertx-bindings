@@ -44,6 +44,7 @@
             <version>${micrometer.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
