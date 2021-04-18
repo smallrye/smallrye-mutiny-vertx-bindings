@@ -163,6 +163,28 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <excludePackageNames>*.impl,io.smallrye.mutiny.vertx.codegen,io.smallrye.mutiny.vertx.codegen.lang
+                            </excludePackageNames>
+                        </configuration>
+                        <phase>pre-site</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
