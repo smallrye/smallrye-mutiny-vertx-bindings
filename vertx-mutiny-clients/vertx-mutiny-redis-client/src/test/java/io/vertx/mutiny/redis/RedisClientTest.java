@@ -3,6 +3,7 @@ package io.vertx.mutiny.redis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -46,5 +47,12 @@ public class RedisClientTest {
                 .subscribeAsCompletionStage()
                 .join();
         assertThat(object.get("title").toString()).isEqualTo("The Hobbit");
+
+        List<String> responses = redis.keys("*")
+                .onItem().transformToMulti(Response::toMulti)
+                .map(Response::toString)
+                .collect().asList()
+                .await().indefinitely();
+        assertThat(responses).containsExactly("book");
     }
 }

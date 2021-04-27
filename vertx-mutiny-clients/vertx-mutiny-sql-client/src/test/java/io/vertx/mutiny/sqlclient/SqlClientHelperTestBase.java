@@ -29,13 +29,13 @@ public abstract class SqlClientHelperTestBase {
     }
 
     protected void assertTableContainsInitDataOnly() throws Exception {
-        List<String> actual = uniqueNames(pool).collectItems().asList().await().indefinitely();
+        List<String> actual = uniqueNames(pool).collect().asList().await().indefinitely();
         assertThat(actual).isEqualTo(NAMES.stream().sorted().distinct().collect(toList()));
     }
 
     protected static Multi<String> uniqueNames(SqlClient client) {
         return client.query(UNIQUE_NAMES_SQL).execute()
-                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transformToMulti(RowSet::toMulti)
                 .onItem().transform(row -> row.getString(0));
     }
 

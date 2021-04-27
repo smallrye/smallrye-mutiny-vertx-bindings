@@ -1,13 +1,17 @@
 package io.smallrye.mutiny.vertx.codegen.lang;
 
-import java.io.PrintWriter;
-
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.type.ClassKind;
 import io.vertx.codegen.type.TypeInfo;
 
+import java.io.PrintWriter;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.StreamSupport;
+
 /**
  * Add methods if the class implements {@code Iterator} interface.
+ * It also injects a {@code toMulti} method if not present.
  */
 public class IteratorMethodsCodeWriter implements ConditionalCodeWriter {
 
@@ -21,8 +25,8 @@ public class IteratorMethodsCodeWriter implements ConditionalCodeWriter {
             writer.println();
         }
 
+        TypeInfo iteratorArg = model.getIteratorArg();
         if (model.getMethods().stream().noneMatch(it -> it.getParams().isEmpty() && "next".equals(it.getName()))) {
-            TypeInfo iteratorArg = model.getIteratorArg();
 
             writer.println("  @Override");
             writer.printf("  public %s next() {%n", genTypeName(iteratorArg));
@@ -35,6 +39,20 @@ public class IteratorMethodsCodeWriter implements ConditionalCodeWriter {
                 writer.println("    return delegate.next();");
             }
 
+            writer.println("  }");
+            writer.println();
+        }
+
+        if (model.getMethods().stream().noneMatch(it -> it.getParams().isEmpty() && "toMulti".equals(it.getName()))) {
+            writer.printf("  public Multi<%s> toMulti() {%n", genTypeName(iteratorArg));
+            String support = StreamSupport.class.getName();
+            String splitIterators = Spliterators.class.getName() + ".spliteratorUnknownSize";
+            String ordered = Spliterator.class.getName() + ".ORDERED";
+            writer.printf("    return Multi.createFrom().items(%n"
+                            + "      %s.stream(%n"
+                            + "        %s(this, %s), false)%n"
+                            + "    );%n",
+                    support, splitIterators, ordered);
             writer.println("  }");
             writer.println();
         }
