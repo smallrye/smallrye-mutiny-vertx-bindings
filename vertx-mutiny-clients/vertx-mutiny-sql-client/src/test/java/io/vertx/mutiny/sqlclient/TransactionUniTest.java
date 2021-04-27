@@ -13,7 +13,6 @@ import io.smallrye.mutiny.Uni;
 
 public abstract class TransactionUniTest extends SqlClientHelperTestBase {
 
-    @SuppressWarnings("ConstantConditions")
     @Test
     public void testCompletion() {
         AtomicBoolean committed = new AtomicBoolean();

@@ -128,7 +128,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
             new BufferRelatedMethodCodeWriter(),
             new ToStringMethodCodeWriter(),
             new HashCodeAndEqualsMethodsCodeWriter(),
-            new IteratableMethodCodeWriter(),
+            new IterableMethodCodeWriter(),
             new IteratorMethodsCodeWriter(),
             new FunctionApplyMethodCodeWriter(),
             new ToSubscriberCodeWriter(),
