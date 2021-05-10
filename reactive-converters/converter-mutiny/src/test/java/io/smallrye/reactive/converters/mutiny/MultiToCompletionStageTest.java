@@ -43,7 +43,7 @@ public class MultiToCompletionStageTest extends ToCompletionStageTCK<Multi> {
     protected Multi createInstanceFailingAsynchronously(RuntimeException e) {
         return Multi.createFrom().item("X")
                 .emitOn(executor)
-                .onItem().apply(s -> {
+                .onItem().transform(s -> {
                     throw e;
                 });
     }
@@ -82,7 +82,7 @@ public class MultiToCompletionStageTest extends ToCompletionStageTCK<Multi> {
     protected Optional<Multi> createInstanceCompletingAsynchronously() {
         return Optional.of(Multi.createFrom().item("X")
                 .emitOn(executor)
-                .onItem().produceMulti(x -> Multi.createFrom().empty()).concatenate());
+                .onItem().transformToMulti(x -> Multi.createFrom().empty()).concatenate());
     }
 
     @Override

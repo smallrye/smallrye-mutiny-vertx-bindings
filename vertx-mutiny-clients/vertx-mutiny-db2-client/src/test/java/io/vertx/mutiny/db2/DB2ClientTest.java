@@ -67,8 +67,9 @@ public class DB2ClientTest {
         Pool client = DB2Pool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
         Uni<Tuple2<RowSet<Row>, RowSet<Row>>> uni = client.getConnection()
-                .flatMap(c -> c.preparedQuery("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute()
-                        .and(c.preparedQuery("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute()));
+                .flatMap(c -> Uni.combine().all().unis(
+                        c.preparedQuery("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute(),
+                        c.preparedQuery("SELECT 1 FROM SYSIBM.SYSDUMMY1").execute()).asTuple());
 
         Tuple2<RowSet<Row>, RowSet<Row>> results = uni.await().indefinitely();
         assertThat(results).isNotNull();
