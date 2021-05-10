@@ -1,9 +1,10 @@
 package io.vertx.mutiny.sqlclient;
 
-import java.util.function.Function;
-
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.sqlclient.TransactionRollbackException;
+
+import java.util.function.Function;
 
 /**
  * Utilities for generating {@link Multi} and {@link Uni} with a {@link SqlClient}.
@@ -21,26 +22,20 @@ public class SqlClientHelper {
      */
     public static <T> Multi<T> inTransactionMulti(Pool pool, Function<SqlClient, Multi<T>> sourceSupplier) {
         return usingConnectionMulti(pool, conn -> {
-            return conn
-                    .begin()
-                    .onItem().transformToMulti(transaction -> {
-                        Multi<T> multi = sourceSupplier.apply(conn)
-                                .onCompletion().call(() -> transaction.commit())
-                                .onFailure().call(() -> transaction.rollback());
-                        return multi;
-                        //                        return multi.onTermination()
-                        //                                .call((failure, cancellation) -> {
-                        //                                    System.out.println("Failing or cancelling " + failure);
-                        //                                    if (cancellation || failure != null) {
-                        //                                        // The failure will be propagated downstream
-                        //                                        System.out.println("rollback");
-                        //                                        return transaction.rollback();
-                        //                                    } else {
-                        //                                        return transaction.commit();
-                        //                                    }
-                        //                                });
-                    });
+            return conn.begin().onItem().transformToMulti(tx -> {
+                Multi<T> multi = Multi.createBy().concatenating().streams(
+                        sourceSupplier.apply(conn),
+                        tx.commit().toMulti().onItem().transform(v -> null)
+                );
+                return multi.onFailure().recoverWithMulti(err -> {
+                    return err instanceof TransactionRollbackException ? Multi.createFrom().failure(err) : rollbackMulti(tx, err);
+                });
+            });
         });
+    }
+
+    private static <T> Multi<T> rollbackMulti(Transaction tx, Throwable originalErr) {
+        return SqlClientHelper.<T>rollbackUni(tx, originalErr).toMulti();
     }
 
     /**
@@ -53,16 +48,24 @@ public class SqlClientHelper {
      * @return a {@link Uni} generated from operations executed inside a {@link Transaction}
      */
     public static <T> Uni<T> inTransactionUni(Pool pool, Function<SqlClient, Uni<T>> sourceSupplier) {
-        return usingConnectionUni(pool, conn -> conn.begin()
-                .onItem().transformToUni(tx -> sourceSupplier.apply(conn)
-                        .onItemOrFailure().transformToUni((res, fail) -> {
-                            if (fail != null) {
-                                //noinspection unchecked
-                                return (Uni<T>) tx.rollback().onItem().failWith(x -> fail);
-                            } else {
-                                return tx.commit().onItem().transform(x -> res);
-                            }
-                        })));
+        return usingConnectionUni(pool, conn -> conn.begin().onItem().transformToUni(tx -> {
+            return sourceSupplier.apply(conn).onItemOrFailure().transformToUni((res, err) -> {
+                if (err != null) {
+                    return err instanceof TransactionRollbackException ? Uni.createFrom().failure(err) : rollbackUni(tx, err);
+                } else {
+                    return tx.commit().onItem().transform(x -> res);
+                }
+            });
+        }));
+    }
+
+    private static <T> Uni<T> rollbackUni(Transaction tx, Throwable originalErr) {
+        return tx.rollback().onItemOrFailure().transformToUni((res, err) -> {
+            if (err != null) {
+                originalErr.addSuppressed(err);
+            }
+            return Uni.createFrom().failure(originalErr);
+        });
     }
 
     /**
