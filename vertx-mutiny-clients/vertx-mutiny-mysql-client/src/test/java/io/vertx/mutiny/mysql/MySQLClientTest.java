@@ -2,10 +2,7 @@ package io.vertx.mutiny.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.mutiny.core.Vertx;
@@ -19,8 +16,8 @@ public class MySQLClientTest {
     private static final String MYSQL_ROOT_PASSWORD = "my-secret-pw";
     private static final String MYSQL_DATABASE = "test";
 
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mysql:latest")
+    @ClassRule
+    public static GenericContainer<?> container = new GenericContainer<>("mysql:latest")
             .withExposedPorts(3306)
             .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_ROOT_PASSWORD)
             .withEnv("MYSQL_DATABASE", MYSQL_DATABASE);

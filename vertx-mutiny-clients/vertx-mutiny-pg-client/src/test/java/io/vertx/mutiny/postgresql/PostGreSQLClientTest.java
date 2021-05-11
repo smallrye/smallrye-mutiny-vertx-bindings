@@ -2,10 +2,7 @@ package io.vertx.mutiny.postgresql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.smallrye.mutiny.Uni;
@@ -20,8 +17,8 @@ import io.vertx.sqlclient.PoolOptions;
 
 public class PostGreSQLClientTest {
 
-    @Rule
-    public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
+    @ClassRule
+    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
 
     private Vertx vertx;
 
