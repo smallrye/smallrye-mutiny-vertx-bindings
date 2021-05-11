@@ -1,10 +1,10 @@
 package io.vertx.mutiny.sqlclient;
 
+import java.util.function.Function;
+
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.sqlclient.TransactionRollbackException;
-
-import java.util.function.Function;
 
 /**
  * Utilities for generating {@link Multi} and {@link Uni} with a {@link SqlClient}.
@@ -25,17 +25,17 @@ public class SqlClientHelper {
             return conn.begin().onItem().transformToMulti(tx -> {
                 Multi<T> multi = Multi.createBy().concatenating().streams(
                         sourceSupplier.apply(conn),
-                        tx.commit().toMulti().onItem().transform(v -> null)
-                );
+                        tx.commit().toMulti().onItem().transform(v -> null));
                 return multi.onFailure().recoverWithMulti(err -> {
-                    return err instanceof TransactionRollbackException ? Multi.createFrom().failure(err) : rollbackMulti(tx, err);
+                    return err instanceof TransactionRollbackException ? Multi.createFrom().failure(err)
+                            : rollbackMulti(tx, err);
                 });
             });
         });
     }
 
     private static <T> Multi<T> rollbackMulti(Transaction tx, Throwable originalErr) {
-        return SqlClientHelper.<T>rollbackUni(tx, originalErr).toMulti();
+        return SqlClientHelper.<T> rollbackUni(tx, originalErr).toMulti();
     }
 
     /**
