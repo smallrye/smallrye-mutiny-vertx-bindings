@@ -15,8 +15,8 @@ public abstract class TransactionMultiTest extends SqlClientHelperTestBase {
 
     @Test
     public void inTransactionSuccess() throws Exception {
-        List<String> actual = inTransaction(null).collectItems().asList().await().indefinitely();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
+        List<String> actual = inTransaction(null).collect().asList().await().indefinitely();
+        assertThat(actual).isEqualTo(namesWithExtraFolks());
     }
 
     @Test
@@ -24,10 +24,10 @@ public abstract class TransactionMultiTest extends SqlClientHelperTestBase {
         Exception failure = new Exception();
         List<String> emitted = Collections.synchronizedList(new ArrayList<>());
         try {
-            inTransaction(failure).onItem().invoke(emitted::add).collectItems().asList().await().indefinitely();
+            inTransaction(failure).onItem().invoke(emitted::add).collect().asList().await().indefinitely();
         } catch (Exception e) {
             assertThat(e).isInstanceOf(CompletionException.class).getCause().isEqualTo(failure);
-            assertThat(emitted).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
+            assertThat(emitted).isEqualTo(namesWithExtraFolks());
         }
         assertTableContainsInitDataOnly();
     }

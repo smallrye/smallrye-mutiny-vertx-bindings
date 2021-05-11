@@ -29,13 +29,13 @@ public abstract class TransactionUniTest extends SqlClientHelperTestBase {
     @Test
     public void inTransactionSuccess() {
         List<String> actual = inTransaction(null).await().indefinitely();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
+        assertThat(actual).isEqualTo(namesWithExtraFolks());
     }
 
     @Test
     public void withTransactionSuccess() {
         List<String> actual = withTransaction(null).await().indefinitely();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
+        assertThat(actual).isEqualTo(namesWithExtraFolks());
     }
 
     @Test
@@ -65,7 +65,7 @@ public abstract class TransactionUniTest extends SqlClientHelperTestBase {
     private Uni<List<String>> inTransaction(Exception e) {
         return SqlClientHelper.inTransactionUni(pool, transaction -> {
             Uni<List<String>> upstream = insertExtraFolks(transaction)
-                    .onItem().transformToUni(v -> uniqueNames(transaction).collectItems().asList());
+                    .onItem().transformToUni(v -> uniqueNames(transaction).collect().asList());
             if (e == null) {
                 return upstream;
             }
@@ -76,7 +76,7 @@ public abstract class TransactionUniTest extends SqlClientHelperTestBase {
     private Uni<List<String>> withTransaction(Exception e) {
         return pool.withTransaction(connection -> {
             Uni<List<String>> upstream = insertExtraFolks(connection)
-                    .onItem().transformToUni(v -> uniqueNames(connection).collectItems().asList());
+                    .onItem().transformToUni(v -> uniqueNames(connection).collect().asList());
             if (e == null) {
                 return upstream;
             }
