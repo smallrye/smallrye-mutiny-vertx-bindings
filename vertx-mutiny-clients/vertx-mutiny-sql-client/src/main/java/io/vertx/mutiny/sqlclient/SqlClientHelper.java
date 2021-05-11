@@ -25,7 +25,7 @@ public class SqlClientHelper {
             return conn.begin().onItem().transformToMulti(tx -> {
                 Multi<T> multi = Multi.createBy().concatenating().streams(
                         sourceSupplier.apply(conn),
-                        tx.commit().toMulti().onItem().transform(v -> null));
+                        tx.commit().onItem().transformToMulti(v -> Multi.createFrom().empty()));
                 return multi.onFailure().recoverWithMulti(err -> {
                     return err instanceof TransactionRollbackException ? Multi.createFrom().failure(err)
                             : rollbackMulti(tx, err);
