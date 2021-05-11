@@ -17,7 +17,7 @@ public abstract class UsingConnectionSafetyTest {
     public void testUsingConnectionMulti() throws Exception {
         doTest(throwable -> SqlClientHelper.usingConnectionMulti(pool, conn -> {
             throw throwable;
-        }).collectItems().first());
+        }).collect().first());
     }
 
     @Test

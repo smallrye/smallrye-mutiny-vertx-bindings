@@ -1,8 +1,10 @@
 package io.vertx.mutiny.mysql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.mutiny.core.Vertx;
@@ -15,8 +17,8 @@ public class MySqlInTransactionUniTest extends TransactionUniTest {
     private static final String MYSQL_ROOT_PASSWORD = "my-secret-pw";
     private static final String MYSQL_DATABASE = "test";
 
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mysql:latest")
+    @ClassRule
+    public static GenericContainer<?> container = new GenericContainer<>("mysql:latest")
             .withExposedPorts(3306)
             .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_ROOT_PASSWORD)
             .withEnv("MYSQL_DATABASE", MYSQL_DATABASE);
@@ -43,5 +45,10 @@ public class MySqlInTransactionUniTest extends TransactionUniTest {
     public void tearDown() {
         pool.close();
         vertx.closeAndAwait();
+    }
+
+    @Override
+    protected void verifyDuplicateException(Exception e) {
+        assertThat(e).hasMessageContaining("Duplicate entry");
     }
 }

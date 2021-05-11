@@ -28,21 +28,21 @@ public abstract class TransactionUniTest extends SqlClientHelperTestBase {
 
     @Test
     public void inTransactionSuccess() {
-        List<String> actual = inTransaction(null).await().indefinitely();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
+        List<String> actual = inTransaction(false, null);
+        assertThat(actual).isEqualTo(namesWithExtraFolks());
     }
 
     @Test
     public void withTransactionSuccess() {
-        List<String> actual = withTransaction(null).await().indefinitely();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(namesWithExtraFolks());
+        List<String> actual = withTransaction(false, null);
+        assertThat(actual).isEqualTo(namesWithExtraFolks());
     }
 
     @Test
-    public void inTransactionFailure() throws Exception {
+    public void inTransactionUserFailure() throws Exception {
         Exception failure = new Exception();
         try {
-            inTransaction(failure).await().indefinitely();
+            inTransaction(true, failure);
             fail("Exception expected");
         } catch (Exception e) {
             assertThat(e).isInstanceOf(CompletionException.class).getCause().isEqualTo(failure);
@@ -51,10 +51,21 @@ public abstract class TransactionUniTest extends SqlClientHelperTestBase {
     }
 
     @Test
-    public void withTransactionFailure() throws Exception {
+    public void inTransactionDBFailure() throws Exception {
+        try {
+            inTransaction(true, null);
+            fail("Exception expected");
+        } catch (Exception e) {
+            verifyDuplicateException(e);
+        }
+        assertTableContainsInitDataOnly();
+    }
+
+    @Test
+    public void withTransactionUserFailure() throws Exception {
         Exception failure = new Exception();
         try {
-            withTransaction(failure).await().indefinitely();
+            withTransaction(true, failure);
             fail("Exception expected");
         } catch (Exception e) {
             assertThat(e).isInstanceOf(CompletionException.class).getCause().isEqualTo(failure);
@@ -62,25 +73,44 @@ public abstract class TransactionUniTest extends SqlClientHelperTestBase {
         assertTableContainsInitDataOnly();
     }
 
-    private Uni<List<String>> inTransaction(Exception e) {
+    @Test
+    public void withTransactionDBFailure() throws Exception {
+        try {
+            withTransaction(true, null);
+            fail("Exception expected");
+        } catch (Exception e) {
+            verifyDuplicateException(e);
+        }
+        assertTableContainsInitDataOnly();
+    }
+
+    protected abstract void verifyDuplicateException(Exception e);
+
+    private List<String> inTransaction(boolean fail, Exception e) {
         return SqlClientHelper.inTransactionUni(pool, transaction -> {
             Uni<List<String>> upstream = insertExtraFolks(transaction)
-                    .onItem().transformToUni(v -> uniqueNames(transaction).collectItems().asList());
-            if (e == null) {
+                    .onItem().transformToUni(v -> uniqueNames(transaction).collect().asList());
+            if (!fail) {
                 return upstream;
             }
-            return upstream.onItem().transformToUni(v -> Uni.createFrom().failure(e));
-        });
+            if (e != null) {
+                return upstream.onItem().transformToUni(v -> Uni.createFrom().failure(e));
+            }
+            return upstream.replaceWith(upstream);
+        }).await().indefinitely();
     }
 
-    private Uni<List<String>> withTransaction(Exception e) {
+    private List<String> withTransaction(boolean fail, Exception e) {
         return pool.withTransaction(connection -> {
             Uni<List<String>> upstream = insertExtraFolks(connection)
-                    .onItem().transformToUni(v -> uniqueNames(connection).collectItems().asList());
-            if (e == null) {
+                    .onItem().transformToUni(v -> uniqueNames(connection).collect().asList());
+            if (!fail) {
                 return upstream;
             }
-            return upstream.onItem().transformToUni(v -> Uni.createFrom().failure(e));
-        });
+            if (e != null) {
+                return upstream.onItem().transformToUni(v -> Uni.createFrom().failure(e));
+            }
+            return upstream.replaceWith(upstream);
+        }).await().indefinitely();
     }
 }

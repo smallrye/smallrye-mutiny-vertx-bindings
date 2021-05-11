@@ -12,7 +12,7 @@ import io.smallrye.mutiny.Uni;
 
 public abstract class SqlClientHelperTestBase {
 
-    protected static final List<String> NAMES = Arrays.asList("John", "Paul", "Peter", "Andrew", "Peter", "Steven");
+    protected static final List<String> NAMES = Arrays.asList("John", "Paul", "Peter", "Andrew", "Steven");
 
     protected static final String UNIQUE_NAMES_SQL = "select distinct firstname from folks order by firstname asc";
 
@@ -22,7 +22,7 @@ public abstract class SqlClientHelperTestBase {
 
     public void initDb() {
         pool.query("drop table if exists folks").executeAndAwait();
-        pool.query("create table folks (firstname varchar(255) not null)").executeAndAwait();
+        pool.query("create table folks (firstname varchar(255) not null unique)").executeAndAwait();
         for (String name : NAMES) {
             pool.query(String.format(INSERT_FOLK_SQL, name)).executeAndAwait();
         }
