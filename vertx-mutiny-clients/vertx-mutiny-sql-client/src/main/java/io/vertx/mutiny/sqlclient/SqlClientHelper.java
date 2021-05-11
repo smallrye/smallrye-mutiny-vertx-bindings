@@ -23,13 +23,9 @@ public class SqlClientHelper {
     public static <T> Multi<T> inTransactionMulti(Pool pool, Function<SqlClient, Multi<T>> sourceSupplier) {
         return usingConnectionMulti(pool, conn -> {
             return conn.begin().onItem().transformToMulti(tx -> {
-                Multi<T> multi = Multi.createBy().concatenating().streams(
-                        sourceSupplier.apply(conn),
-                        tx.commit().onItem().transformToMulti(v -> Multi.createFrom().empty()));
-                return multi.onFailure().recoverWithMulti(err -> {
-                    return err instanceof TransactionRollbackException ? Multi.createFrom().failure(err)
-                            : rollbackMulti(tx, err);
-                });
+                return sourceSupplier.apply(conn)
+                        .onCompletion().call(tx::commit)
+                        .onFailure(SqlClientHelper::needsRollback).recoverWithMulti(err -> rollbackMulti(tx, err));
             });
         });
     }
@@ -49,14 +45,14 @@ public class SqlClientHelper {
      */
     public static <T> Uni<T> inTransactionUni(Pool pool, Function<SqlClient, Uni<T>> sourceSupplier) {
         return usingConnectionUni(pool, conn -> conn.begin().onItem().transformToUni(tx -> {
-            return sourceSupplier.apply(conn).onItemOrFailure().transformToUni((res, err) -> {
-                if (err != null) {
-                    return err instanceof TransactionRollbackException ? Uni.createFrom().failure(err) : rollbackUni(tx, err);
-                } else {
-                    return tx.commit().onItem().transform(x -> res);
-                }
-            });
+            return sourceSupplier.apply(conn)
+                    .onItem().call(tx::commit)
+                    .onFailure(SqlClientHelper::needsRollback).recoverWithUni(err -> rollbackUni(tx, err));
         }));
+    }
+
+    private static boolean needsRollback(Throwable throwable) {
+        return !(throwable instanceof TransactionRollbackException);
     }
 
     private static <T> Uni<T> rollbackUni(Transaction tx, Throwable originalErr) {
