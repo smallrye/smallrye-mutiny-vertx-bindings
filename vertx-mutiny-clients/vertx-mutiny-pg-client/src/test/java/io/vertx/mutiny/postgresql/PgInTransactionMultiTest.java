@@ -12,7 +12,7 @@ import io.vertx.sqlclient.PoolOptions;
 public class PgInTransactionMultiTest extends TransactionMultiTest {
 
     @Rule
-    public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
+    public PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:latest");
 
     private Vertx vertx;
 

@@ -14,7 +14,7 @@ import io.vertx.sqlclient.PoolOptions;
 public class PgInTransactionUniTest extends TransactionUniTest {
 
     @Rule
-    public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
+    public PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:latest");
 
     private Vertx vertx;
 
