@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.smallrye.mutiny.operators.AbstractUni;
 import io.smallrye.mutiny.subscription.UniSubscriber;
 import io.vertx.core.AsyncResult;
@@ -17,7 +18,7 @@ public class AsyncResultUni<T> extends AbstractUni<T> implements Uni<T> {
     }
 
     public AsyncResultUni(Consumer<Handler<AsyncResult<T>>> subscriptionConsumer) {
-        this.subscriptionConsumer = subscriptionConsumer;
+        this.subscriptionConsumer = Infrastructure.decorate(subscriptionConsumer);
     }
 
     @Override
