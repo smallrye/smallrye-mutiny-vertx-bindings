@@ -239,6 +239,23 @@ public class CodeGenHelper {
             Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, MethodInfo method, String expr,
             TypeInfo argType, TypeInfo retType) {
 
+        // If the retType if a Future<X> and X is of type API, we need to unwrap the mutiny type to the bare type
+        // (call getDelegate())
+        boolean appendDelegate = false;
+        if (retType.isParameterized()  && retType.getKind() == FUTURE) {
+            ParameterizedTypeInfo ret = (ParameterizedTypeInfo) retType;
+            appendDelegate = ret.getArg(0).getKind() == API;
+        }
+
+        if (appendDelegate) {
+            return "new java.util.function.Function<" + genTypeName(argType) + "," + retType.getName() + ">() {\n" +
+                    "      public " + genTypeName(retType) + " apply(" + genTypeName(argType) + " arg) {\n" +
+                    "            return io.smallrye.mutiny.vertx.UniHelper.toFuture(\n" +
+                    "                 " + expr + ".apply(" + genConvReturn(methodTypeArgMap, argType, method, "arg") + ").map(x -> x.getDelegate())\n" +
+                    "            );\n" +
+                    "         }\n" +
+                    "     }";
+        }
         return "new java.util.function.Function<" + genTypeName(argType) + "," + retType.getName() + ">() {\n" +
                 "      public " + genTypeName(retType) + " apply(" + genTypeName(argType) + " arg) {\n" +
                 "            return io.smallrye.mutiny.vertx.UniHelper.toFuture(\n" +
