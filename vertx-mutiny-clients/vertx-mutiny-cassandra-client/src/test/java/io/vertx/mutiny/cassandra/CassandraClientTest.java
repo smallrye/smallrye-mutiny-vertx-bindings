@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.CassandraContainer;
-import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.cassandra.CassandraClientOptions;
 import io.vertx.mutiny.core.Vertx;
@@ -15,7 +14,7 @@ import io.vertx.mutiny.core.Vertx;
 public class CassandraClientTest {
 
     @Rule
-    public GenericContainer<?> container = new CassandraContainer<>()
+    public CassandraContainer<?> container = new CassandraContainer<>("cassandra:3.11")
             .withExposedPorts(9042);
 
     private Vertx vertx;

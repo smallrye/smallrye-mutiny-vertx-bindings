@@ -20,7 +20,7 @@ import io.vertx.redis.client.RedisOptions;
 public class RedisClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("redis:latest")
+    public GenericContainer<?> container = new GenericContainer<>("redis:6.2")
             .withExposedPorts(6379);
 
     private Vertx vertx;

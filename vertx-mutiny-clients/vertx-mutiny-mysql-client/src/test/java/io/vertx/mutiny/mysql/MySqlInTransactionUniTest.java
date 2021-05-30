@@ -18,7 +18,7 @@ public class MySqlInTransactionUniTest extends TransactionUniTest {
     private static final String MYSQL_DATABASE = "test";
 
     @ClassRule
-    public static GenericContainer<?> container = new GenericContainer<>("mysql:latest")
+    public static GenericContainer<?> container = new GenericContainer<>("mysql:8")
             .withExposedPorts(3306)
             .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_ROOT_PASSWORD)
             .withEnv("MYSQL_DATABASE", MYSQL_DATABASE);
