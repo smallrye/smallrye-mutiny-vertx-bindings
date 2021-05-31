@@ -8,6 +8,7 @@ import org.reactivestreams.Subscription;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.helpers.Subscriptions;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.smallrye.mutiny.operators.AbstractMulti;
 import io.vertx.core.streams.ReadStream;
 
@@ -20,7 +21,7 @@ public class MultiReadStream<T, U> extends AbstractMulti<U> implements Multi<U> 
     public MultiReadStream(ReadStream<T> source, Function<T, U> transformation) {
         source.pause();
         this.source = source;
-        this.transformation = transformation;
+        this.transformation = Infrastructure.decorate(transformation);
         this.upstream = new AtomicReference<>();
     }
 
