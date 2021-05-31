@@ -200,7 +200,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
             ListIterator<MethodInfo> it = methods.listIterator();
             while (it.hasNext()) {
                 MethodInfo method = it.next();
-                if (CodeGenHelper.methodKind(method) != MethodKind.FUTURE) {
+                if (CodeGenHelper.methodKind(method) != MethodKind.CALLBACK) {
                     // Has it been removed above ?
                     Predicate<MethodInfo> pred;
                     if (method.isOwnedBy(model.getType())) {
@@ -209,7 +209,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
                         pred = other -> isOverride(method, other);
                     }
                     if (methods.stream()
-                            .filter(m -> CodeGenHelper.methodKind(m) == MethodKind.FUTURE)
+                            .filter(m -> CodeGenHelper.methodKind(m) == MethodKind.CALLBACK)
                             .anyMatch(pred)) {
                         it.remove();
                     }
@@ -220,18 +220,18 @@ public class MutinyGenerator extends Generator<ClassModel> {
             it = methods.listIterator();
             while (it.hasNext()) {
                 MethodInfo meth = it.next();
-                if (CodeGenHelper.methodKind(meth) == MethodKind.FUTURE) {
+                if (CodeGenHelper.methodKind(meth) == MethodKind.CALLBACK) {
                     boolean remove;
                     List<MethodInfo> abc = model.getMethodMap().getOrDefault(meth.getName(), Collections.emptyList());
                     if (meth.isOwnedBy(model.getType())) {
                         remove = abc.stream()
-                                .filter(m -> CodeGenHelper.methodKind(m) != MethodKind.FUTURE && isOverride(m, meth))
+                                .filter(m -> CodeGenHelper.methodKind(m) != MethodKind.CALLBACK && isOverride(m, meth))
                                 .anyMatch(m -> !m.isOwnedBy(model.getType()) || methods.contains(m));
                     } else {
                         remove = abc.stream()
-                                .filter(other -> CodeGenHelper.methodKind(other) != MethodKind.FUTURE)
+                                .filter(other -> CodeGenHelper.methodKind(other) != MethodKind.CALLBACK)
                                 .anyMatch(other -> {
-                                    if (CodeGenHelper.methodKind(other) != MethodKind.FUTURE) {
+                                    if (CodeGenHelper.methodKind(other) != MethodKind.CALLBACK) {
                                         Set<ClassTypeInfo> tmp = new HashSet<>(other.getOwnerTypes());
                                         tmp.retainAll(meth.getOwnerTypes());
                                         return isOverride(meth, other) & !tmp.isEmpty();
@@ -308,7 +308,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
         AwaitMethodGenerator await = new AwaitMethodGenerator(writer);
         ConsumerMethodGenerator consumer = new ConsumerMethodGenerator(writer);
         SimpleMethodGenerator simple = new SimpleMethodGenerator(writer, cacheDecls, methodTypeArgMap);
-        if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
+        if (CodeGenHelper.methodKind(method) == MethodKind.CALLBACK) {
             uni.generate(model, method);
             await.generate(method);
             forget.generate(model, method);
@@ -337,7 +337,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
 
     private void generateMethodDeclaration(ClassModel model, MethodInfo method, List<String> cacheDecls,
             PrintWriter writer) {
-        if (CodeGenHelper.methodKind(method) == MethodKind.FUTURE) {
+        if (CodeGenHelper.methodKind(method) == MethodKind.CALLBACK) {
             new UniMethodGenerator(writer, methodTypeArgMap).generateDeclaration(method);
             if (model.getMethods().stream()
                     .noneMatch(mi -> mi.getName().equals(method.getName() + AwaitMethodGenerator.SUFFIX_AND_AWAIT))) {

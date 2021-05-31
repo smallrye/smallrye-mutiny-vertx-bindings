@@ -48,7 +48,7 @@ public class CodeGenHelper {
             if (lastParamType.getKind() == ClassKind.HANDLER) {
                 TypeInfo typeArg = ((ParameterizedTypeInfo) lastParamType).getArgs().get(0);
                 if (typeArg.getKind() == ClassKind.ASYNC_RESULT) {
-                    return MethodKind.FUTURE;
+                    return MethodKind.CALLBACK;
                 } else {
                     return MethodKind.HANDLER;
                 }
@@ -230,6 +230,9 @@ public class CodeGenHelper {
                 return expr + ".entrySet().stream().collect(java.util.stream.Collectors.toMap(e -> e.getKey(), e -> "
                         + genConvParam(methodTypeArgMap, parameterizedTypeInfo.getArg(1), method, "e.getValue()")
                         + "))";
+            } else if (kind == FUTURE) {
+                ParameterizedTypeInfo futureType = (ParameterizedTypeInfo) type;
+                return expr + ".map(val -> " + genConvParam(methodTypeArgMap, futureType.getArg(0), method, "val") + ")";
             }
         }
         return expr;
@@ -242,7 +245,7 @@ public class CodeGenHelper {
         // If the retType if a Future<X> and X is of type API, we need to unwrap the mutiny type to the bare type
         // (call getDelegate())
         boolean appendDelegate = false;
-        if (retType.isParameterized()  && retType.getKind() == FUTURE) {
+        if (retType.getKind() == FUTURE) {
             ParameterizedTypeInfo ret = (ParameterizedTypeInfo) retType;
             appendDelegate = ret.getArg(0).getKind() == API;
         }
@@ -402,6 +405,9 @@ public class CodeGenHelper {
             } else if (kind == MAP) {
                 return expr + ".entrySet().stream().collect(Collectors.toMap(_e -> _e.getKey(), _e -> " + genConvReturn(
                         methodTypeArgMap, parameterizedTypeInfo.getArg(1), method, "_e.getValue()") + "))";
+            } else if (kind == FUTURE) {
+                ParameterizedTypeInfo futureType = (ParameterizedTypeInfo) type;
+                return expr + ".map(val -> " + genConvReturn(methodTypeArgMap, futureType.getArg(0), method, "val") + ")";
             }
         }
         return expr;
