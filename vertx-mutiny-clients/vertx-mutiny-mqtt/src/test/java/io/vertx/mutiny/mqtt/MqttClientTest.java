@@ -20,7 +20,7 @@ import io.vertx.mutiny.mqtt.messages.MqttConnAckMessage;
 public class MqttClientTest {
 
     @ClassRule
-    public static GenericContainer<?> mosquitto = new GenericContainer<>("eclipse-mosquitto:latest")
+    public static GenericContainer<?> mosquitto = new GenericContainer<>("eclipse-mosquitto:2.0")
             .withExposedPorts(1883)
             .withClasspathResourceMapping("mosquitto.conf", "/mosquitto/config/mosquitto.conf", BindMode.READ_ONLY)
             .waitingFor(Wait.forLogMessage(".*mosquitto .* running.*", 1));

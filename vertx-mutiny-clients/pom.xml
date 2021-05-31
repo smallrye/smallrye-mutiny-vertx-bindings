@@ -49,7 +49,7 @@
         <module>vertx-mutiny-jdbc-client</module>
         <module>vertx-mutiny-json-schema</module>
         <module>vertx-mutiny-web-validation</module>
-        <module>vertx-mutiny-web-openapi</module>
+<!--        <module>vertx-mutiny-web-openapi</module>-->
         <module>vertx-mutiny-web-templ-freemarker</module>
         <module>vertx-mutiny-web-templ-handlebars</module>
         <module>vertx-mutiny-web-templ-jade</module>

@@ -29,7 +29,7 @@ public class RabbitMQClientTest {
 
     private static final String QUEUE = "my-queue";
     @Rule
-    public GenericContainer<?> container = new FixedHostPortGenericContainer<>("rabbitmq:alpine")
+    public GenericContainer<?> container = new FixedHostPortGenericContainer<>("rabbitmq:3.8-alpine")
             .withCreateContainerCmdModifier(cmd -> cmd.withHostName("my-rabbit"))
             .withExposedPorts(5672);
 

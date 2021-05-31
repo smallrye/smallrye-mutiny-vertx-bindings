@@ -24,7 +24,7 @@ import io.vertx.sqlclient.PoolOptions;
 public class AuthSqlClientTest {
 
     @ClassRule
-    public static GenericContainer<?> container = new GenericContainer<>("mysql:5.7")
+    public static GenericContainer<?> container = new GenericContainer<>("mysql:8")
             .withEnv("MYSQL_USER", "mysql")
             .withEnv("MYSQL_PASSWORD", "password")
             .withEnv("MYSQL_ROOT_PASSWORD", "password")

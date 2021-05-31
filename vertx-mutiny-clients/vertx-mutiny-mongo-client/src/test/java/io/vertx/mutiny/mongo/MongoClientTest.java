@@ -17,7 +17,7 @@ import io.vertx.mutiny.ext.mongo.MongoClient;
 public class MongoClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mongo:latest")
+    public GenericContainer<?> container = new GenericContainer<>("mongo:4.4")
             .withExposedPorts(27017);
 
     private Vertx vertx;
