@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import static io.smallrye.mutiny.vertx.codegen.lang.TypeHelper.isConsumerOfPromise;
 import static io.smallrye.mutiny.vertx.codegen.lang.TypeHelper.isHandlerOfPromise;
-import static io.vertx.codegen.type.ClassKind.API;
+import static io.vertx.codegen.type.ClassKind.*;
 
 public class UniMethodGenerator extends MutinyMethodGenerator {
 
@@ -136,13 +136,21 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         writer.print(params.stream().map(pi -> {
             if (pi.getType().getKind() == API) {
                 return pi.getName() + ".getDelegate()";
+            } else if (pi.getType().getKind() == FUNCTION) {
+                ParameterizedTypeInfo type = (ParameterizedTypeInfo) pi.getType();
+                if (type.getArg(1).getKind() == FUTURE  && ((ParameterizedTypeInfo) type.getArg(1)).getArg(0).getKind() == API) {
+                    // Must adapt the uni to future and switch to delegate
+                    return "\n    " + pi.getName() + ".andThen(u -> " + UniHelper.class.getName()+ ".toFuture(u).map(h -> h.getDelegate()))\n";
+                } else {
+                    return pi.getName();
+                }
             } else {
                 return pi.getName();
             }
         }).collect(Collectors.joining(", ")));
         TypeInfo arg = ((ParameterizedTypeInfo) (descriptor.getOriginalMethod().getReturnType())).getArg(0);
         if (arg.getKind() == API) {
-            writer.print(").map(x -> newInstance(x)));");
+            writer.print(").map(x -> " + arg.getSimpleName() + ".newInstance(x)));");
         } else {
             writer.print("));");
         }

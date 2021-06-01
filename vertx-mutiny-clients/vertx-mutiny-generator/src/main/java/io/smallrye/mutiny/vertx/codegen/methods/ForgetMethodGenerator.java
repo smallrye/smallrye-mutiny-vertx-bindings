@@ -1,6 +1,5 @@
 package io.smallrye.mutiny.vertx.codegen.methods;
 
-import io.smallrye.mutiny.vertx.UniHelper;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.MethodInfo;
 import io.vertx.codegen.ParamInfo;
@@ -12,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static io.vertx.codegen.type.ClassKind.API;
 
 public class ForgetMethodGenerator extends MutinyMethodGenerator {
 
@@ -62,18 +59,12 @@ public class ForgetMethodGenerator extends MutinyMethodGenerator {
 
     private void generateBodyOther(MutinyMethodDescriptor forgetMethod) {
         writer.println(" { ");
-        writer.print("    " + UniHelper.class.getName() + ".toUni(delegate.");
-        writer.print(forgetMethod.getOriginalMethodName());
-        writer.print("(");
-        List<ParamInfo> params = forgetMethod.getMethod().getParams();
-        writer.print(params.stream().map(pi -> {
-            if (pi.getType().getKind() == API) {
-                return pi.getName() + ".getDelegate()";
-            } else {
-                return pi.getName();
-            }
-        }).collect(Collectors.joining(", ")));
-        writer.print(")).subscribe().with(io.smallrye.mutiny.vertx.UniHelper.NOOP);\n");
+        writer.print("    " + forgetMethod.getOriginalMethodName() + "(");
+
+        List<String> names = forgetMethod.getMethod().getParams().stream().map(ParamInfo::getName)
+                .collect(Collectors.toList());
+        writer.print(String.join(", ", names));
+        writer.print(").subscribe().with(io.smallrye.mutiny.vertx.UniHelper.NOOP);\n");
         if (forgetMethod.isFluent()) {
             writer.print("    return this;\n");
         }
@@ -126,6 +117,5 @@ public class ForgetMethodGenerator extends MutinyMethodGenerator {
                 .map(MethodInfo::getReturnType)
                 .findFirst();
     }
-
 
 }

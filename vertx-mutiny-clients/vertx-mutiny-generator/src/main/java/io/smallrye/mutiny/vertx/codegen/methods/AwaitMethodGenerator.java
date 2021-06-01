@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.vertx.codegen.type.ClassKind.API;
+import static io.vertx.codegen.type.ClassKind.*;
 
 public class AwaitMethodGenerator extends MutinyMethodGenerator {
 
@@ -67,23 +67,13 @@ public class AwaitMethodGenerator extends MutinyMethodGenerator {
     private void generateBodyOther(MutinyMethodDescriptor method) {
         writer.println(" { ");
         if (! method.getMethod().getReturnType().isVoid()) {
-            writer.print("    return " + UniHelper.class.getName() + ".toUni(delegate.");
-        }
-        writer.print(method.getOriginalMethodName());
-        writer.print("(");
-        List<ParamInfo> params = method.getMethod().getParams();
-        writer.print(params.stream().map(pi -> {
-            if (pi.getType().getKind() == API) {
-                return pi.getName() + ".getDelegate()";
-            } else {
-                return pi.getName();
-            }
-        }).collect(Collectors.joining(", ")));
-        if (method.getMethod().getReturnType().getKind() == API) {
-            writer.println(").map(x -> newInstance(x))).await().indefinitely();");
+            writer.print("    return " + method.getOriginalMethodName() + "(");
         } else {
-            writer.println(")).await().indefinitely();");
+            writer.print(method.getMethodName() + "(");
         }
+        List<String> names = method.getMethod().getParams().stream().map(ParamInfo::getName).collect(Collectors.toList());
+        writer.print(String.join(", ", names));
+        writer.print(").await().indefinitely();\n");
         writer.println("  }");
         writer.println("");
     }
