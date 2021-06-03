@@ -8,7 +8,7 @@ echo "Generating aggregated javadoc"
 mvn ${MVN_PHASE}
 echo "Cloning gh-pages"
 cd target  || exit
-git clone -b gh-pages "git@github.com:smallrye/smallrye-reactive-utils.git" ${DEST}
+git clone -b gh-pages "git@github.com:smallrye/smallrye-mutiny-vertx-bindings.git" ${DEST}
 echo "Copy content"
 yes | cp -R site/apidocs ${DEST}/apidocs
 echo "Pushing documentation"

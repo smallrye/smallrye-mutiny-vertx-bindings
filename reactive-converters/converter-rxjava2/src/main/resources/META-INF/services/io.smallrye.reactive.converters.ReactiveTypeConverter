@@ -1,5 +1,0 @@
-io.smallrye.reactive.converters.rxjava2.SingleConverter
-io.smallrye.reactive.converters.rxjava2.MaybeConverter
-io.smallrye.reactive.converters.rxjava2.CompletableConverter
-io.smallrye.reactive.converters.rxjava2.ObservableConverter
-io.smallrye.reactive.converters.rxjava2.FlowableConverter
