@@ -1,9 +1,9 @@
 # SmallRye Reactive Utilities
 
-[![Build Status](https://github.com/smallrye/smallrye-reactive-utils/workflows/SmallRye%20Build/badge.svg?branch=main)]( https://github.com/smallrye/smallrye-reactive-utils/actions?query=workflow%3A%22SmallRye+Build%22)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smallrye_smallrye-reactive-utils&metric=alert_status)](https://sonarcloud.io/dashboard?id=smallrye_smallrye-reactive-utils)
+[![Build Status](https://github.com/smallrye/smallrye-mutiny-vertx-bindings/workflows/SmallRye%20Build/badge.svg?branch=main)]( https://github.com/smallrye/smallrye-mutiny-vertx-bindings/actions?query=workflow%3A%22SmallRye+Build%22)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smallrye_smallrye-mutiny-vertx-bindings&metric=alert_status)](https://sonarcloud.io/dashboard?id=smallrye_smallrye-mutiny-vertx-bindings)
 [![License](https://img.shields.io/github/license/smallrye/smallrye-fault-tolerance.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Maven](https://img.shields.io/maven-central/v/io.smallrye.reactive/smallrye-reactive-utilities-projects?color=green)]()
+[![Maven](https://img.shields.io/maven-central/v/io.smallrye.reactive/smallrye-mutiny-vertx-bindings-projects?color=green)]()
 
 This contains a set of modules helping the development of reactive applications in SmallRye 
 
@@ -32,7 +32,7 @@ Documentation is available in [the reactive-converters directory](./reactive-con
 
 1. checkout the created tag (`$VERSION`)
 2. run `mvn javadoc:aggregate -DskipTests`
-3. clone the website: `cd target  && git clone git@github.com:smallrye/smallrye-reactive-utils.git gh-pages  && cd gh-pages && git checkout gh-pages`
+3. clone the website: `cd target  && git clone git@github.com:smallrye/smallrye-mutiny-vertx-bindings.git gh-pages  && cd gh-pages && git checkout gh-pages`
 4. create a repository with the version name: `mkdir apidocs/$VERSION`
 5. copy the generated content into the new directory `cp -R ../site/apidocs/* apidocs/$VERSION`
 6. commit and push: `git add -A  && git commit -am "Publish javadoc for version $VERSION" && git push origin gh-pages`
