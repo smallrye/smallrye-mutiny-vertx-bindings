@@ -25,6 +25,7 @@ jobs:
         name: Set up Python
         with:
           python-version: 3.x
+      - run: mvn -B install -DskipTests
       - run: pip install mkdocs-material
       - run: pip install mike
       - run: sudo snap install yq
