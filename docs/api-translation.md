@@ -15,7 +15,7 @@ public void someOperation(Foo a, Bar b, Baz c, Handler<AsyncResult<T>> handler) 
 
 Here `someOperation` is a method where `a`, `b` and `c` are _parameters_, and `handler` is a _callback_:
 
-* the callback is notified when the asynchronous operation done in `someOperation` completes, and
+* the callback is notified when the asynchronous operation done in `someOperation` completes (_continuation_), and
 * callbacks are always passed as a last parameter of type `Handler<AsyncResult<T>>`, and
 * `AsyncResult` encapsulates an asynchronous result of type `T`, or a failure.
 
