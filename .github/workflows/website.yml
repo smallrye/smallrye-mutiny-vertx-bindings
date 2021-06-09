@@ -27,5 +27,5 @@ jobs:
           python-version: 3.x
       - run: pip install mkdocs-material
       - run: pip install mike
-      - run: sudo apt-get -y install 
+      - run: sudo snap install yq
       - run: .build/render-documentation.sh
