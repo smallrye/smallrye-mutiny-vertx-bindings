@@ -1,6 +1,6 @@
 # Overview
 
-[Eclipse Vert.x](https://vertx.io/) is a popular toolkit for writing reactive applications on the JVM.
+[Eclipse Vert.x](https://vertx.io/) is the leading toolkit for writing reactive applications on the JVM.
 
 While the Vert.x core APIs expose asynchronous programming through _callbacks_ and _promise / future_, code generators offer bindings to other asynchronous programming models, including: [Kotlin coroutines](https://github.com/vert-x3/vertx-lang-kotlin/tree/master/vertx-lang-kotlin-coroutines), and [RxJava 1, 2 and 3](https://github.com/vert-x3/vertx-rx).
 
