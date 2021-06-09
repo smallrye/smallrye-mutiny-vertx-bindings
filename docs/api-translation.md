@@ -5,7 +5,12 @@ The Vert.x Mutiny bindings are generated from the existing Vert.x APIs.
 ## Vert.x and asynchronous operation methods
 
 Vert.x is a toolkit that simplifies asynchronous I/O programming.
-The Vert.x APIs rely on simple conventions to denote methods doing asynchronous operations, as in:
+The Vert.x APIs rely on simple conventions to denote methods doing asynchronous operations:
+
+1. methods that accept a _callback_ as a last parameter, and
+2. methods that return a Vert.x `Future`.
+
+Vert.x has historically relied on callbacks, as in:
 
 ```java
 public void someOperation(Foo a, Bar b, Baz c, Handler<AsyncResult<T>> handler) {
@@ -63,7 +68,7 @@ Because Mutiny is a _Reactive Streams_ compliant implementation, the generated s
 Given an asynchronous operation method, the Mutiny code generator also provides 2 further variants:
 
 * `xAndAwait()` to block the caller thread until the outcome is received, or throw a `RuntimeException` when a failure arises, and
-* `xAndForget()` to trigger the operation then discard the outcome.
+* `xAndForget()` to trigger the operation then discard the outcome (failures will be logged).
 
 Given the `someOperation` method above, the generator provides these 3 methods:
 
