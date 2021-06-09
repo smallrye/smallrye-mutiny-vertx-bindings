@@ -1,6 +1,6 @@
 # API translation
 
-The Vert.x Mutiny bindings are generated from existing APIs.
+The Vert.x Mutiny bindings are generated from the existing Vert.x APIs.
 
 ## Vert.x and asynchronous operation methods
 
