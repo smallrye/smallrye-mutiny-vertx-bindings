@@ -1,0 +1,31 @@
+name: Publish the website
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "!*"
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+jobs:
+  publish-website:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout code
+      - uses: actions/cache@v2
+        name: Maven cache
+        with:
+          path: ~/.m2/repository
+          key: maven
+      - uses: actions/setup-java@v1
+        name: Set up Java 11
+        with:
+          java-version: 11
+      - uses: actions/setup-python@v2
+        name: Set up Python
+        with:
+          python-version: 3.x
+      - run: pip install mkdocs-material
+      - run: pip install mike
+      - run: sudo apt-get -y install 
+      - run: .build/render-documentation.sh

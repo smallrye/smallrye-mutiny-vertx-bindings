@@ -1,0 +1,35 @@
+site_name: Smallrye Mutiny Vert.x bindings
+repo_url: https://github.com/smallrye/smallrye-mutiny-vertx-bindings
+edit_uri: edit/main/docs/
+
+nav:
+  - Overview: 'index.md'
+  - API Translation: 'api-translation.md'
+  - Javadoc: './apidocs/index.html'
+
+copyright: >-
+  Sponsored by <a href="https://www.redhat.com">Red Hat</a> <br/>
+  <a href="https://creativecommons.org/licenses/by/3.0/">CC by 3.0</a> |
+  <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+
+theme:
+  name: material
+  palette:
+    primary: deep purple
+    accent: deep purple
+  font:
+    text: Red Hat Text
+    code: Ubuntu Mono
+  features:
+    - navigation.sections
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - admonition
+
+extra:
+  manifest: manifest.webmanifest
+  version:
+    provider: mike
