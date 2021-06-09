@@ -25,8 +25,14 @@ jobs:
         name: Set up Python
         with:
           python-version: 3.x
-      - run: mvn -B install -DskipTests
-      - run: pip install mkdocs-material
-      - run: pip install mike
-      - run: sudo snap install yq
-      - run: .build/render-documentation.sh
+      - name: Tools setup
+        run: |
+          git config --global user.name "SmallRye CI"
+          git config --global user.email "smallrye@googlegroups.com"
+          sudo snap install yq
+          pip install mkdocs-material
+          pip install mike          
+      #- name: Build local artifacts
+      #  run: mvn -B install -DskipTests
+      - name: Render docs and publish
+        run: .build/render-documentation.sh
