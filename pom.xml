@@ -191,6 +191,7 @@
     <modules>
         <module>vertx-mutiny-clients</module>
         <module>vertx-mutiny-generator</module>
+        <module>vertx-mutiny-clients-bom</module>
     </modules>
 
     <repositories>
