@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -8,12 +10,12 @@
         <version>2.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>smallrye-mutiny-vertx-web-openapi</artifactId>
-    <name>SmallRye Mutiny - Vert.x Web OpenAPI</name>
+    <artifactId>smallrye-mutiny-vertx-mssql-client</artifactId>
+    <name>SmallRye Mutiny - Vert.x MS SQL Client</name>
 
     <properties>
         <gen-source-groupId>io.vertx</gen-source-groupId>
-        <gen-source-artifactId>vertx-web-openapi</gen-source-artifactId>
+        <gen-source-artifactId>vertx-mssql-client</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
     </properties>
 
@@ -32,36 +34,18 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Vert.x mutiny SQL Client -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-web-validation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-web</artifactId>
+            <artifactId>smallrye-mutiny-vertx-sql-client</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-web-client</artifactId>
+            <artifactId>smallrye-mutiny-vertx-sql-client</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -140,5 +124,6 @@
             </properties>
         </profile>
     </profiles>
+
 
 </project>
