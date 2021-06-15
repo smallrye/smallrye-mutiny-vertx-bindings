@@ -1,7 +1,9 @@
 package io.smallrye.mutiny.vertx.codegen.lang;
 
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -29,10 +31,13 @@ public class ImportDeclarationCodeWriter implements CodeWriter {
         writer.println("import " + TypeArg.class.getName() + ";");
         writer.println("import " + Fluent.class.getName() + ";");
 
+        Set<String> imported = new HashSet<>();
         for (ClassTypeInfo importedType : model.getImportedTypes()) {
             if (importedType.getKind() != ClassKind.API) {
                 if (!importedType.getPackageName().equals("java.lang")) {
-                    writer.println("import " + importedType + ";");
+                    if (imported.add(importedType.getSimpleName())) {
+                        writer.println("import " + importedType + ";");
+                    }
                 }
             }
         }
