@@ -42,7 +42,7 @@ jobs:
           java-version: ${{matrix.java}}
 
       - name: build with maven
-        run: mvn -B formatter:validate verify --file pom.xml
+        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B formatter:validate verify
 
   quality:
     needs: [build]
@@ -63,4 +63,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-        run: mvn -B verify --file pom.xml -Pcoverage javadoc:javadoc sonar:sonar -Dsonar.projectKey=smallrye_smallrye-mutiny-vertx-bindings -Dsonar.login=$SONAR_TOKEN
+        run: mvn -s .build/maven-ci-settings.xml -B -f pom.xml -Pcoverage verify javadoc:javadoc sonar:sonar -Dsonar.projectKey=smallrye_smallrye-mutiny-vertx-bindings -Dsonar.login=$SONAR_TOKEN
