@@ -71,7 +71,6 @@
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
         <version.nexus.staging.plugin>1.6.8</version.nexus.staging.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
-        <version.versions.plugin>2.8.1</version.versions.plugin>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -435,14 +434,6 @@
                     <localCheckout>true</localCheckout>
                     <remoteTagging>false</remoteTagging>
                     <arguments>-DskipTests ${release.arguments}</arguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${version.versions.plugin}</version>
-                <configuration>
-                    <generateBackupPoms>false</generateBackupPoms>
                 </configuration>
             </plugin>
         </plugins>
