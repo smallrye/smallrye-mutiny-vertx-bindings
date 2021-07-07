@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <name>SmallRye Reactive Utilities</name>
+    <url>https://smallrye.io/smallrye-mutiny-vertx-bindings</url>
 
     <inceptionYear>2019</inceptionYear>
     <organization>
@@ -44,7 +45,7 @@
 
     <properties>
         <vertx.version>4.1.1</vertx.version>
-        <mutiny.version>0.18.1</mutiny.version>
+        <mutiny.version>0.19.2</mutiny.version>
         <jackson.version>2.12.3</jackson.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
 

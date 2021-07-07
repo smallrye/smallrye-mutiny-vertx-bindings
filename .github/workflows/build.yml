@@ -41,8 +41,10 @@ jobs:
         with:
           java-version: ${{matrix.java}}
 
+      - name: validate format
+        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B -pl '!vertx-mutiny-clients-bom' formatter:validate
       - name: build with maven
-        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B formatter:validate verify
+        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B verify
 
   quality:
     needs: [build]
