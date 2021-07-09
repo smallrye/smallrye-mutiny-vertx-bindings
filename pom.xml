@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>io.smallrye</groupId>
-        <artifactId>smallrye-parent</artifactId>
-        <version>28</version>
+        <artifactId>smallrye-build-parent</artifactId>
+        <version>29</version>
     </parent>
 
     <groupId>io.smallrye.reactive</groupId>
@@ -44,6 +45,8 @@
     </scm>
 
     <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        
         <vertx.version>4.1.1</vertx.version>
         <mutiny.version>0.19.2</mutiny.version>
         <jackson.version>2.12.3</jackson.version>
@@ -56,7 +59,10 @@
 
         <testcontainers.version>1.15.3</testcontainers.version>
 
-        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <junit.version>4.13.2</junit.version>
+        <junit-jupiter.version>5.7.2</junit-jupiter.version>
+        <assertj-core.version>3.20.2</assertj-core.version>
+        <slf4j-api.version>1.7.31</slf4j-api.version>
     </properties>
 
     <dependencyManagement>
@@ -115,6 +121,37 @@
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-core</artifactId>
                 <version>${reactor-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -179,7 +216,8 @@
                             <goal>aggregate</goal>
                         </goals>
                         <configuration>
-                            <excludePackageNames>*.impl,io.smallrye.mutiny.vertx.codegen,io.smallrye.mutiny.vertx.codegen.lang
+                            <excludePackageNames>
+                                *.impl,io.smallrye.mutiny.vertx.codegen,io.smallrye.mutiny.vertx.codegen.lang
                             </excludePackageNames>
                         </configuration>
                         <phase>pre-site</phase>
