@@ -24,6 +24,13 @@
             <version>${vertx.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Vert.x mutiny Core -->
         <dependency>
             <groupId>${project.groupId}</groupId>
