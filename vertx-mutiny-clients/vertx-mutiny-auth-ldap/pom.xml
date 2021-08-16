@@ -122,6 +122,16 @@
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
+
+        <profile>
+            <id>java-16+</id>
+            <activation>
+                <jdk>[16,)</jdk>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
     </profiles>
 
 </project>

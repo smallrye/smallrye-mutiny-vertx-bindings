@@ -1,7 +1,6 @@
 # SmallRye Mutiny Vert.x Bindings
 
 [![Build Status](https://github.com/smallrye/smallrye-mutiny-vertx-bindings/workflows/SmallRye%20Build/badge.svg?branch=main)](https://github.com/smallrye/smallrye-mutiny-vertx-bindings/actions?query=workflow%3A%22SmallRye+Build%22)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smallrye_smallrye-mutiny-vertx-bindings&metric=alert_status)](https://sonarcloud.io/dashboard?id=smallrye_smallrye-mutiny-vertx-bindings)
 [![License](https://img.shields.io/github/license/smallrye/smallrye-fault-tolerance.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Maven](https://img.shields.io/maven-central/v/io.smallrye.reactive/smallrye-mutiny-vertx-bindings-projects?color=green)]()
 
