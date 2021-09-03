@@ -41,7 +41,7 @@ public class HtDigestAuthTest {
                 .setCnonce("0a4f113b")
                 .setResponse("6629fae49393a05397450978507c4ef1");
 
-        User user = authProvider.authenticate(authInfo).await().indefinitely();
+        User user = authProvider.authenticate(authInfo.toJson()).await().indefinitely();
         assertNotNull(user);
         assertEquals("Mufasa", user.principal().getString("username"));
     }
@@ -58,7 +58,7 @@ public class HtDigestAuthTest {
                 .setCnonce("0a4f113b")
                 .setResponse("670fd8c2df070c60b045671b8b24ff02");
 
-        User user = authProvider.authenticate(authInfo).await().indefinitely();
+        User user = authProvider.authenticate(authInfo.toJson()).await().indefinitely();
         assertNotNull(user);
         assertNotNull(user);
         assertEquals("Mufasa", user.principal().getString("username"));

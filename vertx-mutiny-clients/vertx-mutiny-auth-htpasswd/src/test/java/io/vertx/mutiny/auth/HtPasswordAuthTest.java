@@ -37,35 +37,35 @@ public class HtPasswordAuthTest {
     @Test
     public void md5() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("md5", "myPassword");
-        User user = authProviderCrypt.authenticate(credentials).await().indefinitely();
+        User user = authProviderCrypt.authenticate(credentials.toJson()).await().indefinitely();
         assertNotNull(user);
     }
 
     @Test
     public void sha1() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("sha1", "myPassword");
-        User user = authProviderCrypt.authenticate(credentials).await().indefinitely();
+        User user = authProviderCrypt.authenticate(credentials.toJson()).await().indefinitely();
         assertNotNull(user);
     }
 
     @Test
     public void crypt() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("crypt", "myPassword");
-        User user = authProviderCrypt.authenticate(credentials).await().indefinitely();
+        User user = authProviderCrypt.authenticate(credentials.toJson()).await().indefinitely();
         assertNotNull(user);
     }
 
     @Test
     public void plaintext() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("plaintext", "myPassword");
-        User user = authProviderPlainText.authenticate(credentials).await().indefinitely();
+        User user = authProviderPlainText.authenticate(credentials.toJson()).await().indefinitely();
         assertNotNull(user);
     }
 
     @Test
     public void authzFalse() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("md5", "myPassword");
-        User user = authProviderUsersAreAuthorizedForNothing.authenticate(credentials).await()
+        User user = authProviderUsersAreAuthorizedForNothing.authenticate(credentials.toJson()).await()
                 .indefinitely();
         assertNotNull(user);
         assertFalse(PermissionBasedAuthorization.create("something").match(user));

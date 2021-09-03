@@ -51,7 +51,7 @@ public class LdapAuthTest {
     @Test
     public void testSimpleAuthenticate() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("tim", "sausages");
-        User user = provider.authenticate(credentials).await().indefinitely();
+        User user = provider.authenticate(credentials.toJson()).await().indefinitely();
         assertNotNull(user);
     }
 
@@ -59,7 +59,7 @@ public class LdapAuthTest {
     public void testSimpleAuthenticateFailWrongPassword() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("tim", "wrongpassword");
         try {
-            provider.authenticate(credentials).await().indefinitely();
+            provider.authenticate(credentials.toJson()).await().indefinitely();
         } catch (CompletionException e) {
             assertTrue(e.getMessage().contains("INVALID_CREDENTIALS"));
         }
@@ -69,7 +69,7 @@ public class LdapAuthTest {
     public void testSimpleAuthenticateFailWrongUser() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("frank", "sausages");
         try {
-            provider.authenticate(credentials).await().indefinitely();
+            provider.authenticate(credentials.toJson()).await().indefinitely();
         } catch (CompletionException e) {
             assertTrue(e.getMessage().contains("INVALID_CREDENTIALS"));
         }
