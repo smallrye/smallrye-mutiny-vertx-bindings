@@ -14,7 +14,6 @@ import io.vertx.mqtt.MqttClientOptions;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.mqtt.messages.MqttConnAckMessage;
 
-@Ignore("See https://github.com/vert-x3/vertx-mqtt/issues/207")
 public class MqttClientTest {
 
     @ClassRule
