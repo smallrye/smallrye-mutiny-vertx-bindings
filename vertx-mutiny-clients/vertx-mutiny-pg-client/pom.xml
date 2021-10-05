@@ -39,6 +39,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Currently marked as an optional dependency upstream but is actually required -->
+        <dependency>
+            <groupId>com.ongres.scram</groupId>
+            <artifactId>client</artifactId>
+            <version>2.1</version>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>smallrye-mutiny-vertx-sql-client</artifactId>

@@ -14,16 +14,12 @@ jobs:
         name: Checkout code
         with:
           fetch-depth: 0 # fetch all commits and branches for mike to work properly
-      - uses: actions/cache@v2
-        name: Maven cache
-        with:
-          path: ~/.m2/repository
-          key: maven
       - uses: actions/setup-java@v2
         name: Set up Java 11
         with:
           java-version: 11
           distribution: temurin
+          cache: maven
       - uses: actions/setup-python@v2
         name: Set up Python
         with:

@@ -24,24 +24,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [8, 11, 16, 17-ea]
+        java: [8, 11, 17]
     name: build with jdk ${{matrix.java}}
 
     steps:
       - uses: actions/checkout@v2
         name: checkout
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: maven
-
       - uses: actions/setup-java@v2
         name: set up jdk ${{matrix.java}}
         with:
           distribution: temurin
           java-version: ${{matrix.java}}
-
+          cache: maven
       - name: validate format
         run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B -pl '!vertx-mutiny-clients-bom' formatter:validate
       - name: build with maven
