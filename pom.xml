@@ -305,7 +305,7 @@
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-reporter-text</artifactId>
-                                <version>0.14.2</version>
+                                <version>0.14.3</version>
                             </dependency>
 
                             <dependency>
