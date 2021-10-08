@@ -47,7 +47,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         
         <vertx.version>4.1.5</vertx.version>
-        <mutiny.version>1.1.0</mutiny.version>
+        <mutiny.version>1.1.1</mutiny.version>
         <jackson.version>2.13.0</jackson.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
 
