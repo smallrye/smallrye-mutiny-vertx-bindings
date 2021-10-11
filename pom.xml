@@ -311,7 +311,7 @@
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-reporter-json</artifactId>
-                                <version>0.4.2</version>
+                                <version>0.4.3</version>
                             </dependency>
 
                         </dependencies>
