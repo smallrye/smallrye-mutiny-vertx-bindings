@@ -42,6 +42,7 @@ public class IterableMethodCodeWriter implements ConditionalCodeWriter {
 
         // Generate the toMulti method if not present
         if (model.getMethods().stream().noneMatch(it -> it.getParams().isEmpty() && "toMulti".equals(it.getName()))) {
+            writer.print("  @CheckReturnValue\n");
             writer.printf("  public Multi<%s> toMulti() {%n", genTypeName(iterableArg));
             writer.println("    return Multi.createFrom().iterable(this);");
             writer.println("  }");
