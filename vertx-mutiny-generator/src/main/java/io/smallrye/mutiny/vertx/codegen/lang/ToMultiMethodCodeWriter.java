@@ -11,9 +11,9 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
     public void generate(ClassModel model, PrintWriter writer) {
         writer.print("  private Multi<");
         writer.print(genTypeName(model.getReadStreamArg()));
-        writer.println("> multi;");
+        writer.println("> multi;\n");
 
-        genToMulti(model.getReadStreamArg(), "multi", writer);
+        genToMulti(model.getReadStreamArg(), writer);
         genToBlockingIterable(model.getReadStreamArg(), writer);
         genToBlockingStream(model.getReadStreamArg(), writer);
     }
@@ -23,7 +23,8 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
         return classModel.isReadStream()  && classModel.isConcrete();
     }
 
-    private void genToMulti(TypeInfo type, String fieldName, PrintWriter writer) {
+    private void genToMulti(TypeInfo type, PrintWriter writer) {
+        writer.print("  @CheckReturnValue\n");
         writer.print("  public synchronized Multi");
         writer.print("<");
         writer.print(genTypeName(type));
@@ -32,7 +33,7 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
 
         writer.print("    ");
         writer.print("if (");
-        writer.print(fieldName);
+        writer.print("multi");
         writer.println(" == null) {");
 
         if (type.getKind() == ClassKind.API) {
@@ -45,7 +46,7 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
             writer.println("::newInstance;");
 
             writer.print("      ");
-            writer.print(fieldName);
+            writer.print("multi");
             writer.print(" = io.smallrye.mutiny.vertx.MultiHelper.toMulti(delegate, conv);");
         } else if (type.isVariable()) {
             String typeVar = type.getSimpleName();
@@ -60,17 +61,17 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
             writer.println(">) __typeArg_0.wrap;");
 
             writer.print("      ");
-            writer.print(fieldName);
+            writer.print("multi");
             writer.print(" = io.smallrye.mutiny.vertx.MultiHelper.toMulti(delegate, conv);");
         } else {
             writer.print("      ");
-            writer.print(fieldName);
+            writer.print("multi");
             writer.print(" = io.smallrye.mutiny.vertx.MultiHelper.toMulti(this.getDelegate());");
         }
 
         writer.println("    }");
         writer.print("    return ");
-        writer.print(fieldName);
+        writer.print("multi");
         writer.println(";");
         writer.println("  }");
         writer.println();
@@ -84,7 +85,7 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
         writer.println("() {");
 
         writer.print("    ");
-        writer.print("return toMulti().subscribe().asIterable();");
+        writer.print("return toMulti().subscribe().asIterable();\n");
         writer.println("  }");
         writer.println();
     }
@@ -97,7 +98,7 @@ public class ToMultiMethodCodeWriter implements ConditionalCodeWriter {
         writer.println("() {");
 
         writer.print("    ");
-        writer.print("return toMulti().subscribe().asStream();");
+        writer.print("return toMulti().subscribe().asStream();\n");
         writer.println("  }");
         writer.println();
     }

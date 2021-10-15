@@ -44,6 +44,7 @@ public class IteratorMethodsCodeWriter implements ConditionalCodeWriter {
         }
 
         if (model.getMethods().stream().noneMatch(it -> it.getParams().isEmpty() && "toMulti".equals(it.getName()))) {
+            writer.print("  @CheckReturnValue\n");
             writer.printf("  public Multi<%s> toMulti() {%n", genTypeName(iteratorArg));
             String support = StreamSupport.class.getName();
             String splitIterators = Spliterators.class.getName() + ".spliteratorUnknownSize";

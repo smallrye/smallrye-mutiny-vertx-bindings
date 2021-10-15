@@ -45,6 +45,12 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         writer.println();
     }
 
+    @Override
+    public void generateMethodDeclaration(MutinyMethodDescriptor descriptor) {
+        writer.print("  @CheckReturnValue\n");
+        super.generateMethodDeclaration(descriptor);
+    }
+
     public void generateDeclaration(MethodInfo method) {
         MutinyMethodDescriptor uniMethod = computeMethodInfo(method);
         generateJavadoc(uniMethod);

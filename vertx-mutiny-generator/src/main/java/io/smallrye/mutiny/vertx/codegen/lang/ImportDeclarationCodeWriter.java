@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.vertx.TypeArg;
 import io.vertx.codegen.annotations.Fluent;
 import org.reactivestreams.Publisher;
@@ -30,6 +31,7 @@ public class ImportDeclarationCodeWriter implements CodeWriter {
         writer.println("import " + Publisher.class.getName() + ";");
         writer.println("import " + TypeArg.class.getName() + ";");
         writer.println("import " + Fluent.class.getName() + ";");
+        writer.println("import " + CheckReturnValue.class.getName() + ";");
 
         Set<String> imported = new HashSet<>();
         for (ClassTypeInfo importedType : model.getImportedTypes()) {

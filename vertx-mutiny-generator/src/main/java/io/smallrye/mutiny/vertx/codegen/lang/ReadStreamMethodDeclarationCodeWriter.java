@@ -11,6 +11,7 @@ public class ReadStreamMethodDeclarationCodeWriter implements ConditionalCodeWri
     @Override
     public void generate(ClassModel model, PrintWriter writer) {
         List<TypeParamInfo.Class> params = model.getType().getParams();
+        writer.print("  @CheckReturnValue\n");
         writer.print("  " + Multi.class.getName() + "<");
         writer.print(params.get(0).getName());
         writer.println("> toMulti();");
