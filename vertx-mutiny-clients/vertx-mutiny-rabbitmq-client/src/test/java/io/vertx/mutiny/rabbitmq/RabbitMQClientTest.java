@@ -14,8 +14,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
@@ -29,8 +29,10 @@ public class RabbitMQClientTest {
 
     private static final String QUEUE = "my-queue";
     @Rule
-    public GenericContainer<?> container = new FixedHostPortGenericContainer<>("rabbitmq:3.8-alpine")
+    public GenericContainer<?> container = new GenericContainer<>("rabbitmq:3.8-alpine")
             .withCreateContainerCmdModifier(cmd -> cmd.withHostName("my-rabbit"))
+            .waitingFor(
+                    Wait.forLogMessage(".*started TCP listener on.*\\n", 1))
             .withExposedPorts(5672);
 
     private Vertx vertx;
@@ -58,7 +60,7 @@ public class RabbitMQClientTest {
         RabbitMQConsumer consumer = client.basicConsumer(QUEUE).subscribeAsCompletionStage().join();
         Uni<String> stage = consumer.toMulti()
                 .onItem().transform(m -> m.body().toString())
-                .collectItems().first();
+                .collect().first();
 
         client.basicPublish("", QUEUE, Buffer.buffer(uuid))
                 .subscribeAsCompletionStage().join();
