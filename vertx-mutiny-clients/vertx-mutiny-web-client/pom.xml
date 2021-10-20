@@ -36,6 +36,12 @@
             <artifactId>smallrye-mutiny-vertx-auth-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>smallrye-mutiny-vertx-auth-oauth2</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
 
 
         <dependency>
