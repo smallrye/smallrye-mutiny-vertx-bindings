@@ -7,12 +7,13 @@ import java.util.stream.Collectors;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.vertx.core.json.*;
 
-class Main {
+class CompatibilityReport {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Looking for compatibility reports");
@@ -23,8 +24,20 @@ class Main {
             if (child.isDirectory()) {
                 File report = new File(child, "target/compatibility-report.json");
                 if (report.isFile()) {
+                    System.out.println("Found compatibility report " + report.getAbsolutePath());
                     JsonArray content = new JsonArray(Files.readString(report.toPath()));
                     reports.put(child.getName(), content);
+                } else if (child.isDirectory()) {
+                    for (File child2 : child.listFiles()) {
+                        if (child2.isDirectory()) {
+                            report = new File(child2, "target/compatibility-report.json");
+                            if (report.isFile()) {
+                                System.out.println("Found compatibility report " + report.getAbsolutePath());
+                                JsonArray content = new JsonArray(Files.readString(report.toPath()));
+                                reports.put(child2.getName(), content);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -48,9 +61,9 @@ class Main {
             }
 
             buffer.append("\n## Incompatible changes in ").append(entry.getKey()).append("\n");
-            buffer.append("[cols=\"1,1,1\", options=\"header\"]\n");
+            buffer.append("[cols=\"1,1,1,1\", options=\"header\"]\n");
             buffer.append("|===\n");
-            buffer.append("| Element | Classification | Description\n");
+            buffer.append("| Element | Classification | Criticality | Description\n");
 
             buffer.append("\n");
             for (Difference difference : differences) {
@@ -58,6 +71,8 @@ class Main {
                 buffer.append(difference.getOldCode());
                 buffer.append("` a| ");
                 buffer.append(difference.getCompatibility());
+                buffer.append(" | " );
+                buffer.append(difference.getCriticality());
                 buffer.append(" | ");
                 buffer.append(difference.getDescription());
                 buffer.append("\n");
@@ -127,6 +142,7 @@ class Main {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Difference {
         private String code;
         @JsonProperty("old")
@@ -134,9 +150,11 @@ class Main {
         @JsonProperty("new")
         private String newCode;
         private String name;
+        private String criticality;
         private String description;
         private Compatibility[] classification;
         private Attachment[] attachments;
+        private String justification;
 
         public String getPackage() {
             return findAttachmentByName("package");
@@ -160,6 +178,10 @@ class Main {
 
         public String getNewArchive() {
             return findAttachmentByName("newArchive");
+        }
+
+        public String getCriticality() {
+            return criticality;
         }
 
         private String findAttachmentByName(String name) {
