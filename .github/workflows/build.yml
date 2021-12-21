@@ -24,22 +24,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [8, 11, 17]
-    name: build with jdk ${{matrix.java}}
+        java: [
+          { 'version': '8', opts: '-pl !:smallrye-mutiny-vertx-oracle-client' },
+          { 'version': '11', opts: '' },
+          { 'version': '17', 'opts': '' }
+        ]
+    name: build with jdk ${{matrix.java.version}}
 
     steps:
       - uses: actions/checkout@v2
         name: checkout
       - uses: actions/setup-java@v2
-        name: set up jdk ${{matrix.java}}
+        name: set up jdk ${{matrix.java.version}}
         with:
           distribution: temurin
-          java-version: ${{matrix.java}}
+          java-version: ${{matrix.java.version}}
           cache: maven
       - name: validate format
-        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B -pl '!vertx-mutiny-clients-bom' formatter:validate
+        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B -pl '!vertx-mutiny-clients-bom' ${{matrix.java.opts}} formatter:validate
       - name: build with maven
-        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B verify
+        run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B verify ${{matrix.java.opts}}
 
   quality:
     needs: [build]
