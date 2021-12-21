@@ -33,6 +33,7 @@
         <module>vertx-mutiny-pg-client</module>
         <module>vertx-mutiny-mssql-client</module>
         <module>vertx-mutiny-mysql-client</module>
+        <module>vertx-mutiny-oracle-client</module>
         <module>vertx-mutiny-mqtt</module>
         <module>vertx-mutiny-auth-common</module>
         <module>vertx-mutiny-auth-jwt</module>
