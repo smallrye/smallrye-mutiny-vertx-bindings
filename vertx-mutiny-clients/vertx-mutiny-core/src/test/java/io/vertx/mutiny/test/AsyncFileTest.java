@@ -46,7 +46,7 @@ public class AsyncFileTest extends VertxTestBase {
                 .collect(toList());
 
         Multi<Buffer> flow = Multi.createFrom().iterable(bytes)
-                .groupItems().intoLists().of(256)
+                .group().intoLists().of(256)
                 .onItem().transform(ba -> {
                     Buffer buffer = Buffer.buffer();
                     ba.forEach(buffer::appendByte);

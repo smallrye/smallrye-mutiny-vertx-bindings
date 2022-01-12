@@ -60,7 +60,7 @@ public class KafkaClientTest {
 
         Uni<String> first = consumer.toMulti()
                 .onItem().transform(KafkaConsumerRecord::value)
-                .collectItems().first();
+                .collect().first();
 
         consumer.subscribe("my-topic").await().indefinitely();
 

@@ -50,7 +50,7 @@ public class AMQPClientTest {
                 .onItem().transform(AmqpReceiver::toMulti)
                 .await().indefinitely();
 
-        Uni<AmqpMessage> first = stream.collectItems().first();
+        Uni<AmqpMessage> first = stream.collect().first();
 
         client.createSender("my-address")
                 .onItem().transformToUni(sender -> sender.write(AmqpMessage.create().withBody(payload).build()))
