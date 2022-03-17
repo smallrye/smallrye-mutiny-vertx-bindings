@@ -42,6 +42,11 @@
             <artifactId>smallrye-mutiny-vertx-web</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>smallrye-mutiny-vertx-uri-template</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
