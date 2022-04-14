@@ -27,8 +27,6 @@ public class ImportDeclarationCodeWriter implements CodeWriter {
         writer.println("import " + Multi.class.getName() + ";");
         writer.println("import " + Uni.class.getName() + ";");
         writer.println("import " + Consumer.class.getName() + ";");
-        writer.println("import " + Subscriber.class.getName() + ";");
-        writer.println("import " + Publisher.class.getName() + ";");
         writer.println("import " + TypeArg.class.getName() + ";");
         writer.println("import " + Fluent.class.getName() + ";");
         writer.println("import " + CheckReturnValue.class.getName() + ";");
