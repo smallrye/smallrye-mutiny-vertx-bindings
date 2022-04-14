@@ -92,10 +92,25 @@ public class MutinyMethodGenerator {
         }
     }
 
-    private String sanitize(String link) {
-        return link
+    public static String sanitize(String link) {
+        String sanitized = link
                 .replace("AndAwait", "")
                 .replace("AndForget", "");
+
+        // Need to remove the generic parameters
+        StringBuilder buffer = new StringBuilder();
+        boolean param = false;
+        for (char c : sanitized.toCharArray()) {
+            if (c == '<'  && ! param) {
+                param = true;
+            } else if (c == '>'  && param) {
+                param = false;
+            } else if (! param  && c != '>') {
+                buffer.append(c);
+            }
+        }
+        return buffer.toString();
+
     }
 
     public void generateMethodDeclaration(MutinyMethodDescriptor descriptor) {
