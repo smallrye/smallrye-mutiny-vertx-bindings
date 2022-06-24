@@ -1,8 +1,9 @@
 package io.vertx.mutiny.postgresql;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.BeforeClass;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.vertx.mutiny.core.Vertx;
@@ -13,10 +14,19 @@ import io.vertx.sqlclient.PoolOptions;
 
 public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
 
-    @ClassRule
-    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:latest");
+    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
 
-    private Vertx vertx;
+    @BeforeClass
+    public static void init() {
+        container.start();
+    }
+
+    @AfterClass
+    public static void shutdown() {
+        container.stop();
+    }
+
+    Vertx vertx;
     private int maxSize;
 
     @Before
