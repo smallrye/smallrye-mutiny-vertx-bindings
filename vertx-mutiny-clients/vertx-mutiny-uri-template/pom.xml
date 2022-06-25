@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -8,12 +10,13 @@
         <version>2.23.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>smallrye-mutiny-vertx-web-client</artifactId>
-    <name>SmallRye Mutiny - Vert.x Web Client</name>
+    <artifactId>smallrye-mutiny-vertx-uri-template</artifactId>
+
+    <name>SmallRye Mutiny - Vert.x URI Template</name>
 
     <properties>
         <gen-source-groupId>io.vertx</gen-source-groupId>
-        <gen-source-artifactId>vertx-web-client</gen-source-artifactId>
+        <gen-source-artifactId>vertx-uri-template</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
     </properties>
 
@@ -25,67 +28,21 @@
             <version>${vertx.version}</version>
         </dependency>
 
-        <!-- Vert.x Mutiny Core -->
+        <!-- Vert.x mutiny Core -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>smallrye-mutiny-vertx-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-auth-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-auth-oauth2</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-        </dependency>
-
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-web-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>smallrye-mutiny-vertx-uri-template</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -123,7 +80,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.web.client</Automatic-Module-Name>
+                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.redis.client</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>

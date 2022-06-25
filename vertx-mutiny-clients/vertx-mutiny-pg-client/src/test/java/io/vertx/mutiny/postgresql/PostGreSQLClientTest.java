@@ -3,11 +3,9 @@ package io.vertx.mutiny.postgresql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.*;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.tuples.Tuple2;
-import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
@@ -15,23 +13,7 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
-public class PostGreSQLClientTest {
-
-    @ClassRule
-    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
-
-    private Vertx vertx;
-
-    @Before
-    public void setUp() {
-        vertx = Vertx.vertx();
-        assertThat(vertx).isNotNull();
-    }
-
-    @After
-    public void tearDown() {
-        vertx.closeAndAwait();
-    }
+public class PostGreSQLClientTest extends PGTestBase {
 
     @Test
     public void testMutinyAPI() {
