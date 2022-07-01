@@ -62,7 +62,7 @@
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <assertj-core.version>3.23.1</assertj-core.version>
         <slf4j-api.version>1.7.36</slf4j-api.version>
-        <smallrye-common.version>1.12.0</smallrye-common.version>
+        <smallrye-common.version>1.13.0</smallrye-common.version>
     </properties>
 
     <dependencyManagement>
