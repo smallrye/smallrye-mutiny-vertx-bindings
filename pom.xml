@@ -63,6 +63,11 @@
         <assertj-core.version>3.23.1</assertj-core.version>
         <slf4j-api.version>1.7.36</slf4j-api.version>
         <smallrye-common.version>1.13.0</smallrye-common.version>
+
+        <revapi-maven-plugin.version>0.14.7</revapi-maven-plugin.version>
+        <revapi-java.version>0.27.0</revapi-java.version>
+        <revapi-reporter-json.version>0.4.6</revapi-reporter-json.version>
+        <revapi-reporter-text.version>0.14.6</revapi-reporter-text.version>
     </properties>
 
     <dependencyManagement>
@@ -300,24 +305,24 @@
                     <plugin>
                         <groupId>org.revapi</groupId>
                         <artifactId>revapi-maven-plugin</artifactId>
-                        <version>0.14.6</version>
+                        <version>${revapi-maven-plugin.version}</version>
                         <dependencies>
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-java</artifactId>
-                                <version>0.26.1</version>
+                                <version>${revapi-java.version}</version>
                             </dependency>
 
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-reporter-text</artifactId>
-                                <version>0.14.5</version>
+                                <version>${revapi-reporter-text.version}</version>
                             </dependency>
 
                             <dependency>
                                 <groupId>org.revapi</groupId>
                                 <artifactId>revapi-reporter-json</artifactId>
-                                <version>0.4.5</version>
+                                <version>${revapi-reporter-json.version}</version>
                             </dependency>
 
                         </dependencies>
