@@ -1,4 +1,4 @@
 name: SmallRye Mutiny Vert.x Bindings
 release:
-  current-version: 2.24.0
+  current-version: 2.24.1
   next-version: 2.25.0-SNAPSHOT
