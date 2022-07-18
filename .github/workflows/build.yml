@@ -44,25 +44,3 @@ jobs:
         run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B -pl '!vertx-mutiny-clients-bom' ${{matrix.java.opts}} formatter:validate
       - name: build with maven
         run: mvn -s .build/maven-ci-settings.xml -f pom.xml -B verify ${{matrix.java.opts}}
-
-  quality:
-    needs: [build]
-    if: github.event_name == 'push' && startsWith('smallrye', github.repository)
-    runs-on: ubuntu-latest
-    name: quality
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
-        with:
-          java-version: 11
-          distribution: temurin
-      - uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: maven
-      - name: sonar
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-        run: mvn -s .build/maven-ci-settings.xml -B -f pom.xml -Pcoverage verify javadoc:javadoc sonar:sonar -Dsonar.projectKey=smallrye_smallrye-mutiny-vertx-bindings -Dsonar.login=$SONAR_TOKEN
