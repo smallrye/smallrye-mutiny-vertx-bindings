@@ -3,8 +3,9 @@ name: SmallRye Build
 on:
   push:
     branches:
-      - main
+      - "main"
       - "1.x"
+      - "2.x"
     paths-ignore:
       - '.gitignore'
       - 'CODEOWNERS'
@@ -25,7 +26,6 @@ jobs:
     strategy:
       matrix:
         java: [
-          { 'version': '8', opts: '-pl !:smallrye-mutiny-vertx-oracle-client' },
           { 'version': '11', opts: '' },
           { 'version': '17', 'opts': '' }
         ]
