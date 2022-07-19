@@ -81,34 +81,38 @@ public class CodeGenHelper {
         }
     }
 
+    private static String expandInnerTypes(String type) {
+        return type.replace('$', '.');
+    }
+
     public static String genTypeName(TypeInfo type, boolean translate) {
         if (!translate && type.isParameterized() && type.getRaw().getName().equals(Uni.class.getName())) {
             ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
-            return "io.vertx.core.Future<" + genTypeName(parameterizedType.getArg(0), translate) + ">";
+            return expandInnerTypes("io.vertx.core.Future<" + genTypeName(parameterizedType.getArg(0), translate) + ">");
         }
 
         if (type.isParameterized()) {
             ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
             if (translate  && type.getRaw().getName().equals(Handler.class.getName())  && pt.getArg(0).getName().startsWith(Promise.class.getName())) {
                 TypeInfo arg = ((ParameterizedTypeInfo) pt.getArg(0)).getArg(0);
-                return Uni.class.getName() + "<" + genTypeName(arg, true) + ">";
+                return expandInnerTypes(Uni.class.getName() + "<" + genTypeName(arg, true) + ">");
             }
-            return genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate))
-                    .collect(joining(", ", "<", ">"));
+            return expandInnerTypes(genTypeName(pt.getRaw(), translate) + pt.getArgs().stream().map(a -> genTypeName(a, translate))
+                    .collect(joining(", ", "<", ">")));
         } else {
             if (type.getKind() == ClassKind.API && translate) {
                 // TODO Is this still a thing? Future is not API anymore
                 if (type.getName().equals(Future.class.getName())) {
-                    return Uni.class.getName();
+                    return expandInnerTypes(Uni.class.getName());
                 }
-                return type.translateName(ID);
+                return expandInnerTypes(type.translateName(ID));
             } else if (translate  && type.getName().equals(Future.class.getName())) {
-                    return Uni.class.getName();
+                    return expandInnerTypes(Uni.class.getName());
             } else {
                 if (isImported(type)) {
-                    return type.getSimpleName();
+                    return expandInnerTypes(type.getSimpleName());
                 } else {
-                    return type.getName();
+                    return expandInnerTypes(type.getName());
                 }
             }
         }

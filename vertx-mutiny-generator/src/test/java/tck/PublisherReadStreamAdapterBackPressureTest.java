@@ -7,8 +7,9 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.test.fakestream.FakeStream;
 import org.junit.Test;
-import org.reactivestreams.Publisher;
+import java.util.concurrent.Flow.Publisher;
 
+import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 

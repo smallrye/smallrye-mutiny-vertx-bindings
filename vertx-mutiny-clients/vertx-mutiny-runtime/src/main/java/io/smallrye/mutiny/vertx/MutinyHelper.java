@@ -1,9 +1,8 @@
 package io.smallrye.mutiny.vertx;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.Flow.Subscriber;
 import java.util.function.Function;
-
-import org.reactivestreams.Subscriber;
 
 import io.smallrye.mutiny.vertx.impl.WriteStreamSubscriberImpl;
 import io.vertx.core.Vertx;
