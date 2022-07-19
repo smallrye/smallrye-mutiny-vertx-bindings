@@ -125,7 +125,7 @@ public class SimpleMethodGenerator extends MutinyMethodGenerator {
                 ret.append(", ");
             }
             TypeInfo type = param.getType();
-            if (type.isParameterized() && (type.getRaw().getName().equals("org.reactivestreams.Publisher"))) {
+            if (type.isParameterized() && (type.getRaw().getName().equals("java.util.concurrent.Flow$Publisher"))) {
                 String adapterFunction;
                 ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
                 if (parameterizedType.getArg(0).isVariable()) {

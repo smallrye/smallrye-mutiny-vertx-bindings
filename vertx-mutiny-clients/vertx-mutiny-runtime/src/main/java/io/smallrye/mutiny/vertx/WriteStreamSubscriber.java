@@ -1,11 +1,10 @@
 package io.smallrye.mutiny.vertx;
 
+import java.util.concurrent.Flow.Subscriber;
 import java.util.function.Consumer;
 
-import org.reactivestreams.Subscriber;
-
 /**
- * A {@link io.vertx.core.streams.WriteStream} to {@link org.reactivestreams.Subscriber} adapter.
+ * A {@link io.vertx.core.streams.WriteStream} to {@link Subscriber} adapter.
  *
  * @param <T> the type of item.
  */

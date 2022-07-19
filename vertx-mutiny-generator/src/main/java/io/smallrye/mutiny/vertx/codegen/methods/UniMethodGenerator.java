@@ -13,7 +13,7 @@ import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
 import io.vertx.core.Handler;
-import org.reactivestreams.Publisher;
+import java.util.concurrent.Flow.Publisher;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

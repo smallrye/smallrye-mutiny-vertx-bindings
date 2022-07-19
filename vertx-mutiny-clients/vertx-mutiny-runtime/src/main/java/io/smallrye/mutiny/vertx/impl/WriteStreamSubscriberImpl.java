@@ -1,11 +1,10 @@
 package io.smallrye.mutiny.vertx.impl;
 
+import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Subscription;
 
 import io.smallrye.mutiny.CompositeException;
 import io.smallrye.mutiny.helpers.ParameterValidation;
@@ -20,7 +19,7 @@ public class WriteStreamSubscriberImpl<I, O> implements WriteStreamSubscriber<I>
     private final WriteStream<O> stream;
     private final Function<I, O> mapping;
 
-    private AtomicReference<Subscription> upstream = new AtomicReference<>();
+    private AtomicReference<Flow.Subscription> upstream = new AtomicReference<>();
     private AtomicBoolean done = new AtomicBoolean();
     private int outstanding;
 
@@ -34,7 +33,7 @@ public class WriteStreamSubscriberImpl<I, O> implements WriteStreamSubscriber<I>
     }
 
     @Override
-    public void onSubscribe(Subscription subscription) {
+    public void onSubscribe(Flow.Subscription subscription) {
         ParameterValidation.nonNullNpe(subscription, "upstream");
         if (upstream.compareAndSet(null, subscription)) {
             stream.exceptionHandler(t -> {
@@ -146,7 +145,7 @@ public class WriteStreamSubscriberImpl<I, O> implements WriteStreamSubscriber<I>
     }
 
     private void requestMore() {
-        Subscription s = upstream.get();
+        Flow.Subscription s = upstream.get();
         if (s == null) {
             return;
         }

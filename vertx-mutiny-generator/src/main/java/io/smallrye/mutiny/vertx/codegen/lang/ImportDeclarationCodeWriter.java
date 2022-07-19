@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.vertx.TypeArg;
 import io.vertx.codegen.annotations.Fluent;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;

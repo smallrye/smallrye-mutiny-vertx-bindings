@@ -1,7 +1,7 @@
 package tck;
 
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
-import org.reactivestreams.Subscription;
+import java.util.concurrent.Flow.Subscription;
 
 import java.util.function.Function;
 

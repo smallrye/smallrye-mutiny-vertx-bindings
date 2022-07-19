@@ -1,8 +1,8 @@
 package tck;
 
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
+import java.util.concurrent.Flow.Publisher;
+import java.util.concurrent.Flow.Subscriber;
+import java.util.concurrent.Flow;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -14,7 +14,7 @@ public class TestUtils {
             boolean unsubscribed;
 
             @Override
-            public void onSubscribe(Subscription s) {
+            public void onSubscribe(Flow.Subscription s) {
                 sub.onSubscribe(new TestSubscriber.Subscription() {
                     @Override
                     public void fetch(long val) {

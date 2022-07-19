@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.concurrent.Flow;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
                     params = new ArrayList<>(method.getParams());
                 }
                 ParameterizedTypeInfo paramType = new io.vertx.codegen.type.ParameterizedTypeInfo(
-                        io.vertx.codegen.type.TypeReflectionFactory.create(org.reactivestreams.Publisher.class).getRaw(),
+                        io.vertx.codegen.type.TypeReflectionFactory.create(Flow.Publisher.class).getRaw(),
                         false,
                         Collections.singletonList(((ParameterizedTypeInfo) param.getType()).getArg(0)));
                 params.set(count, new io.vertx.codegen.ParamInfo(
