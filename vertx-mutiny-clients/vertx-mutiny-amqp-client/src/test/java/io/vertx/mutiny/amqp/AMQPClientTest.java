@@ -19,7 +19,10 @@ import io.vertx.mutiny.core.Vertx;
 public class AMQPClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("vromero/activemq-artemis:latest")
+    public GenericContainer<?> container = new GenericContainer<>("quay.io/artemiscloud/activemq-artemis-broker:1.0.6")
+            .withEnv("AMQ_USER", "admin")
+            .withEnv("AMQ_PASSWORD", "admin")
+            .withEnv("AMQ_EXTRA_ARGS", "--nio")
             .withExposedPorts(5672);
 
     private Vertx vertx;
