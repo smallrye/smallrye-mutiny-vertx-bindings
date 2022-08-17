@@ -147,6 +147,20 @@
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
+
+        <profile>
+            <id>arm</id>
+            <activation>
+                <os>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <!-- No DB2 image for ARM - https://hub.docker.com/r/ibmcom/db2/tags -->
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+
+        </profile>
     </profiles>
 
 </project>

@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.ext.mail.MailConfig;
@@ -19,9 +18,8 @@ import io.vertx.mutiny.ext.mail.MailClient;
 public class MailClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("digiplant/fake-smtp:latest")
-            .withExposedPorts(25)
-            .withFileSystemBind("target", "/tmp/fakemail", BindMode.READ_WRITE);
+    public GenericContainer<?> container = new GenericContainer<>("mailhog/mailhog:latest")
+            .withExposedPorts(1025);
 
     private Vertx vertx;
 
@@ -39,8 +37,8 @@ public class MailClientTest {
     @Test
     public void testMutinyAPI() {
         MailClient client = MailClient.createShared(vertx, new MailConfig()
-                .setPort(container.getMappedPort(25))
-                .setHostname(container.getContainerIpAddress()));
+                .setPort(container.getMappedPort(1025))
+                .setHostname(container.getHost()));
         assertThat(client, is(notNullValue()));
         client.sendMail(new MailMessage().setText("hello mutiny")
                 .setSubject("test email")
@@ -53,8 +51,8 @@ public class MailClientTest {
     @Test
     public void testBlockingAPI() {
         MailClient client = MailClient.createShared(vertx, new MailConfig()
-                .setPort(container.getMappedPort(25))
-                .setHostname(container.getContainerIpAddress()));
+                .setPort(container.getMappedPort(1025))
+                .setHostname(container.getHost()));
         assertThat(client, is(notNullValue()));
         client.sendMailAndAwait(new MailMessage().setText("hello mutiny")
                 .setSubject("test email")
