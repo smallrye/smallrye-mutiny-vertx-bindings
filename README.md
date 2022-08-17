@@ -30,7 +30,7 @@ To generate the compatibility report, you need:
 Generate the report with:
 
 ```bash
-mvn verify -DskipTests revapi:report@revapi-check  -Prevapi -DskipTests -Dmaven.javadoc.skip=true -pl \!vertx-mutiny-clients-bom
+mvn verify -DskipTests revapi:report@revapi-check  -Prevapi -DskipTests -Dmaven.javadoc.skip=true -pl \!vertx-mutiny-clients-bom -pl \!vertx-mutiny-clients/vertx-mutiny-sql-client
 jbang CompatibilityReport.java && asciidoctor target/compatibility-report.adoc
 ``` 
 
