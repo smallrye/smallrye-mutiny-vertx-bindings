@@ -22,8 +22,7 @@
         <dependency>
             <groupId>${gen-source-groupId}</groupId>
             <artifactId>${gen-source-artifactId}</artifactId>
-            <!-- This is because of the close method that changed its signature in 4.3.3 -->
-            <version>${vertx.version}.1</version>
+            <version>${vertx.version}</version>
         </dependency>
 
         <!-- Vert.x Mutiny Core -->
