@@ -62,7 +62,7 @@
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <assertj-core.version>3.23.1</assertj-core.version>
         <slf4j-api.version>2.0.2</slf4j-api.version>
-        <smallrye-common.version>1.13.0</smallrye-common.version>
+        <smallrye-common.version>2.0.0</smallrye-common.version>
 
         <revapi-maven-plugin.version>0.14.7</revapi-maven-plugin.version>
         <revapi-java.version>0.27.0</revapi-java.version>
