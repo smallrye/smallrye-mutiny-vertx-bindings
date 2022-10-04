@@ -193,6 +193,11 @@
             </dependency>
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
+                <artifactId>smallrye-mutiny-vertx-health-checks</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
                 <artifactId>smallrye-mutiny-vertx-pg-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -264,6 +269,11 @@
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
                 <artifactId>smallrye-mutiny-vertx-json-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>smallrye-mutiny-vertx-web-api-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -349,6 +359,11 @@
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
                 <artifactId>smallrye-mutiny-vertx-tcp-eventbus-bridge</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>smallrye-mutiny-vertx-uri-template</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
