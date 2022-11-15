@@ -172,3 +172,176 @@ updates:
   - dependency-name: org.revapi:revapi-maven-plugin
     versions:
     - 0.13.2
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  target-branch: 2.x
+  ignore:
+  - dependency-name: com.fasterxml.jackson.core:jackson-databind
+    versions:
+    - 2.12.3
+  - dependency-name: com.fasterxml.jackson.core:jackson-core
+    versions:
+    - 2.12.3
+  - dependency-name: io.micrometer:micrometer-registry-influx
+    versions:
+    - 1.6.6
+  - dependency-name: io.micrometer:micrometer-registry-prometheus
+    versions:
+    - 1.6.6
+  - dependency-name: io.micrometer:micrometer-registry-jmx
+    versions:
+    - 1.6.6
+  - dependency-name: io.smallrye.reactive:smallrye-reactive-converter-api:tests
+    versions:
+    - 2.0.0
+    - 2.0.0.RC3
+    - 2.1.1
+    - 2.2.0
+    - 2.3.0
+  - dependency-name: io.projectreactor:reactor-core
+    versions:
+    - 3.4.4
+  - dependency-name: io.vertx:vertx-health-check
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-auth-htdigest
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-auth-oauth2
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-auth-jwt
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-auth-common
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-mqtt
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-db2-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-web
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-bridge-common
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-mysql-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-pg-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-sql-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-rabbitmq-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-amqp-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-kafka-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-consul-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-cassandra-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-redis-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-mongo-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-web-common
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-web-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-mail-client
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-core:sources
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-codegen:tck-sources
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-core
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-codegen
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: io.vertx:vertx-dependencies
+    versions:
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+  - dependency-name: org.apache.logging.log4j:log4j-api
+    versions:
+    - 2.14.0
+  - dependency-name: org.revapi:revapi-maven-plugin
+    versions:
+    - 0.13.2
