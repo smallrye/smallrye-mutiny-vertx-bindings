@@ -61,7 +61,7 @@ public class PropertiesAuthTest {
         try {
             authn.authenticate(authInfo).await().indefinitely();
         } catch (CompletionException e) {
-            assertTrue(e.getMessage().contains("invalid username/password"));
+            assertTrue(e.getMessage().contains("unknown user"));
         }
     }
 
