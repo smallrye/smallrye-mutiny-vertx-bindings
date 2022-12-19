@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -19,7 +20,7 @@ import io.vertx.mutiny.core.Vertx;
 public class AMQPClientTest {
 
     @Rule
-    public GenericContainer<?> container = new GenericContainer<>("quay.io/artemiscloud/activemq-artemis-broker:1.0.6")
+    public GenericContainer<?> container = new GenericContainer<>("quay.io/artemiscloud/activemq-artemis-broker:1.0.11")
             .withEnv("AMQ_USER", "admin")
             .withEnv("AMQ_PASSWORD", "admin")
             .withEnv("AMQ_EXTRA_ARGS", "--nio")
@@ -27,10 +28,21 @@ public class AMQPClientTest {
 
     private Vertx vertx;
 
+    @BeforeClass
+    public static void beforeAll() {
+        org.junit.Assume.assumeTrue(isNotArm64());
+
+    }
+
     @Before
     public void setUp() {
         vertx = Vertx.vertx();
         assertThat(vertx).isNotNull();
+    }
+
+    static boolean isNotArm64() {
+        String v = System.getProperty("os.arch");
+        return !"aarch64".equalsIgnoreCase(v);
     }
 
     @After
