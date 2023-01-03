@@ -73,7 +73,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.http.proxy</Automatic-Module-Name>
+                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.web.sstore.cookie</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
