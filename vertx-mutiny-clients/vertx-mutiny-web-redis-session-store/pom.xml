@@ -13,7 +13,7 @@
 
     <properties>
         <gen-source-groupId>io.vertx</gen-source-groupId>
-        <gen-source-artifactId>vertx-web-sstore-cookie</gen-source-artifactId>
+        <gen-source-artifactId>vertx-web-sstore-redis</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
     </properties>
 
@@ -78,7 +78,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.http.proxy</Automatic-Module-Name>
+                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.web.sstore.redis</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
