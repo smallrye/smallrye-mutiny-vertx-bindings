@@ -78,7 +78,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.redis.client</Automatic-Module-Name>
+                            <Automatic-Module-Name>io.smallrye.mutiny.vertx.uri.template</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
