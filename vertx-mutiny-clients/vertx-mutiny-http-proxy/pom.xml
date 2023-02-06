@@ -32,6 +32,13 @@
             <version>${project.version}</version>
         </dependency>
 
+	<!-- Vert.x Mutiny Web -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>smallrye-mutiny-vertx-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
