@@ -26,7 +26,7 @@ public class UniHelper {
      * asynchronous method.
      * <p>
      * For example:
-     * 
+     *
      * <pre>
      * {
      *     &#64;code

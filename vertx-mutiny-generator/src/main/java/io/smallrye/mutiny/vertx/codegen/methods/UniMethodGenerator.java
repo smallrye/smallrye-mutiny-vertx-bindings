@@ -13,6 +13,7 @@ import io.vertx.codegen.type.ClassTypeInfo;
 import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
 import io.vertx.core.Handler;
+
 import java.util.concurrent.Flow.Publisher;
 
 import java.io.PrintWriter;
@@ -115,7 +116,6 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
                         .append(adapterFunction).append(").resume()");
             } else if (index < method.getParams().size() - 1 && type.isParameterized() && (type.getRaw().getName().equals(Handler.class.getName()))
                     && ! (isHandlerOfPromise(param) || isConsumerOfPromise(param))) {
-                System.out.println(method.getName() + " ===> " + param.getName() + " : " + param.getType().getRaw() + " / " + param.getType().toString());
                 object.append(param.getName()).append("::accept");
             } else {
                 object.append(CodeGenHelper.genConvParam(methodTypeArgMap, type, method, param.getName()));
@@ -138,14 +138,19 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         writer.print(method.getName());
         writer.print("(");
         List<ParamInfo> params = method.getParams();
+
         writer.print(params.stream().map(pi -> {
             if (pi.getType().getKind() == API) {
                 return pi.getName() + ".getDelegate()";
             } else if (pi.getType().getKind() == FUNCTION) {
                 ParameterizedTypeInfo type = (ParameterizedTypeInfo) pi.getType();
-                if (type.getArg(1).getKind() == FUTURE  && ((ParameterizedTypeInfo) type.getArg(1)).getArg(0).getKind() == API) {
+                TypeInfo functionParamArgType = type.getArg(0);
+                TypeInfo futureArgType = type.getArg(1);
+                if (futureArgType.getKind() == FUTURE  && ((ParameterizedTypeInfo) futureArgType).getArg(0).getKind() == API) {
                     // Must adapt the uni to future and switch to delegate
-                    return "\n    " + pi.getName() + ".andThen(u -> " + UniHelper.class.getName()+ ".toFuture(u).map(h -> h.getDelegate()))\n";
+                    return "\n    " + pi.getName() + ".andThen(u -> " + UniHelper.class.getName() + ".toFuture(u).map(h -> h.getDelegate()))\n";
+                } else if (functionParamArgType.getKind() == API  && futureArgType.getKind() == FUTURE) {
+                    return "\n\t arg -> " + UniHelper.class.getName() + ".toFuture(" + pi.getName() + ".apply(" + CodeGenHelper.genTranslatedTypeName(functionParamArgType) + ".newInstance(arg)))\n";
                 } else {
                     return pi.getName();
                 }
