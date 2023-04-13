@@ -99,7 +99,7 @@ public class VertxContextAwareSchedulerTest {
     public void mutiny_infra_integration() {
         try {
             Infrastructure.setDefaultExecutor(scheduler);
-            SomeVerticle verticle = new SomeVerticle(infraBasedUni);
+            SomeVerticle verticle = new SomeVerticle(infraBasedUni());
             vertx.deployVerticleAndAwait(verticle);
             assertThat(verticle.result).startsWith("foo=bar: ").contains("vert.x-eventloop-thread-");
         } finally {
@@ -109,37 +109,41 @@ public class VertxContextAwareSchedulerTest {
 
     @Test
     public void mutiny_explicit_executor_integration() {
-        SomeVerticle verticle = new SomeVerticle(executorBasedUni);
+        SomeVerticle verticle = new SomeVerticle(executorBasedUni());
         vertx.deployVerticleAndAwait(verticle);
         assertThat(verticle.result).startsWith("foo=bar: ").contains("vert.x-eventloop-thread-");
     }
 
     @Test
     public void mutiny_without_infra_integration() {
-        SomeVerticle verticle = new SomeVerticle(infraBasedUni);
+        SomeVerticle verticle = new SomeVerticle(infraBasedUni());
         vertx.deployVerticleAndAwait(verticle);
         assertThat(verticle.result).startsWith("woops: ").doesNotContain("vert.x-eventloop-thread-");
     }
 
-    Uni<String> infraBasedUni = Uni.createFrom().item("foo=")
-            .onItem().delayIt().by(Duration.ofMillis(100))
-            .onItem().transform(str -> {
-                Context innerCtx = Vertx.currentContext();
-                if (innerCtx == null) {
-                    return "woops: " + Thread.currentThread().getName();
-                }
-                return str + innerCtx.<String> getLocal("foo") + ": " + Thread.currentThread().getName();
-            });
+    private Uni<String> infraBasedUni() {
+        return Uni.createFrom().item("foo=")
+                .onItem().delayIt().by(Duration.ofMillis(100))
+                .onItem().transform(str -> {
+                    Context innerCtx = Vertx.currentContext();
+                    if (innerCtx == null) {
+                        return "woops: " + Thread.currentThread().getName();
+                    }
+                    return str + innerCtx.<String> getLocal("foo") + ": " + Thread.currentThread().getName();
+                });
+    }
 
-    Uni<String> executorBasedUni = Uni.createFrom().item("foo=")
-            .onItem().delayIt().onExecutor(VertxContextAwareScheduler.wrappingMutinyWorkerPool()).by(Duration.ofMillis(100))
-            .onItem().transform(str -> {
-                Context innerCtx = Vertx.currentContext();
-                if (innerCtx == null) {
-                    return "woops: " + Thread.currentThread().getName();
-                }
-                return str + innerCtx.<String> getLocal("foo") + ": " + Thread.currentThread().getName();
-            });
+    private Uni<String> executorBasedUni() {
+        return Uni.createFrom().item("foo=")
+                .onItem().delayIt().onExecutor(VertxContextAwareScheduler.wrappingMutinyWorkerPool()).by(Duration.ofMillis(100))
+                .onItem().transform(str -> {
+                    Context innerCtx = Vertx.currentContext();
+                    if (innerCtx == null) {
+                        return "woops: " + Thread.currentThread().getName();
+                    }
+                    return str + innerCtx.<String> getLocal("foo") + ": " + Thread.currentThread().getName();
+                });
+    }
 
     static class SomeVerticle extends AbstractVerticle {
 
