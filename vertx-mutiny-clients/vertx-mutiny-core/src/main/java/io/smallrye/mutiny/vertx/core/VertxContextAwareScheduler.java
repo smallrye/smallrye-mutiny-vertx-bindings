@@ -1,5 +1,7 @@
 package io.smallrye.mutiny.vertx.core;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
@@ -8,12 +10,44 @@ import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 
+/**
+ * A helper for the scheduled tasks methods in {@link ScheduledExecutorService} that supports Vert.x contexts.
+ * <p>
+ * This {@link ScheduledExecutorService} delegates to a concrete {@link ScheduledExecutorService}, but the following
+ * scheduled tasks get executed on a Vert.x {@link Context}, if available:
+ * <ul>
+ * <li>{@link ScheduledExecutorService#schedule(Runnable, long, TimeUnit)}</li>
+ * <li>{@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}</li>
+ * <li>{@link ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)}</li>
+ * </ul>
+ * <p>
+ * {@link ScheduledExecutorService#schedule(Callable, long, TimeUnit)} throws a {@link UnsupportedOperationException}.
+ * <p>
+ * The other methods from {@link ExecutorService} delegate to the provided {@link ScheduledExecutorService} and run on
+ * one of its managed thread.
+ * <p>
+ * When a task is scheduled with one of the 3 methods above (@{code schedule, scheduleAtFixedRate, scheduleWithFixedDelay})
+ * but the call is not from a Vert.x {@link Context}, then the task is run on a managed thread of the provided
+ * {@link ScheduledExecutorService}.
+ */
 public class VertxContextAwareScheduler implements ScheduledExecutorService {
 
+    /**
+     * Create a new {@link VertxContextAwareScheduler} from a delegate {@link ScheduledExecutorService}.
+     *
+     * @param delegate the delegate executor, must not be {@code null}
+     * @return the scheduler
+     */
     public static VertxContextAwareScheduler wrapping(ScheduledExecutorService delegate) {
-        return new VertxContextAwareScheduler(delegate);
+        return new VertxContextAwareScheduler(requireNonNull(delegate, "The delegate executor cannot be null"));
     }
 
+    /**
+     * Create a new {@link VertxContextAwareScheduler} that delegates to the Mutiny worker pool.
+     *
+     * @return the scheduler
+     * @see Infrastructure#getDefaultWorkerPool()
+     */
     public static VertxContextAwareScheduler wrappingMutinyWorkerPool() {
         return new VertxContextAwareScheduler(Infrastructure.getDefaultWorkerPool());
     }

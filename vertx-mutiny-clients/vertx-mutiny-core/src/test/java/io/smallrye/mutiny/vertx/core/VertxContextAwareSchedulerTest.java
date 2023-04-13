@@ -60,6 +60,13 @@ public class VertxContextAwareSchedulerTest {
     }
 
     @Test
+    public void reject_null_executor() {
+        assertThatThrownBy(() -> VertxContextAwareScheduler.wrapping(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("The delegate executor cannot be null");
+    }
+
+    @Test
     public void regular_submit_from_vertx_context() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean calledOnVertxThread = new AtomicBoolean();
