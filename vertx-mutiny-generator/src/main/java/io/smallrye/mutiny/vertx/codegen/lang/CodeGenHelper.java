@@ -15,6 +15,7 @@ import io.vertx.core.Promise;
 import javax.lang.model.element.Element;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static io.smallrye.mutiny.vertx.codegen.MutinyGenerator.ID;
 import static io.vertx.codegen.type.ClassKind.*;
@@ -32,9 +33,9 @@ public class CodeGenHelper {
             return false;
         }
         if (concreteSuperType.isParameterized()) {
-            return ! MutinyGenerator.IGNORED_TYPES.contains(concreteSuperType.getRaw().getName());
+            return !MutinyGenerator.IGNORED_TYPES.contains(concreteSuperType.getRaw().getName());
         } else {
-            return ! MutinyGenerator.IGNORED_TYPES.contains(concreteSuperType.getName());
+            return !MutinyGenerator.IGNORED_TYPES.contains(concreteSuperType.getName());
         }
     }
 
@@ -93,7 +94,7 @@ public class CodeGenHelper {
 
         if (type.isParameterized()) {
             ParameterizedTypeInfo pt = (ParameterizedTypeInfo) type;
-            if (translate  && type.getRaw().getName().equals(Handler.class.getName())  && pt.getArg(0).getName().startsWith(Promise.class.getName())) {
+            if (translate && type.getRaw().getName().equals(Handler.class.getName()) && pt.getArg(0).getName().startsWith(Promise.class.getName())) {
                 TypeInfo arg = ((ParameterizedTypeInfo) pt.getArg(0)).getArg(0);
                 return expandInnerTypes(Uni.class.getName() + "<" + genTypeName(arg, true) + ">");
             }
@@ -106,8 +107,8 @@ public class CodeGenHelper {
                     return expandInnerTypes(Uni.class.getName());
                 }
                 return expandInnerTypes(type.translateName(ID));
-            } else if (translate  && type.getName().equals(Future.class.getName())) {
-                    return expandInnerTypes(Uni.class.getName());
+            } else if (translate && type.getName().equals(Future.class.getName())) {
+                return expandInnerTypes(Uni.class.getName());
             } else {
                 if (isImported(type)) {
                     return expandInnerTypes(type.getSimpleName());
@@ -146,7 +147,7 @@ public class CodeGenHelper {
     }
 
     public static String genConvParam(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type,
-            MethodInfo method, String expr) {
+                                      MethodInfo method, String expr) {
         if (type.isParameterized() && (type.getRaw().getName().equals(Multi.class.getName()))) {
             ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
             String adapterFunction = "obj -> " + genConvParam(methodTypeArgMap, parameterizedType.getArg(0), method, "obj");
@@ -159,6 +160,11 @@ public class CodeGenHelper {
                 return "io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ".map(r -> r.getDelegate()))";
             } else {
                 return "io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ")";
+            }
+        } else if (type.isParameterized() && type.getRaw().getName().equals(Supplier.class.getName())) {
+            ParameterizedTypeInfo parameterizedType = (ParameterizedTypeInfo) type;
+            if (parameterizedType.getArg(0).getRaw().getName().equals(Future.class.getName())) {
+                return "() -> io.smallrye.mutiny.vertx.UniHelper.toFuture(" + expr + ".get())";
             }
         }
 
@@ -185,7 +191,7 @@ public class CodeGenHelper {
                 if (eventKind == ASYNC_RESULT) {
                     TypeInfo resultType = ((ParameterizedTypeInfo) eventType).getArg(0);
                     return "new io.smallrye.mutiny.vertx.DelegatingHandler<>(" + expr + ", ar -> ar.map(event -> " + genConvReturn(methodTypeArgMap, resultType, method, "event") + "))";
-                } else if (eventType.isParameterized()  && eventType.getRaw().getName().equals(Promise.class.getName())) {
+                } else if (eventType.isParameterized() && eventType.getRaw().getName().equals(Promise.class.getName())) {
                     return "new Handler<" + genTypeName(eventType) + ">() {\n" +
                             "          public void handle(" + genTypeName(eventType) + " event) {\n" +
                             "            " + expr + ".subscribe().with(it -> event.complete(it), failure -> event.fail(failure));\n" +
@@ -312,7 +318,7 @@ public class CodeGenHelper {
     }
 
     private static String genTypeArg(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo arg,
-            MethodInfo method) {
+                                     MethodInfo method) {
         Map<TypeInfo, String> typeArgMap = methodTypeArgMap.get(method);
         if (typeArgMap != null) {
             String typeArgRef = typeArgMap.get(arg);
@@ -330,7 +336,7 @@ public class CodeGenHelper {
     }
 
     public static String writeReturnStatementForApi(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap,
-            TypeInfo type, MethodInfo method, String expr) {
+                                                    TypeInfo type, MethodInfo method, String expr) {
         StringBuilder tmp = new StringBuilder(type.getRaw().translateName(ID));
         tmp.append(".newInstance((");
         tmp.append(type.getRaw());
@@ -348,7 +354,7 @@ public class CodeGenHelper {
     }
 
     public static String genConvReturn(Map<MethodInfo, Map<TypeInfo, String>> methodTypeArgMap, TypeInfo type,
-            MethodInfo method, String expr) {
+                                       MethodInfo method, String expr) {
         ClassKind kind = type.getKind();
         if (kind == OBJECT) {
             if (type.isVariable()) {
