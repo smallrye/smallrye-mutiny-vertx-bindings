@@ -9,3 +9,6 @@ target
 .vscode
 .cache
 .factorypath
+
+maven-settings.xml
+smallrye-sign.asc
