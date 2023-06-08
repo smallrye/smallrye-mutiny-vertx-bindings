@@ -193,7 +193,7 @@
             </dependency>
             <dependency>
                 <groupId>io.smallrye.reactive</groupId>
-                <artifactId>smallrye-mutiny-vertx-health-checks</artifactId>
+                <artifactId>smallrye-mutiny-vertx-health-check</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
