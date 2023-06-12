@@ -46,7 +46,7 @@
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 
-        <vertx.version>4.4.2</vertx.version>
+        <vertx.version>4.4.3</vertx.version>
         <mutiny.version>2.2.0</mutiny.version>
         <jackson.version>2.15.2</jackson.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>
@@ -341,7 +341,7 @@
                             <!-- Do not check for Vert.x, only focus on the client API -->
                             <checkDependencies>false</checkDependencies>
                             <generateSiteReport>false</generateSiteReport>
-                            <oldVersion>4.4.0</oldVersion>
+                            <oldVersion>3.4.0</oldVersion>
                             <newVersion>${project.version}</newVersion>
 
                             <analysisConfiguration>
