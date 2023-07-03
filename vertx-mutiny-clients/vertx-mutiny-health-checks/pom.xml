@@ -5,10 +5,10 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>3.6.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>smallrye-mutiny-health-check</artifactId>
+    <artifactId>smallrye-mutiny-vertx-health-check</artifactId>
     <name>SmallRye Mutiny - Vert.x Health Check</name>
 
     <properties>
