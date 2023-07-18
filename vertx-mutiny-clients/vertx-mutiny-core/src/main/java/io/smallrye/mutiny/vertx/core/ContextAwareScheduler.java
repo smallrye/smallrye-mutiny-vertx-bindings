@@ -59,6 +59,11 @@ public interface ContextAwareScheduler {
         /**
          * Actions will be run on a context that is captured by calling {@link Vertx#getOrCreateContext()}
          * when a scheduling method is being called like {@link ScheduledExecutorService#schedule(Runnable, long, TimeUnit)}.
+         * <p>
+         * <strong>Important.</strong>
+         * Note that in many cases such as {@link io.smallrye.mutiny.operators.uni.UniDelayOnItem} the scheduling operation
+         * happens on a worker thread and not a Vert.x thread, so {@link #withGetOrCreateContextOnCurrentThread(Vertx)}
+         * might be the better option when data is being shared through the context.
          *
          * @param vertx the Vert.x object, cannot be {@code null}
          * @return the scheduler

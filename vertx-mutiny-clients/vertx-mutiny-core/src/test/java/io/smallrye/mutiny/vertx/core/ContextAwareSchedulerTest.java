@@ -284,7 +284,7 @@ public class ContextAwareSchedulerTest {
     }
 
     @Test
-    public void usage_verticle() {
+    public void usage_verticle_withCurrentContext() {
         class MyVerticle extends AbstractVerticle {
 
             @Override
@@ -312,5 +312,71 @@ public class ContextAwareSchedulerTest {
         }
 
         vertx.deployVerticle(new MyVerticle()).await().atMost(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void usage_verticle_withGetOrCreateContextOnCurrentThread() {
+        class MyVerticle extends AbstractVerticle {
+
+            @Override
+            public Uni<Void> asyncStart() {
+                vertx.getOrCreateContext().put("foo", "bar");
+
+                ScheduledExecutorService scheduler = ContextAwareScheduler.delegatingTo(delegate)
+                        .withGetOrCreateContextOnCurrentThread(vertx);
+
+                return Uni.createFrom().voidItem()
+                        .onItem().delayIt().onExecutor(scheduler).by(Duration.ofMillis(10))
+                        .onItem().transformToUni(v -> {
+                            Context ctx = vertx.getOrCreateContext();
+                            if (isDuplicate(ctx)) {
+                                if ("bar".equals(ctx.get("foo"))) {
+                                    return Uni.createFrom().voidItem();
+                                } else {
+                                    return Uni.createFrom().failure(new IllegalStateException("No data in context"));
+                                }
+                            } else {
+                                return Uni.createFrom().failure(new IllegalStateException("No context"));
+                            }
+                        });
+            }
+        }
+
+        vertx.deployVerticle(new MyVerticle()).await().atMost(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void usage_verticle_withGetOrCreateContextFailing() {
+        class MyVerticle extends AbstractVerticle {
+
+            @Override
+            public Uni<Void> asyncStart() {
+                vertx.getOrCreateContext().put("foo", "bar");
+
+                ScheduledExecutorService scheduler = ContextAwareScheduler.delegatingTo(delegate)
+                        .withGetOrCreateContext(vertx);
+
+                return Uni.createFrom().voidItem()
+                        .onItem().delayIt().onExecutor(scheduler).by(Duration.ofMillis(10))
+                        .onItem().transformToUni(v -> {
+                            Context ctx = vertx.getOrCreateContext();
+                            if (isDuplicate(ctx)) {
+                                if ("bar".equals(ctx.get("foo"))) {
+                                    return Uni.createFrom().voidItem();
+                                } else {
+                                    return Uni.createFrom().failure(new IllegalStateException("No data in context"));
+                                }
+                            } else {
+                                return Uni.createFrom().failure(new IllegalStateException("No context"));
+                            }
+                        });
+            }
+        }
+
+        try {
+            vertx.deployVerticle(new MyVerticle()).await().atMost(Duration.ofSeconds(5));
+        } catch (IllegalStateException err) {
+            assertThat(err).hasMessage("No data in context");
+        }
     }
 }
