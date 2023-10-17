@@ -27,7 +27,8 @@ jobs:
       matrix:
         java: [
           { 'version': '11', opts: '' },
-          { 'version': '17', 'opts': '' }
+          { 'version': '17', 'opts': '' },
+          { 'version': '21', 'opts': "-pl '!vertx-mutiny-clients/vertx-mutiny-web-templ-mvel'" }
         ]
     name: build with jdk ${{matrix.java.version}}
 
