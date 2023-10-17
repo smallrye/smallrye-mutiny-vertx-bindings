@@ -68,6 +68,8 @@
         <revapi-java.version>0.28.1</revapi-java.version>
         <revapi-reporter-json.version>0.5.0</revapi-reporter-json.version>
         <revapi-reporter-text.version>0.15.0</revapi-reporter-text.version>
+
+        <cyclonedx-maven-plugin.version>2.7.9</cyclonedx-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -239,6 +241,20 @@
                             </excludePackageNames>
                         </configuration>
                         <phase>pre-site</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>${cyclonedx-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>makeBom</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
