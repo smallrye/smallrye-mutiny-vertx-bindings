@@ -495,7 +495,7 @@
                         <artifactId>nexus-staging-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                             <serverId>oss.sonatype</serverId>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
