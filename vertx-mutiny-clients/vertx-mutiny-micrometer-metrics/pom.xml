@@ -15,7 +15,7 @@
         <gen-source-groupId>io.vertx</gen-source-groupId>
         <gen-source-artifactId>vertx-micrometer-metrics</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
-        <micrometer.version>1.11.5</micrometer.version>
+        <micrometer.version>1.12.0</micrometer.version>
     </properties>
 
     <dependencies>
