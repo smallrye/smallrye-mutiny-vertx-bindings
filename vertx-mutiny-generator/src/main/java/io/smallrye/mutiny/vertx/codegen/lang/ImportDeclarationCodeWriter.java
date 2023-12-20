@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import io.smallrye.common.annotation.CheckReturnValue;
@@ -24,7 +23,6 @@ public class ImportDeclarationCodeWriter implements CodeWriter {
         writer.println("import " + Collectors.class.getName() + ";");
         writer.println("import " + Multi.class.getName() + ";");
         writer.println("import " + Uni.class.getName() + ";");
-        writer.println("import " + Consumer.class.getName() + ";");
         writer.println("import " + TypeArg.class.getName() + ";");
         writer.println("import " + Fluent.class.getName() + ";");
         writer.println("import " + CheckReturnValue.class.getName() + ";");
