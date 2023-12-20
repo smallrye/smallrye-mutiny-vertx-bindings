@@ -58,6 +58,7 @@
         <module>vertx-mutiny-web-api-contract</module>
         <module>vertx-mutiny-web-templ-freemarker</module>
         <module>vertx-mutiny-web-templ-handlebars</module>
+        <module>vertx-mutiny-web-templ-httl</module>
         <module>vertx-mutiny-web-templ-jade</module>
         <module>vertx-mutiny-web-templ-mvel</module>
         <module>vertx-mutiny-web-templ-pebble</module>
