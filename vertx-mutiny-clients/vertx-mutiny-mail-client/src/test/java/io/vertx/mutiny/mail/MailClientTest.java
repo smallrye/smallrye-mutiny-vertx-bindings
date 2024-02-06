@@ -3,9 +3,12 @@ package io.vertx.mutiny.mail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -16,6 +19,11 @@ import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.mail.MailClient;
 
 public class MailClientTest {
+
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+    }
 
     @Rule
     public GenericContainer<?> container = new GenericContainer<>("mailhog/mailhog:latest")

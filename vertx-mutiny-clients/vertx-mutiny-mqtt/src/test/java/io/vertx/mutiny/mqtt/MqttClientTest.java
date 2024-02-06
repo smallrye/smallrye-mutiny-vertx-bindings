@@ -3,6 +3,8 @@ package io.vertx.mutiny.mqtt;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,6 +35,7 @@ public class MqttClientTest {
 
     @BeforeClass
     public static void init() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
         container.start();
     }
 

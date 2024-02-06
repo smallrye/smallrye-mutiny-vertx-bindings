@@ -1,6 +1,10 @@
 package io.vertx.mutiny.amqp;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +34,8 @@ public class AMQPClientTest {
 
     @BeforeClass
     public static void beforeAll() {
-        org.junit.Assume.assumeTrue(isNotArm64());
+        assumeTrue(isNotArm64());
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
 
     }
 

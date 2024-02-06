@@ -1,6 +1,9 @@
 package io.vertx.mutiny.postgresql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -16,6 +19,7 @@ public class PGTestBase {
 
     @BeforeClass
     public static void init() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
         container.start();
     }
 

@@ -1,6 +1,9 @@
 package io.vertx.mutiny.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +12,7 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.KafkaContainer;
@@ -21,6 +25,11 @@ import io.vertx.mutiny.kafka.client.producer.KafkaProducer;
 import io.vertx.mutiny.kafka.client.producer.KafkaProducerRecord;
 
 public class KafkaClientTest {
+
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+    }
 
     @Rule
     public KafkaContainer container = new KafkaContainer();

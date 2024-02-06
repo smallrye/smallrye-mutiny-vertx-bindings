@@ -1,9 +1,13 @@
 package io.vertx.mutiny.db2;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.Db2Container;
@@ -19,6 +23,11 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.sqlclient.PoolOptions;
 
 public class DB2ClientTest {
+
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+    }
 
     @ClassRule
     public static Db2Container container = new Db2Container()

@@ -1,9 +1,13 @@
 package io.smallrye.mutiny.vertx.auth;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeThat;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.BindMode;
@@ -23,15 +27,21 @@ import io.vertx.sqlclient.PoolOptions;
 
 public class AuthSqlClientTest {
 
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+        container = new GenericContainer<>("mysql:8")
+                .withEnv("MYSQL_USER", "mysql")
+                .withEnv("MYSQL_PASSWORD", "password")
+                .withEnv("MYSQL_ROOT_PASSWORD", "password")
+                .withEnv("MYSQL_DATABASE", "testschema")
+                .withExposedPorts(3306)
+                .withClasspathResourceMapping("mysql-auth-ddl-test.sql", "/docker-entrypoint-initdb.d/init.sql",
+                        BindMode.READ_ONLY);
+    }
+
     @ClassRule
-    public static GenericContainer<?> container = new GenericContainer<>("mysql:8")
-            .withEnv("MYSQL_USER", "mysql")
-            .withEnv("MYSQL_PASSWORD", "password")
-            .withEnv("MYSQL_ROOT_PASSWORD", "password")
-            .withEnv("MYSQL_DATABASE", "testschema")
-            .withExposedPorts(3306)
-            .withClasspathResourceMapping("mysql-auth-ddl-test.sql", "/docker-entrypoint-initdb.d/init.sql",
-                    BindMode.READ_ONLY);
+    public static GenericContainer<?> container;
 
     private Vertx vertx;
     private MySQLPool mysql;

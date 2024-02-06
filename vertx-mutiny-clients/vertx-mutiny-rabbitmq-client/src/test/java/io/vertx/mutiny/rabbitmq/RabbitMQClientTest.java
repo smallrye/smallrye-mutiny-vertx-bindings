@@ -1,6 +1,9 @@
 package io.vertx.mutiny.rabbitmq;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -12,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -26,6 +30,11 @@ import io.vertx.mutiny.core.buffer.Buffer;
 import io.vertx.rabbitmq.RabbitMQOptions;
 
 public class RabbitMQClientTest {
+
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+    }
 
     private static final String QUEUE = "my-queue";
     @Rule

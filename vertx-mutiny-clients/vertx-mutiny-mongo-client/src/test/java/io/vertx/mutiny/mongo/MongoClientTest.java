@@ -1,11 +1,15 @@
 package io.vertx.mutiny.mongo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -15,6 +19,11 @@ import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.mongo.MongoClient;
 
 public class MongoClientTest {
+
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+    }
 
     @Rule
     public GenericContainer<?> container = new GenericContainer<>("mongo:4.4")

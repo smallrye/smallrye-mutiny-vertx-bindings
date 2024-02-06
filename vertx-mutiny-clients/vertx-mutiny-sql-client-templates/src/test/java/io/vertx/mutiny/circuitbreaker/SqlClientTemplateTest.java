@@ -1,12 +1,16 @@
 package io.vertx.mutiny.circuitbreaker;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
 
 import java.util.Collections;
 import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -20,6 +24,11 @@ import io.vertx.pgclient.PgException;
 import io.vertx.sqlclient.PoolOptions;
 
 public class SqlClientTemplateTest {
+
+    @BeforeClass
+    public static void beforeAll() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
+    }
 
     @Rule
     public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();

@@ -1,5 +1,9 @@
 package io.vertx.mutiny.postgresql;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeThat;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,6 +22,7 @@ public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
 
     @BeforeClass
     public static void init() {
+        assumeThat(System.getProperty("skipInContainerTests"), is(nullValue()));
         container.start();
     }
 

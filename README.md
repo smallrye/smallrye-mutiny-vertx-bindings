@@ -13,7 +13,15 @@ It also contains the Vert.x code generator.
 
 ## Build
 
-`mvn clean install`
+```bash
+mvn clean install
+```
+
+Note: you can disable tests that require containers using the `skipInContainerTests` system property:
+
+```bash
+mvn clean install -DskipInContainerTests
+```
 
 ## Release
 
