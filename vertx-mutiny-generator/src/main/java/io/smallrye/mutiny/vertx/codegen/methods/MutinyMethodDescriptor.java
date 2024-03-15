@@ -2,10 +2,14 @@ package io.smallrye.mutiny.vertx.codegen.methods;
 
 import io.vertx.codegen.MethodInfo;
 
+import java.util.Set;
+
 /**
  * Just a structure describing a method.
  */
 public class MutinyMethodDescriptor {
+    private static final Set<String> NON_DEPRECATED_METHODS = Set.of("executeBlocking");
+
     public final boolean fluent;
     private final MutinyKind kind;
     private final MethodInfo method;
@@ -21,7 +25,7 @@ public class MutinyMethodDescriptor {
     }
 
     public MutinyMethodDescriptor(MethodInfo method, MethodInfo original, MutinyKind kind, boolean fluent,
-            boolean isPrivate) {
+                                  boolean isPrivate) {
         this.kind = kind;
         this.fluent = fluent;
         this.method = method;
@@ -62,6 +66,10 @@ public class MutinyMethodDescriptor {
     }
 
     public boolean isDeprecated() {
+        // Temporary workaround to avoid generating deprecated methods
+        if (NON_DEPRECATED_METHODS.contains(method.getName())) {
+            return false;
+        }
         return method.isDeprecated();
     }
 
