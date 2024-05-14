@@ -35,7 +35,6 @@
         <module>vertx-mutiny-mssql-client</module>
         <module>vertx-mutiny-mysql-client</module>
         <module>vertx-mutiny-oracle-client</module>
-        <module>vertx-mutiny-openapi</module>
         <module>vertx-mutiny-mqtt</module>
         <module>vertx-mutiny-auth-common</module>
         <module>vertx-mutiny-auth-jwt</module>
@@ -55,7 +54,6 @@
         <module>vertx-mutiny-json-schema</module>
         <module>vertx-mutiny-web-validation</module>
         <module>vertx-mutiny-web-openapi</module>
-        <module>vertx-mutiny-web-openapi-router</module>
         <module>vertx-mutiny-web-api-service</module>
         <module>vertx-mutiny-web-api-contract</module>
         <module>vertx-mutiny-web-templ-freemarker</module>
