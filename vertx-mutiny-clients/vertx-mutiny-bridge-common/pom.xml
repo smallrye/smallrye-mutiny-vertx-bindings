@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.14.0</version>
+        <version>3.14.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>smallrye-mutiny-vertx-bridge-common</artifactId>
