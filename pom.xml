@@ -14,7 +14,8 @@
 
     <packaging>pom</packaging>
 
-    <name>SmallRye Reactive Utilities</name>
+    <name>SmallRye Mutiny Vert.x Bindings</name>
+    <description>SmallRye Mutiny Vert.x Bindings</description>
     <url>https://smallrye.io/smallrye-mutiny-vertx-bindings</url>
 
     <inceptionYear>2019</inceptionYear>
@@ -274,26 +275,6 @@
         <module>vertx-mutiny-generator</module>
         <module>vertx-mutiny-clients-bom</module>
     </modules>
-
-    <repositories>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>microprofile-snapshots</id>
-            <url>https://repo.eclipse.org/content/repositories/microprofile-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <profiles>
         <profile>
