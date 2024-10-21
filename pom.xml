@@ -225,9 +225,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.10.1</version>
                 <configuration>
                     <additionalJOption>-Xdoclint:none</additionalJOption>
+                    <force>true</force>
                 </configuration>
                 <executions>
                     <execution>
@@ -243,6 +243,14 @@
                         <phase>pre-site</phase>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <forceCreation>true</forceCreation>
+                </configuration>
             </plugin>
 
             <plugin>
