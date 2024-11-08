@@ -39,7 +39,7 @@ public interface Expectations {
     /**
      * Yields a function to turn an {@link Expectation} into a {@link Uni} and uses an extractor so that expectations
      * work on the correct types (e.g., {@link io.vertx.core.http.HttpResponseHead}) instead of the Mutiny shim types
-     * (e.g., {@link io.vertx.mutiny.core.http.HttpResponseHead}.
+     * (e.g., {@link io.vertx.mutiny.core.http.HttpResponseHead}).
      *
      * @param extractor the extractor function, often a reference to a {@code getDelegate()} method
      * @param expectation the expectation
