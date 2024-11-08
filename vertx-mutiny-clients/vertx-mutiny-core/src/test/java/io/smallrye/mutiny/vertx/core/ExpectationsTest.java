@@ -53,7 +53,7 @@ public class ExpectationsTest {
                             .setStatusCode(200)
                             .putHeader("content-type", "text/plain")
                             .endAndForget("Yolo"))
-                    .listen()
+                    .listen(0)
                     .await().atMost(Duration.ofSeconds(30));
 
             int port = server.actualPort();
