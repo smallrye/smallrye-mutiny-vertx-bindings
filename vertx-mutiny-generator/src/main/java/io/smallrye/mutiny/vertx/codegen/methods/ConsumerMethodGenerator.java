@@ -60,7 +60,7 @@ public class ConsumerMethodGenerator extends MutinyMethodGenerator {
                 } else if(param.getType().getName().equals(Runnable.class.getName())) {
                     writer.println("ignored -> " + param.getName() + ".run()");
                 } else {
-                    writer.print(param.getName() + " != null ? new io.smallrye.mutiny.vertx.DelegatingConsumerHandler(" + param.getName() + ") : null");
+                    writer.print("io.smallrye.mutiny.vertx.MutinyHelper.convertConsumer(" + param.getName() + ")");
                 }
             }
         }

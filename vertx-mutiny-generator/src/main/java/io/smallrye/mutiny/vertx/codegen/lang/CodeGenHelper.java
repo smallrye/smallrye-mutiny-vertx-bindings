@@ -190,7 +190,7 @@ public class CodeGenHelper {
                 ClassKind eventKind = eventType.getKind();
                 if (eventKind == ASYNC_RESULT) {
                     TypeInfo resultType = ((ParameterizedTypeInfo) eventType).getArg(0);
-                    return "new io.smallrye.mutiny.vertx.DelegatingHandler<>(" + expr + ", ar -> ar.map(event -> " + genConvReturn(methodTypeArgMap, resultType, method, "event") + "))";
+                    return "io.smallrye.mutiny.vertx.MutinyHelper.convertHandler(" + expr + ", ar -> ar.map(event -> " + genConvReturn(methodTypeArgMap, resultType, method, "event") + "))";
                 } else if (eventType.isParameterized() && eventType.getRaw().getName().equals(Promise.class.getName())) {
                     return "new Handler<" + genTypeName(eventType) + ">() {\n" +
                             "          public void handle(" + genTypeName(eventType) + " event) {\n" +
@@ -198,7 +198,7 @@ public class CodeGenHelper {
                             "          }\n" +
                             "      }";
                 } else {
-                    return "new io.smallrye.mutiny.vertx.DelegatingHandler<>(" + expr + ", event -> " + genConvReturn(methodTypeArgMap, eventType, method, "event") + ")";
+                    return "io.smallrye.mutiny.vertx.MutinyHelper.convertHandler(" + expr + ", event -> " + genConvReturn(methodTypeArgMap, eventType, method, "event") + ")";
                 }
             } else if (kind == FUNCTION) {
                 TypeInfo argType = parameterizedTypeInfo.getArg(0);
