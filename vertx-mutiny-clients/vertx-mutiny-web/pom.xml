@@ -163,6 +163,24 @@
                             </optionMap>
                         </configuration>
                     </execution>
+                    <!-- Run the annotation processor on java test sources -->
+                    <execution>
+                        <id>generate-tests</id>
+                        <goals>
+                            <goal>process-test</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <defaultOutputDirectory>${project.build.directory}/generated-test-sources/apt
+                            </defaultOutputDirectory>
+                            <processors>
+                                <processor>io.vertx.codegen.CodeGenProcessor</processor>
+                            </processors>
+                            <optionMap>
+                                <codegen.generators>mutiny</codegen.generators>
+                            </optionMap>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
