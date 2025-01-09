@@ -40,7 +40,7 @@ public class FunctionApplyMethodCodeWriter implements ConditionalCodeWriter {
                     typeVar, typeVar, typeVar, typeVar);
             writer.println("    return outConv.apply(ret);");
         } else {
-            writer.println("    return delegate.iterator();");
+            writer.println("    return ret;");
         }
 
         writer.println("  }");
