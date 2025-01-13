@@ -15,22 +15,21 @@ jobs:
         with:
           fetch-depth: 0 # fetch all commits and branches for mike to work properly
       - uses: actions/setup-java@v4
-        name: Set up Java 11
+        name: Set up Java 17
         with:
-          java-version: 11
+          java-version: 17
           distribution: temurin
           cache: maven
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - uses: actions/setup-python@v5
         name: Set up Python
         with:
-          python-version: 3.x
+          python-version-file: "pyproject.toml"
       - name: Tools setup
         run: |
           git config --global user.name "SmallRye CI"
           git config --global user.email "smallrye@googlegroups.com"
-          sudo snap install yq
-          pip install mkdocs-material
-          pip install mike          
       - name: Build local artifacts
         run: mvn -s .build/maven-ci-settings.xml -B install -DskipTests
       - name: Render docs and publish
