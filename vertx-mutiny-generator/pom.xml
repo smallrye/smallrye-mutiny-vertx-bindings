@@ -80,7 +80,7 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
-                            <release>11</release>
+                            <release>17</release>
                             <annotationProcessors>
                                 <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
                             </annotationProcessors>
