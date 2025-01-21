@@ -32,6 +32,7 @@ public class ClassDeclarationCodeWriter implements CodeWriter {
         }
 
         List<String> interfaces = new ArrayList<>();
+        interfaces.add("io.smallrye.mutiny.vertx.MutinyDelegate");
         if ("io.vertx.core.buffer.Buffer".equals(type.getName())) {
             interfaces.add("io.vertx.core.shareddata.impl.ClusterSerializable");
         }

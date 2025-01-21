@@ -2,13 +2,16 @@ package io.smallrye.mutiny.vertx;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Flow.Subscriber;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.smallrye.mutiny.vertx.impl.WriteStreamSubscriberImpl;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.WorkerExecutor;
 import io.vertx.core.streams.WriteStream;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class MutinyHelper {
 
     /**
@@ -92,6 +95,27 @@ public class MutinyHelper {
             }
         }
         return type;
+    }
+
+    /**
+     * Convert a handler for a generated Mutiny type to a handler for the corresponding core type.
+     */
+    public static <BARE, MUTINY> Handler<BARE> convertHandler(Handler<MUTINY> mutinyHandler, Function<BARE, MUTINY> mapper) {
+        if (mutinyHandler instanceof MutinyDelegate) {
+            MutinyDelegate mutinyDelegate = (MutinyDelegate) mutinyHandler;
+            return (Handler<BARE>) mutinyDelegate.getDelegate();
+        }
+        return new DelegatingHandler<>(mutinyHandler, mapper);
+    }
+
+    /**
+     * Convert a consumer for a generated Mutiny type to a handler of the same type.
+     */
+    public static <T> Handler<T> convertConsumer(Consumer<T> mutinyConsumer) {
+        if (mutinyConsumer instanceof MutinyDelegate) {
+            return (Handler<T>) mutinyConsumer;
+        }
+        return mutinyConsumer != null ? new DelegatingConsumerHandler<>(mutinyConsumer) : null;
     }
 
     /**
