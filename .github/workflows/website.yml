@@ -31,6 +31,6 @@ jobs:
           git config --global user.name "SmallRye CI"
           git config --global user.email "smallrye@googlegroups.com"
       - name: Build local artifacts
-        run: mvn -s .build/maven-ci-settings.xml -B install -DskipTests
+        run: ./mvnw -s .build/maven-ci-settings.xml -B install -DskipTests
       - name: Render docs and publish
         run: .build/render-documentation.sh
