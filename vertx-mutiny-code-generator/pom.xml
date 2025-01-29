@@ -37,7 +37,6 @@
             <artifactId>picocli</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-codegen-api</artifactId>

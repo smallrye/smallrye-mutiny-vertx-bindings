@@ -46,6 +46,10 @@
 
     <properties>
         <java.platform.baseline>21</java.platform.baseline>
+        <maven.compiler.target>${java.platform.baseline}</maven.compiler.target>
+        <maven.compiler.source>${java.platform.baseline}</maven.compiler.source>
+        <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
+        <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
 
         <vertx.version>5.0.0.CR4</vertx.version>
         <mutiny.version>2.8.0</mutiny.version>
