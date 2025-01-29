@@ -13,10 +13,9 @@
     <name>SmallRye Mutiny - Client APIs</name>
     <packaging>pom</packaging>
 
+    <!--  TODO: gradually enable and migrate modules, and remove those gone in Vert.x 5 -->
     <modules>
-        <!--  TODO: gradually enable and migrate modules, and remove those gone in Vert.x 5 -->
-
-        <!--                <module>vertx-mutiny-runtime</module>-->
+        <module>vertx-mutiny-runtime</module>
         <!--                <module>vertx-mutiny-core</module>-->
         <!--                <module>vertx-mutiny-junit5</module>-->
         <!--                <module>vertx-mutiny-camel-bridge</module>-->
