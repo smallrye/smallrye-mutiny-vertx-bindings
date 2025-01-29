@@ -214,6 +214,14 @@ public class VertxGenCollection {
                         continue;
                     }
 
+                    // Ignore static methods from a parent interface
+                    if (resolvedDeclaration.isStatic()) {
+                        LOG.log(DEBUG,
+                                "Ignoring method `{0}` in interface `{1}` as it is a static method from the parent interface",
+                                method.getName(), fqn);
+                        continue;
+                    }
+
                     if (astDeclaration == null) {
                         astDeclaration = lookForMethodDeclaration(typeDeclaringMethod, method);
                         if (astDeclaration == null) {

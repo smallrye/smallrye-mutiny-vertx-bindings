@@ -152,4 +152,50 @@ public class InheritanceTest {
         env.addOutputs(outputs);
         env.compile();
     }
+
+    @Test
+    void inheritanceAndStaticMethods() {
+        Env env = new Env();
+
+        env.addJavaCode("org.acme", "Parent", """
+                package org.acme;
+
+                import io.vertx.codegen.annotations.VertxGen;
+                import io.vertx.codegen.annotations.Fluent;
+
+                @VertxGen
+                public interface Parent {
+
+                    static Parent makeParent() {
+                        return null;
+                    }
+
+                    @Fluent
+                    Parent yolo();
+                }
+                """);
+        env.addJavaCode("org.acme", "Child", """
+                package org.acme;
+
+                import io.vertx.codegen.annotations.VertxGen;
+                import io.vertx.codegen.annotations.Fluent;
+
+                @VertxGen
+                public interface Child extends Parent {
+
+                    static Child makeChild() {
+                        return null;
+                    }
+
+                    @Fluent
+                    Child yolo();
+                }
+                """);
+        env.addModuleGen("org.acme", "test");
+
+        MutinyGenerator generator = new MutinyGenerator(env.root());
+        List<MutinyGenerator.GeneratorOutput> outputs = generator.generate();
+        env.addOutputs(outputs);
+        env.compile();
+    }
 }
