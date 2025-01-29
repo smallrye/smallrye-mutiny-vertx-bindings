@@ -121,14 +121,12 @@ public class IterableShimModule implements ShimModule {
      * The `toMulti` method:
      * <p>
      *
-     * <pre>
-     *  * <code>
-     *  *  *  *  *  *  *   * &#064;CheckReturnValue
-             * public Multi<E> iterator() {
-             *     return Multi.createFrom().iterable(this);
-             * }
-             * </pre>
-             * </code>
+     * <pre>{@code
+     * @CheckReturnValue
+     * public Multi<E> iterator() {
+     *     return Multi.createFrom().iterable(this);
+     * }
+     * }</pre>
      */
     public static class ToMultiMethod extends BaseShimMethod {
 
