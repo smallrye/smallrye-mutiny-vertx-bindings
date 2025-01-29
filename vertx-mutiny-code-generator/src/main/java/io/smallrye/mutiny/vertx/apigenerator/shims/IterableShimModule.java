@@ -123,12 +123,12 @@ public class IterableShimModule implements ShimModule {
      *
      * <pre>
      *  * <code>
-     *  *  *  *  *   * &#064;CheckReturnValue
-           * public Multi<E> iterator() {
-           *     return Multi.createFrom().iterable(this);
-           * }
-           * </pre>
-           * </code>
+     *  *  *  *  *  *  *   * &#064;CheckReturnValue
+             * public Multi<E> iterator() {
+             *     return Multi.createFrom().iterable(this);
+             * }
+             * </pre>
+             * </code>
      */
     public static class ToMultiMethod extends BaseShimMethod {
 

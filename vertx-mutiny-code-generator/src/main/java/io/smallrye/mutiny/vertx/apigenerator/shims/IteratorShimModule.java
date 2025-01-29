@@ -125,15 +125,15 @@ public class IteratorShimModule implements ShimModule {
      *
      * <pre>
      *  * <code>
-     *  *  *  *  *   * &#064;CheckReturnValue
-           * public Multi<X> toMulti() {
-           *     String support = StreamSupport.class.getName();
-           *     String splitIterators = Spliterators.class.getName() + ".spliteratorUnknownSize";
-           *     String ordered = Spliterator.class.getName() + ".ORDERED";
-           *     return Multi.createFrom().items("
-           *        StreamSupport.stream(SplitIterators.splitIteratorUnknownSize(this, ORDERED), false));
-           * </pre>
-           * </code>
+     *  *  *  *  *  *  *   * &#064;CheckReturnValue
+             * public Multi<X> toMulti() {
+             *     String support = StreamSupport.class.getName();
+             *     String splitIterators = Spliterators.class.getName() + ".spliteratorUnknownSize";
+             *     String ordered = Spliterator.class.getName() + ".ORDERED";
+             *     return Multi.createFrom().items("
+             *        StreamSupport.stream(SplitIterators.splitIteratorUnknownSize(this, ORDERED), false));
+             * </pre>
+             * </code>
      */
     public static class ToMultiMethod extends BaseShimMethod {
 

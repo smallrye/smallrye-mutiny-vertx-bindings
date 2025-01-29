@@ -74,12 +74,12 @@ public class HandlerShimModule implements ShimModule {
      *
      * <pre>
      *  * <code>
-     *  *  *  *  *   * &#064;@Override
-           * public void handle(E event) {
-           *     delegate.handle(convertIfNeeded(event));
-           * }
-           * </pre>
-           * </code>
+     *  *  *  *  *  *  *   * &#064;@Override
+             * public void handle(E event) {
+             *     delegate.handle(convertIfNeeded(event));
+             * }
+             * </pre>
+             * </code>
      * <p>
      * If #isParameterVertxGen() returns true, the body of the method must be:
      * <code>delegate.handle(event.getDelegate())</code>
