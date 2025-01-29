@@ -10,7 +10,7 @@
 
     <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-mutiny-vertx-bindings-projects</artifactId>
-    <version>3.18.1-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -45,9 +45,9 @@
     </scm>
 
     <properties>
-        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <java.platform.baseline>17</java.platform.baseline>
 
-        <vertx.version>4.5.12</vertx.version>
+        <vertx.version>5.0.0.CR3</vertx.version>
         <mutiny.version>2.8.0</mutiny.version>
         <jackson.version>2.18.2</jackson.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>
@@ -56,6 +56,7 @@
         <rxjava2.version>2.2.21</rxjava2.version>
         <rxjava1.version>1.3.8</rxjava1.version>
         <reactor-core.version>3.7.2</reactor-core.version>
+        <rxjava2-interop.version>0.13.7</rxjava2-interop.version>
 
         <testcontainers.version>1.20.4</testcontainers.version>
 
@@ -70,7 +71,9 @@
         <revapi-reporter-json.version>0.5.0</revapi-reporter-json.version>
         <revapi-reporter-text.version>0.15.0</revapi-reporter-text.version>
 
+        <jandex-maven-plugin.version>3.2.3</jandex-maven-plugin.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -118,7 +121,7 @@
             <dependency>
                 <groupId>com.github.akarnokd</groupId>
                 <artifactId>rxjava2-interop</artifactId>
-                <version>0.13.7</version>
+                <version>${rxjava2-interop.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
@@ -177,7 +180,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>17</release>
+                    <release>${java.platform.baseline}</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -207,18 +210,15 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jboss.jandex</groupId>
+                <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>1.2.3</version>
+                <version>${jandex-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>make-index</id>
                         <goals>
                             <goal>jandex</goal>
                         </goals>
-                        <configuration>
-
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -272,7 +272,6 @@
 
     <modules>
         <module>vertx-mutiny-clients</module>
-        <module>vertx-mutiny-generator</module>
         <module>vertx-mutiny-clients-bom</module>
     </modules>
 
@@ -396,6 +395,7 @@
                 <skipITs>true</skipITs>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <enforcer.skip>true</enforcer.skip>
+                <cyclonedx.skip>true</cyclonedx.skip>
             </properties>
             <build>
                 <defaultGoal>clean install</defaultGoal>

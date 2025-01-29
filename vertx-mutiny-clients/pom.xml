@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>smallrye-mutiny-vertx-bindings-projects</artifactId>
-        <version>3.18.1-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>vertx-mutiny-clients</artifactId>
@@ -13,81 +14,83 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>vertx-mutiny-runtime</module>
-        <module>vertx-mutiny-core</module>
-        <module>vertx-mutiny-junit5</module>
-        <module>vertx-mutiny-camel-bridge</module>
-        <module>vertx-mutiny-mail-client</module>
-        <module>vertx-mutiny-bridge-common</module>
-        <module>vertx-mutiny-web-common</module>
-        <module>vertx-mutiny-web</module>
-        <module>vertx-mutiny-web-client</module>
-        <module>vertx-mutiny-mongo-client</module>
-        <module>vertx-mutiny-redis-client</module>
-        <module>vertx-mutiny-cassandra-client</module>
-        <module>vertx-mutiny-consul-client</module>
-        <module>vertx-mutiny-kafka-client</module>
-        <module>vertx-mutiny-amqp-client</module>
-        <module>vertx-mutiny-rabbitmq-client</module>
-        <module>vertx-mutiny-sql-client</module>
-        <module>vertx-mutiny-db2-client</module>
-        <module>vertx-mutiny-pg-client</module>
-        <module>vertx-mutiny-mssql-client</module>
-        <module>vertx-mutiny-mysql-client</module>
-        <module>vertx-mutiny-oracle-client</module>
-        <module>vertx-mutiny-mqtt</module>
-        <module>vertx-mutiny-auth-common</module>
-        <module>vertx-mutiny-auth-jwt</module>
-        <module>vertx-mutiny-auth-oauth2</module>
-        <module>vertx-mutiny-auth-otp</module>
-        <module>vertx-mutiny-auth-htdigest</module>
-        <module>vertx-mutiny-auth-htpasswd</module>
-        <module>vertx-mutiny-auth-mongo</module>
-        <module>vertx-mutiny-auth-shiro</module>
-        <module>vertx-mutiny-auth-webauthn</module>
-        <module>vertx-mutiny-auth-properties</module>
-        <module>vertx-mutiny-auth-ldap</module>
-        <module>vertx-mutiny-auth-jdbc</module>
-        <module>vertx-mutiny-auth-sql-client</module>
-        <module>vertx-mutiny-health-checks</module>
-        <module>vertx-mutiny-jdbc-client</module>
-        <module>vertx-mutiny-json-schema</module>
-        <module>vertx-mutiny-web-validation</module>
-        <module>vertx-mutiny-web-openapi</module>
-        <module>vertx-mutiny-web-api-service</module>
-        <module>vertx-mutiny-web-api-contract</module>
-        <module>vertx-mutiny-web-templ-freemarker</module>
-        <module>vertx-mutiny-web-templ-handlebars</module>
-        <module>vertx-mutiny-web-templ-httl</module>
-        <module>vertx-mutiny-web-templ-jade</module>
-        <module>vertx-mutiny-web-templ-mvel</module>
-        <module>vertx-mutiny-web-templ-pebble</module>
-        <module>vertx-mutiny-web-templ-rocker</module>
-        <module>vertx-mutiny-web-templ-thymeleaf</module>
-        <module>vertx-mutiny-web-templ-pug</module>
-        <module>vertx-mutiny-web-cookie-session-store</module>
-        <module>vertx-mutiny-web-redis-session-store</module>
-        <module>vertx-mutiny-web-infinispan-session-store</module>
-        <module>vertx-mutiny-web-graphql</module>
-        <module>vertx-mutiny-web-proxy</module>
-        <module>vertx-mutiny-circuit-breaker</module>
-        <module>vertx-mutiny-stomp</module>
-        <module>vertx-mutiny-config</module>
-        <module>vertx-mutiny-sql-client-templates</module>
-        <module>vertx-mutiny-shell</module>
-        <module>vertx-mutiny-micrometer-metrics</module>
-        <module>vertx-mutiny-tcp-eventbus-bridge</module>
-        <module>vertx-mutiny-service-discovery</module>
-        <module>vertx-mutiny-service-discovery-backend-consul</module>
-        <module>vertx-mutiny-service-discovery-backend-redis</module>
-        <module>vertx-mutiny-service-discovery-backend-zookeeper</module>
-        <module>vertx-mutiny-service-discovery-bridge-consul</module>
-        <module>vertx-mutiny-service-discovery-bridge-docker</module>
-        <module>vertx-mutiny-service-discovery-bridge-docker-links</module>
-        <module>vertx-mutiny-service-discovery-bridge-kubernetes</module>
-        <module>vertx-mutiny-service-discovery-bridge-zookeeper</module>
-        <module>vertx-mutiny-uri-template</module>
-        <module>vertx-mutiny-http-proxy</module>
+        <!--  TODO: gradually enable and migrate modules, and remove those gone in Vert.x 5 -->
+
+        <!--                <module>vertx-mutiny-runtime</module>-->
+        <!--                <module>vertx-mutiny-core</module>-->
+        <!--                <module>vertx-mutiny-junit5</module>-->
+        <!--                <module>vertx-mutiny-camel-bridge</module>-->
+        <!--                <module>vertx-mutiny-mail-client</module>-->
+        <!--                <module>vertx-mutiny-bridge-common</module>-->
+        <!--                <module>vertx-mutiny-web-common</module>-->
+        <!--                <module>vertx-mutiny-web</module>-->
+        <!--                <module>vertx-mutiny-web-client</module>-->
+        <!--                <module>vertx-mutiny-mongo-client</module>-->
+        <!--                <module>vertx-mutiny-redis-client</module>-->
+        <!--                <module>vertx-mutiny-cassandra-client</module>-->
+        <!--                <module>vertx-mutiny-consul-client</module>-->
+        <!--                <module>vertx-mutiny-kafka-client</module>-->
+        <!--                <module>vertx-mutiny-amqp-client</module>-->
+        <!--                <module>vertx-mutiny-rabbitmq-client</module>-->
+        <!--                <module>vertx-mutiny-sql-client</module>-->
+        <!--                <module>vertx-mutiny-db2-client</module>-->
+        <!--                <module>vertx-mutiny-pg-client</module>-->
+        <!--                <module>vertx-mutiny-mssql-client</module>-->
+        <!--                <module>vertx-mutiny-mysql-client</module>-->
+        <!--                <module>vertx-mutiny-oracle-client</module>-->
+        <!--                <module>vertx-mutiny-mqtt</module>-->
+        <!--                <module>vertx-mutiny-auth-common</module>-->
+        <!--                <module>vertx-mutiny-auth-jwt</module>-->
+        <!--                <module>vertx-mutiny-auth-oauth2</module>-->
+        <!--                <module>vertx-mutiny-auth-otp</module>-->
+        <!--                <module>vertx-mutiny-auth-htdigest</module>-->
+        <!--                <module>vertx-mutiny-auth-htpasswd</module>-->
+        <!--                <module>vertx-mutiny-auth-mongo</module>-->
+        <!--                <module>vertx-mutiny-auth-shiro</module>-->
+        <!--                <module>vertx-mutiny-auth-webauthn</module>-->
+        <!--                <module>vertx-mutiny-auth-properties</module>-->
+        <!--                <module>vertx-mutiny-auth-ldap</module>-->
+        <!--                <module>vertx-mutiny-auth-jdbc</module>-->
+        <!--                <module>vertx-mutiny-auth-sql-client</module>-->
+        <!--                <module>vertx-mutiny-health-checks</module>-->
+        <!--                <module>vertx-mutiny-jdbc-client</module>-->
+        <!--                <module>vertx-mutiny-json-schema</module>-->
+        <!--                <module>vertx-mutiny-web-validation</module>-->
+        <!--                <module>vertx-mutiny-web-openapi</module>-->
+        <!--                <module>vertx-mutiny-web-api-service</module>-->
+        <!--                <module>vertx-mutiny-web-api-contract</module>-->
+        <!--                <module>vertx-mutiny-web-templ-freemarker</module>-->
+        <!--                <module>vertx-mutiny-web-templ-handlebars</module>-->
+        <!--                <module>vertx-mutiny-web-templ-httl</module>-->
+        <!--                <module>vertx-mutiny-web-templ-jade</module>-->
+        <!--                <module>vertx-mutiny-web-templ-mvel</module>-->
+        <!--                <module>vertx-mutiny-web-templ-pebble</module>-->
+        <!--                <module>vertx-mutiny-web-templ-rocker</module>-->
+        <!--                <module>vertx-mutiny-web-templ-thymeleaf</module>-->
+        <!--                <module>vertx-mutiny-web-templ-pug</module>-->
+        <!--                <module>vertx-mutiny-web-cookie-session-store</module>-->
+        <!--                <module>vertx-mutiny-web-redis-session-store</module>-->
+        <!--                <module>vertx-mutiny-web-infinispan-session-store</module>-->
+        <!--                <module>vertx-mutiny-web-graphql</module>-->
+        <!--                <module>vertx-mutiny-web-proxy</module>-->
+        <!--                <module>vertx-mutiny-circuit-breaker</module>-->
+        <!--                <module>vertx-mutiny-stomp</module>-->
+        <!--                <module>vertx-mutiny-config</module>-->
+        <!--                <module>vertx-mutiny-sql-client-templates</module>-->
+        <!--                <module>vertx-mutiny-shell</module>-->
+        <!--                <module>vertx-mutiny-micrometer-metrics</module>-->
+        <!--                <module>vertx-mutiny-tcp-eventbus-bridge</module>-->
+        <!--                <module>vertx-mutiny-service-discovery</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-backend-consul</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-backend-redis</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-backend-zookeeper</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-bridge-consul</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-bridge-docker</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-bridge-docker-links</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-bridge-kubernetes</module>-->
+        <!--                <module>vertx-mutiny-service-discovery-bridge-zookeeper</module>-->
+        <!--                <module>vertx-mutiny-uri-template</module>-->
+        <!--                <module>vertx-mutiny-http-proxy</module>-->
     </modules>
 
 </project>
