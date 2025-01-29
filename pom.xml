@@ -70,6 +70,7 @@
         <revapi-reporter-json.version>0.5.0</revapi-reporter-json.version>
         <revapi-reporter-text.version>0.15.0</revapi-reporter-text.version>
 
+        <jandex-maven-plugin.version>3.2.3</jandex-maven-plugin.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
     </properties>
 
@@ -207,9 +208,9 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jboss.jandex</groupId>
+                <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>1.2.3</version>
+                <version>${jandex-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>make-index</id>
@@ -396,6 +397,7 @@
                 <skipITs>true</skipITs>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <enforcer.skip>true</enforcer.skip>
+                <cyclonedx.skip>true</cyclonedx.skip>
             </properties>
             <build>
                 <defaultGoal>clean install</defaultGoal>
