@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.lang.model.element.Modifier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
@@ -30,6 +33,8 @@ public class BaseShimMethod implements ShimMethod {
 
     private final VertxGenMethod originalMethod;
     private final boolean fluent;
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseShimMethod.class);
 
     public BaseShimMethod(ShimModule module, String name, Type returnType, List<ShimMethodParameter> parameters,
             List<Type> throwsTypes, boolean isStatic, boolean isFinal, Javadoc javadoc, VertxGenMethod originalMethod) {
@@ -114,8 +119,7 @@ public class BaseShimMethod implements ShimMethod {
 
     @Override
     public void generate(ShimClass shim, TypeSpec.Builder builder) {
-        System.getLogger(this.getClass().getName()).log(System.Logger.Level.WARNING,
-                "Generate method not implemented for " + this.getClass().getName());
+        logger.warn("Generate method not implemented for {}", this.getClass().getName());
     }
 
     public MethodSpec.Builder generateDeclaration(ShimClass shim, TypeSpec.Builder builder) {

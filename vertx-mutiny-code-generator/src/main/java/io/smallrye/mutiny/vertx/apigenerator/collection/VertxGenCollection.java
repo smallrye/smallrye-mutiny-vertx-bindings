@@ -1,9 +1,5 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.INFO;
-import static java.lang.System.Logger.Level.WARNING;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,6 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -42,7 +41,7 @@ import io.vertx.codegen.annotations.VertxGen;
 public class VertxGenCollection {
 
     public static final String CONCRETE_ATTRIBUTE = "concrete";
-    static System.Logger LOG = System.getLogger(VertxGenCollection.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(VertxGenCollection.class);
     private final JavaSymbolSolver solver;
     private final List<CompilationUnit> units;
 
@@ -56,8 +55,8 @@ public class VertxGenCollection {
 
     public VertxGenCollection(MutinyGenerator generator, SourceRoot source, List<Path> additionSources) throws IOException {
         this.generator = generator;
-        LOG.log(INFO, "Initializing collection of sources from `{0}`", source.getRoot());
-        LOG.log(INFO, "Parsing source code from `{0}`", source);
+        logger.info("Initializing collection of sources from `{}`", source.getRoot());
+        logger.info("Parsing source code from `{}`", source);
         List<TypeSolver> solvers = new ArrayList<>();
         solvers.add(new JavaParserTypeSolver(source.getRoot()));
         for (Path path : additionSources) {
@@ -82,26 +81,26 @@ public class VertxGenCollection {
         this.additionalUnits = additionalUnits;
 
         // Collect the Vert.x Gen modules
-        LOG.log(INFO, "Collecting Vert.x Gen Modules");
+        logger.info("Collecting Vert.x Gen Modules");
         modules.addAll(collectVertxGenModuleFromCompilationUnits(units));
-        LOG.log(INFO, "Found {0} modules in the primary sources: {1}", modules.size(),
+        logger.info("Found {} modules in the primary sources: {}", modules.size(),
                 modules.stream().map(VertxGenModule::name).toList());
         modules.addAll(collectVertxGenModuleFromCompilationUnits(additionalUnits));
-        LOG.log(INFO, "Found {0} modules (primary and additional sources): {1}", modules.size(),
+        logger.info("Found {} modules (primary and additional sources): {}", modules.size(),
                 modules.stream().map(VertxGenModule::name).toList());
 
         merge(modules);
 
         // Collect the data objects
-        LOG.log(INFO, "Collecting data objects");
+        logger.info("Collecting data objects");
         dataObjects.addAll(collectDataObjectsFromCompilationUnits(units));
         dataObjects.addAll(collectDataObjectsFromCompilationUnits(additionalUnits));
-        LOG.log(INFO, "Found {0} data objects (primary and additional sources): {1}", dataObjects.size(), dataObjects);
+        logger.info("Found {} data objects (primary and additional sources): {}", dataObjects.size(), dataObjects);
 
         // Collect all Vert.x Gen interfaces
-        LOG.log(INFO, "Collecting Vert.x Gen interfaces");
+        logger.info("Collecting Vert.x Gen interfaces");
         allInterfaces.addAll(collectVertxGenFromCompilationUnits(units));
-        LOG.log(INFO, "Found {0} Vert.x Gen interfaces in the primary sources", allInterfaces.size());
+        logger.info("Found {} Vert.x Gen interfaces in the primary sources", allInterfaces.size());
         allInterfaces.addAll(collectVertxGenFromCompilationUnits(additionalUnits));
     }
 
@@ -134,13 +133,13 @@ public class VertxGenCollection {
 
     public CollectionResult collect(String moduleName) {
         VertxGenModule module = lookupModule(moduleName);
-        LOG.log(INFO, "Processing module `{0}` with group `{1}", module.name(), module.group());
-        LOG.log(INFO, "Collecting Vert.x Gen interfaces for module `{0}`", module.name());
+        logger.info("Processing module `{}` with group `{}", module.name(), module.group());
+        logger.info("Collecting Vert.x Gen interfaces for module `{}`", module.name());
 
         interfaces.addAll(collectInterfacesForModule(units, module));
-        LOG.log(System.Logger.Level.INFO, "Found {0} interfaces in module `{1}`", interfaces.size(), module.name());
+        logger.info("Found {} interfaces in module `{}`", interfaces.size(), module.name());
 
-        LOG.log(INFO, "Collection completed");
+        logger.info("Collection completed");
         return new CollectionResult(
                 units,
                 module,
@@ -152,7 +151,7 @@ public class VertxGenCollection {
     }
 
     public List<VertxGenInterface> collectInterfacesForModule(List<CompilationUnit> compilations, VertxGenModule module) {
-        LOG.log(System.Logger.Level.INFO, "Collecting Vert.x Gen interfaces");
+        logger.info("Collecting Vert.x Gen interfaces");
         List<VertxGenInterface> foundInterfaces = new ArrayList<>();
         for (CompilationUnit unit : compilations) {
             var list = unit.findAll(ClassOrInterfaceDeclaration.class).stream()
@@ -163,7 +162,7 @@ public class VertxGenCollection {
                 String fqn = unit.getPackageDeclaration().map(p -> p.getName().asString() + ".").orElse("")
                         + vg.getNameAsString();
                 if (!belongsToModule(fqn, module)) {
-                    LOG.log(WARNING, "Ignoring `{0}` as it does not belong to the module `{1}`", fqn, module.name());
+                    logger.warn("Ignoring `{}` as it does not belong to the module `{}`", fqn, module.name());
                     continue;
                 }
                 AnnotationExpr annotation = vg.getAnnotationByClass(VertxGen.class)
@@ -209,15 +208,15 @@ public class VertxGenCollection {
 
                     // Ignore if the method is declared on the interface itself
                     if (typeDeclaringMethod.getQualifiedName().equals(resolvedAnalyzedInterface.getQualifiedName())) {
-                        LOG.log(DEBUG, "Ignoring method `{0}` in interface `{1}` as it is declared on the interface itself",
+                        logger.debug("Ignoring method `{}` in interface `{}` as it is declared on the interface itself",
                                 method.getName(), fqn);
                         continue;
                     }
 
                     // Ignore static methods from a parent interface
                     if (resolvedDeclaration.isStatic()) {
-                        LOG.log(DEBUG,
-                                "Ignoring method `{0}` in interface `{1}` as it is a static method from the parent interface",
+                        logger.debug(
+                                "Ignoring method `{}` in interface `{}` as it is a static method from the parent interface",
                                 method.getName(), fqn);
                         continue;
                     }
@@ -225,7 +224,7 @@ public class VertxGenCollection {
                     if (astDeclaration == null) {
                         astDeclaration = lookForMethodDeclaration(typeDeclaringMethod, method);
                         if (astDeclaration == null) {
-                            LOG.log(WARNING, "Cannot resolve the AST declaration of {0} declared in {1}",
+                            logger.warn("Cannot resolve the AST declaration of {} declared in {}",
                                     resolvedDeclaration.toDescriptor(), typeDeclaringMethod.getQualifiedName());
                             continue;
                         }
@@ -233,7 +232,7 @@ public class VertxGenCollection {
 
                     // Ignore the method if it is annotated with @GenIgnore
                     if (AnnotationHelper.isIgnored(astDeclaration)) {
-                        LOG.log(DEBUG, "Ignoring method `{0}` in interface `{1}` as it is annotated with @GenIgnore",
+                        logger.debug("Ignoring method `{}` in interface `{}` as it is annotated with @GenIgnore",
                                 method.getName(), fqn);
                         continue;
                     }
@@ -241,7 +240,7 @@ public class VertxGenCollection {
                     // Now, we only consider methods from extended interface.
                     // We should only consider methods from Vert.x Gen interfaces.
                     if (!typeDeclaringMethod.hasAnnotation(VertxGen.class.getName())) {
-                        LOG.log(DEBUG, "Ignoring method `{0}` in interface `{1}` as it is not annotated with @VertxGen",
+                        logger.debug("Ignoring method `{}` in interface `{}` as it is not annotated with @VertxGen",
                                 method.getName(), fqn);
                         continue;
                     }
@@ -276,8 +275,7 @@ public class VertxGenCollection {
                 foundInterfaces.add(new VertxGenInterface(unit, vg, module, fqn, concrete, methods, fields, generator));
             }
         }
-        LOG.log(System.Logger.Level.INFO, "Found {0} Vert.x Gen interfaces for module `{1}`", foundInterfaces.size(),
-                module.name());
+        logger.info("Found {} Vert.x Gen interfaces for module `{}`", foundInterfaces.size(), module.name());
         return foundInterfaces;
     }
 
@@ -379,7 +377,7 @@ public class VertxGenCollection {
                 throw new IllegalArgumentException(
                         "No module name, but multiple modules found: " + modules.stream().map(VertxGenModule::name).toList());
             }
-            LOG.log(INFO, "No module name, using the (only) module found: {0}", modules.getFirst().name());
+            logger.info("No module name, using the (only) module found: {}", modules.getFirst().name());
             return modules.getFirst();
         }
         return modules.stream().filter(v -> v.name().equals(moduleName)).findFirst()
@@ -438,7 +436,7 @@ public class VertxGenCollection {
                 if (mod != null) {
                     itfs.add(new VertxGenClass(fqn, mod, concrete));
                 } else {
-                    LOG.log(System.Logger.Level.WARNING, "No module found for `{0}`", fqn);
+                    logger.warn("No module found for `{}`", fqn);
                 }
             }
         }
@@ -487,8 +485,8 @@ public class VertxGenCollection {
                         for (int i = 0; i < md.getParameters().size(); i++) {
                             ResolvedType resolvedType = method.getParamTypes().get(i);
                             if (!resolvedType.isReferenceType()) {
-                                LOG.log(DEBUG,
-                                        "Ignoring method `{0}` in interface `{1}` as it has a non-reference type parameter",
+                                logger.debug(
+                                        "Ignoring method `{}` in interface `{}` as it has a non-reference type parameter",
                                         method.getName(), type.getQualifiedName());
                                 break;
                             }

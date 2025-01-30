@@ -2,8 +2,9 @@ package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
@@ -32,7 +33,7 @@ import io.smallrye.mutiny.vertx.apigenerator.shims.WriteStreamModule;
  */
 public class VertxGenAnalysis {
 
-    private static final Logger LOGGER = Logger.getLogger(VertxGenAnalysis.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(VertxGenAnalysis.class);
     private final MutinyGenerator generator;
 
     public VertxGenAnalysis(MutinyGenerator generator) {
@@ -65,7 +66,7 @@ public class VertxGenAnalysis {
 
         List<ShimClass> shims = new ArrayList<>();
         for (VertxGenInterface itf : generator.getCollectionResult().interfaces()) {
-            LOGGER.log(Level.FINE, "Analyzing {0}", itf.getFullyQualifiedName());
+            logger.debug("Analyzing {}", itf.getFullyQualifiedName());
             ShimClass shim = new ShimClass(itf);
             for (ShimModule module : modules) {
                 if (module.accept(shim)) {

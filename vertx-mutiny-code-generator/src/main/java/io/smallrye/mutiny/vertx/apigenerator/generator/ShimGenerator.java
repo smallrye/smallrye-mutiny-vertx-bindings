@@ -6,6 +6,9 @@ import java.util.Set;
 
 import javax.lang.model.element.Modifier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.palantir.javapoet.AnnotationSpec;
@@ -27,14 +30,14 @@ import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
 public class ShimGenerator {
 
     private final ShimClass shim;
-    private static final System.Logger LOGGER = System.getLogger(ShimGenerator.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ShimGenerator.class);
 
     public ShimGenerator(ShimClass shim) {
         this.shim = shim;
     }
 
     public JavaFile generate() {
-        LOGGER.log(System.Logger.Level.INFO, "Generating {0}", shim.getFullyQualifiedName());
+        logger.info("Generating {}", shim.getFullyQualifiedName());
 
         TypeSpec.Builder builder;
         ClassName className = ClassName.get(shim.getPackage(), shim.getSimpleName());
@@ -115,7 +118,7 @@ public class ShimGenerator {
      */
     private void generateCompanionClass(ShimClass shim, TypeSpec.Builder builder) {
         ShimCompanionClass companion = shim.getCompanion();
-        LOGGER.log(System.Logger.Level.INFO, "Generating companion class {0} (simple name: {1})",
+        logger.info("Generating companion class {} (simple name: {})",
                 companion.getFullyQualifiedName(), companion.getSimpleName());
         TypeSpec.Builder companionBuilder = TypeSpec.classBuilder(companion.getSimpleName())
                 .addSuperinterface(Shim.getTypeNameFromType(shim.getType()))

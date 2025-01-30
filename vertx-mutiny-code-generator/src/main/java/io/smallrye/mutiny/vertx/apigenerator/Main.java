@@ -4,8 +4,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import picocli.CommandLine;
 
@@ -24,6 +25,8 @@ public class Main implements Callable<Integer> {
     @CommandLine.Option(names = "--module-name", description = "The name of the module to generate")
     String module;
 
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
         new CommandLine(new Main()).execute(args);
     }
@@ -39,10 +42,7 @@ public class Main implements Callable<Integer> {
                 try {
                     output.javaFile().writeToPath(this.output);
                 } catch (Exception e) {
-                    Logger.getLogger(Main.class.getName())
-                            .log(Level.SEVERE,
-                                    "Unable to write the file for shim class: " + output.shim().getFullyQualifiedName(),
-                                    e);
+                    logger.error("Unable to write the file for shim class: {}", output.shim().getFullyQualifiedName(), e);
                 }
             });
         }

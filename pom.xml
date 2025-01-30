@@ -65,6 +65,8 @@
         <javaparser.version>3.26.3</javaparser.version>
         <javapoet.version>0.6.0</javapoet.version>
         <picocli.version>4.7.6</picocli.version>
+        <logback-classic.version>1.5.16</logback-classic.version>
+        <slf4j-api.version>2.0.0</slf4j-api.version>
 
         <testcontainers.version>1.20.4</testcontainers.version>
 
@@ -72,7 +74,6 @@
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <slf4j-api.version>2.0.0</slf4j-api.version>
         <smallrye-common.version>2.9.0</smallrye-common.version>
 
         <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
@@ -155,6 +156,17 @@
             </dependency>
 
             <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.reactivex.rxjava3</groupId>
                 <artifactId>rxjava</artifactId>
                 <version>${rxjava3.version}</version>
@@ -214,12 +226,6 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit-jupiter.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
                 <scope>test</scope>
             </dependency>
 
