@@ -31,7 +31,8 @@ public class ShimTest {
 
     @Test
     void testInterfaces() {
-        MutinyGenerator generator = new MutinyGenerator(Paths.get("src/test/java"), "vertx-itf");
+        MutinyGenerator generator = new MutinyGenerator(Paths.get("src/test/java"), "vertx-itf",
+                Paths.get("target/vertx-core-sources"));
         List<ShimClass> shims = generator.analyze().shims();
         assertThat(shims).hasSize(3);
 

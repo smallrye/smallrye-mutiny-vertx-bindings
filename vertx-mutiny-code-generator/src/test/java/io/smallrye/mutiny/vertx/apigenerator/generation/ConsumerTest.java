@@ -2,6 +2,7 @@ package io.smallrye.mutiny.vertx.apigenerator.generation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -43,7 +44,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         MutinyGenerator.GeneratorOutput output = env.getOutputFor("org.acme.MyInterface");
@@ -73,7 +74,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         MutinyGenerator.GeneratorOutput output = env.getOutputFor("org.acme.MyInterface");
@@ -112,7 +113,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         MutinyGenerator.GeneratorOutput output = env.getOutputFor("org.acme.MyInterface");
@@ -172,7 +173,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         env.compile();
@@ -232,7 +233,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         env.compile();
@@ -290,7 +291,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         env.compile();
@@ -352,7 +353,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         env.compile();
@@ -393,7 +394,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         MutinyGenerator.GeneratorOutput output = env.getOutputFor("org.acme.MyInterface");
@@ -432,7 +433,7 @@ public class ConsumerTest {
                         """)
                 .addModuleGen("org.acme", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
 
         MutinyGenerator.GeneratorOutput output = env.getOutputFor("org.acme.MyInterface");

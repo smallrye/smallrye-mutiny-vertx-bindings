@@ -3,6 +3,7 @@ package io.smallrye.mutiny.vertx.apigenerator.generation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ public class NonConcreteInterfaceDeclarationTest {
                         """)
                 .addModuleGen("me.escoffier.test", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         List<MutinyGenerator.GeneratorOutput> outputs = generator.generate();
         MutinyGenerator.GeneratorOutput output = Env.getOutputFor(outputs, "me.escoffier.test.MyInterface");
 
@@ -121,7 +122,7 @@ public class NonConcreteInterfaceDeclarationTest {
                         """)
                 .addModuleGen("me.escoffier.test", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         List<MutinyGenerator.GeneratorOutput> outputs = generator.generate();
         MutinyGenerator.GeneratorOutput output = Env.getOutputFor(outputs, "me.escoffier.test.MyInterface");
 
@@ -282,7 +283,7 @@ public class NonConcreteInterfaceDeclarationTest {
                         """)
                 .addModuleGen("me.escoffier.test", "my-module");
 
-        MutinyGenerator generator = new MutinyGenerator(env.root());
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         List<MutinyGenerator.GeneratorOutput> outputs = generator.generate();
         env.addOutputs(outputs);
         MutinyGenerator.GeneratorOutput output = Env.getOutputFor(outputs, "me.escoffier.test.MyInterface");
