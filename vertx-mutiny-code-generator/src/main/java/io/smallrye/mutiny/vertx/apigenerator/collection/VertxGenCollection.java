@@ -224,8 +224,10 @@ public class VertxGenCollection {
                     if (astDeclaration == null) {
                         astDeclaration = lookForMethodDeclaration(typeDeclaringMethod, method);
                         if (astDeclaration == null) {
-                            logger.warn("Cannot resolve the AST declaration of {} declared in {}",
-                                    resolvedDeclaration.toDescriptor(), typeDeclaringMethod.getQualifiedName());
+                            logger.warn("Cannot resolve the AST declaration of {} of type {} declared in {}",
+                                    method.getName(),
+                                    resolvedDeclaration.toDescriptor(),
+                                    typeDeclaringMethod.getQualifiedName());
                             continue;
                         }
                     }
