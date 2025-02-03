@@ -63,6 +63,10 @@ public class ShimGenerator {
                 .addAnnotation(AnnotationSpec.builder(MutinyGen.class)
                         .addMember("value", shim.getSource().getFullyQualifiedName() + ".class").build());
 
+        if (shim.isDeprecated()) {
+            builder.addAnnotation(Deprecated.class);
+        }
+
         for (TypeParameter parameter : shim.getSource().getTypeParameters()) {
             builder.addTypeVariable(TypeVariableName.get(parameter.getNameAsString()));
         }

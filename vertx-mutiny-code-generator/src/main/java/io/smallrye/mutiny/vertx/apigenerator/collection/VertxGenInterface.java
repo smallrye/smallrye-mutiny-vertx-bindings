@@ -28,6 +28,7 @@ public class VertxGenInterface {
     private final String packageName;
 
     private final boolean concrete;
+    private final boolean deprecated;
 
     private final List<VertxGenMethod> methods;
     private final List<VertxGenConstant> constants;
@@ -52,6 +53,7 @@ public class VertxGenInterface {
         this.generator = generator;
         this.methods = methods;
         this.constants = constants;
+        this.deprecated = declaration.getAnnotationByClass(Deprecated.class).isPresent();
     }
 
     public VertxGenModule getModule() {
@@ -141,5 +143,9 @@ public class VertxGenInterface {
             }
         }
         return false;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
     }
 }

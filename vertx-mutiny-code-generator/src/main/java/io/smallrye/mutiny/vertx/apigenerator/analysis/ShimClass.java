@@ -188,4 +188,8 @@ public class ShimClass {
     public VertxGenClass getVertxGen(String qualifiedName) {
         return getSource().getGenerator().getCollectionResult().getVertxGenClass(qualifiedName);
     }
+
+    public boolean isDeprecated() {
+        return getSource().isDeprecated();
+    }
 }
