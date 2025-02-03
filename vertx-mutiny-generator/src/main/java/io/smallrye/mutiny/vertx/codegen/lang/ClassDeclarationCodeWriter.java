@@ -17,6 +17,10 @@ public class ClassDeclarationCodeWriter implements CodeWriter {
     @Override
     public void generate(ClassModel model, PrintWriter writer) {
         ClassTypeInfo type = model.getType();
+        model.getAnnotations().stream()
+                .filter(ann -> "java.lang.Deprecated".equals(ann.getName()))
+                .findAny()
+                .ifPresent(deprecated -> writer.println("@Deprecated"));
         writer.print("public ");
         if (model.isConcrete()) {
             writer.print("class");
