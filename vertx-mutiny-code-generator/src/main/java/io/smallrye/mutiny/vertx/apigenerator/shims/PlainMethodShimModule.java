@@ -80,7 +80,7 @@ public class PlainMethodShimModule implements ShimModule {
                     TypeUtils.convertBaseToShimThrows(shim, method),
                     method.isStatic(),
                     method.isFinal(),
-                    method.getJavadoc(),
+                    method.getJavadoc(shim),
                     method);
             originalReturnType = method.getReturnedType();
         }
@@ -210,7 +210,7 @@ public class PlainMethodShimModule implements ShimModule {
                     TypeUtils.convertBaseToShimThrows(shim, method),
                     method.isStatic(),
                     method.isFinal(),
-                    method.getJavadoc(),
+                    method.getJavadoc(shim),
                     method);
             this.isSet = isSet;
             this.itemType = TypeUtils.getFirstParameterizedType(method.getReturnedType());
@@ -279,7 +279,7 @@ public class PlainMethodShimModule implements ShimModule {
                     TypeUtils.convertBaseToShimThrows(shim, method),
                     method.isStatic(),
                     method.isFinal(),
-                    method.getJavadoc(),
+                    method.getJavadoc(shim),
                     method);
             this.itemType = TypeUtils.getSecondParameterizedType(method.getReturnedType());
             this.shimItemType = shim.convert(TypeUtils.getSecondParameterizedType(method.getReturnedType()));
@@ -352,7 +352,7 @@ public class PlainMethodShimModule implements ShimModule {
                     TypeUtils.convertBaseToShimThrows(shim, method),
                     method.isStatic(),
                     method.isFinal(),
-                    method.getJavadoc(),
+                    method.getJavadoc(shim),
                     method);
             this.isVoid = method.getReturnedType().isVoid();
         }
