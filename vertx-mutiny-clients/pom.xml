@@ -18,7 +18,7 @@
         <module>vertx-mutiny-runtime</module>
         <module>vertx-mutiny-core</module>
         <!--                <module>vertx-mutiny-junit5</module>-->
-        <!--                <module>vertx-mutiny-camel-bridge</module>-->
+                        <module>vertx-mutiny-camel-bridge</module>
                         <module>vertx-mutiny-mail-client</module>
         <!--                <module>vertx-mutiny-bridge-common</module>-->
         <!--                <module>vertx-mutiny-web-common</module>-->
