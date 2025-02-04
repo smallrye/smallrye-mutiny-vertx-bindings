@@ -49,6 +49,19 @@ public class JavadocHelper {
         return javadoc.addBlockTag("return", value);
     }
 
+    public static Javadoc removeReturnTag(Javadoc javadoc) {
+        // Remove @return tag if any.
+        List<JavadocBlockTag> tags = javadoc.getBlockTags();
+        List<JavadocBlockTag> found = new ArrayList<>(); // Just in case a method has multiple return tags.
+        for (JavadocBlockTag tag : tags) {
+            if (tag.getTagName().equals("return")) {
+                found.add(tag);
+            }
+        }
+        tags.removeAll(found);
+        return javadoc;
+    }
+
     public static Javadoc replace(Javadoc jd, String v1, String v2) {
         String newValue = jd.getDescription().toText().replace(v1, v2);
         var newJavadoc = new Javadoc(JavadocDescription.parseText(newValue));
