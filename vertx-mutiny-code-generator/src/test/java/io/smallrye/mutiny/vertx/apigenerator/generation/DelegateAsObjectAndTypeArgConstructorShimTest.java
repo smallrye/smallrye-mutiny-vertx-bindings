@@ -46,7 +46,7 @@ public class DelegateAsObjectAndTypeArgConstructorShimTest {
         MethodSpec constructor = Env.findConstructor(output, Object.class.getName());
         assertThat(constructor.name()).isEqualTo("<init>");
         assertThat(constructor.parameters()).hasSize(1);
-        assertThat(constructor.parameters().getFirst().type())
+        assertThat(constructor.parameters().get(0).type())
                 .isEqualTo(ClassName.get(Object.class));
         assertThat(constructor.modifiers()).contains(Modifier.PUBLIC);
         assertThat(constructor.code().toString()).contains("this.delegate = (me.escoffier.test.MyInterface) delegate;")
@@ -85,7 +85,7 @@ public class DelegateAsObjectAndTypeArgConstructorShimTest {
                 TypeArg.class.getName() + "<X>", TypeArg.class.getName() + "<Y>");
         assertThat(constructor.name()).isEqualTo("<init>");
         assertThat(constructor.parameters()).hasSize(3);
-        assertThat(constructor.parameters().getFirst().type()).isEqualTo(ClassName.get(Object.class));
+        assertThat(constructor.parameters().get(0).type()).isEqualTo(ClassName.get(Object.class));
         assertThat(constructor.modifiers()).contains(Modifier.PUBLIC);
         assertThat(constructor.code().toString())
                 .contains("this.delegate = (me.escoffier.test.MyInterface) delegate;")
@@ -136,7 +136,7 @@ public class DelegateAsObjectAndTypeArgConstructorShimTest {
                 TypeArg.class.getName() + "<X>", TypeArg.class.getName() + "<Y>");
         assertThat(constructor.name()).isEqualTo("<init>");
         assertThat(constructor.parameters()).hasSize(3);
-        assertThat(constructor.parameters().getFirst().type()).isEqualTo(ClassName.get(Object.class));
+        assertThat(constructor.parameters().get(0).type()).isEqualTo(ClassName.get(Object.class));
         assertThat(constructor.modifiers()).contains(Modifier.PUBLIC);
         assertThat(constructor.code().toString())
                 .contains("this.delegate = (me.escoffier.test.MyInterface) delegate;")

@@ -21,11 +21,11 @@ public class CollectionTest {
         MutinyGenerator generator = new MutinyGenerator(Paths.get("src/test/java/io/vertx/sources/simple"));
         List<VertxGenInterface> interfaces = generator.getCollectionResult().interfaces();
         assertThat(interfaces).hasSize(1);
-        assertThat(interfaces.getFirst().isConcrete()).isTrue();
-        assertThat(interfaces.getFirst().getFullyQualifiedName()).isEqualTo("io.vertx.sources.simple.TestApi");
-        assertThat(interfaces.getFirst().getPackageName()).isEqualTo("io.vertx.sources.simple");
-        assertThat(interfaces.getFirst().getMethods()).hasSize(1);
-        assertThat(interfaces.getFirst().getMethods().getFirst()).satisfies(m -> {
+        assertThat(interfaces.get(0).isConcrete()).isTrue();
+        assertThat(interfaces.get(0).getFullyQualifiedName()).isEqualTo("io.vertx.sources.simple.TestApi");
+        assertThat(interfaces.get(0).getPackageName()).isEqualTo("io.vertx.sources.simple");
+        assertThat(interfaces.get(0).getMethods()).hasSize(1);
+        assertThat(interfaces.get(0).getMethods().get(0)).satisfies(m -> {
             assertThat(m.getName()).isEqualTo("foo");
             assertThat(m.getReturnedType().isVoid()).isTrue();
             assertThat(m.getParameters()).isEmpty();
@@ -35,7 +35,7 @@ public class CollectionTest {
 
         AnalysisResult analyzed = generator.analyze();
         assertThat(analyzed.shims()).hasSize(1);
-        ShimClass shim = analyzed.shims().getFirst();
+        ShimClass shim = analyzed.shims().get(0);
         assertThat(shim.getFullyQualifiedName()).isEqualTo("io.vertx.sources.simple.mutiny.TestApi");
         assertThat(shim.getPackage()).isEqualTo("io.vertx.sources.simple.mutiny");
 

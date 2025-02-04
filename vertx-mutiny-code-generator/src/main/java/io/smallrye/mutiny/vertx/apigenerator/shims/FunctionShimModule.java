@@ -49,7 +49,7 @@ public class FunctionShimModule implements ShimModule {
         for (ClassOrInterfaceType type : extendedTypes) {
             ResolvedReferenceType reference = type.resolve().asReferenceType();
             if (reference.getQualifiedName().equalsIgnoreCase(FUNCTION_CLASS_NAME)) {
-                originalInputType = reference.asReferenceType().getTypeParametersMap().getFirst().b;
+                originalInputType = reference.asReferenceType().getTypeParametersMap().get(0).b;
                 originalOutputType = reference.asReferenceType().getTypeParametersMap().get(1).b;
 
                 var input = shim.getSource().getGenerator().getConverters().convert(originalInputType);

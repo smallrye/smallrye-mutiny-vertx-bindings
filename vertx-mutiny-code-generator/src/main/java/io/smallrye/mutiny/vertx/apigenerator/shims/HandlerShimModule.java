@@ -52,7 +52,7 @@ public class HandlerShimModule implements ShimModule {
         for (ClassOrInterfaceType type : extendedTypes) {
             ResolvedReferenceType reference = type.resolve().asReferenceType();
             if (reference.getQualifiedName().equalsIgnoreCase(HANDLER_CLASS_NAME)) {
-                var elementType = reference.asReferenceType().typeParametersMap().getTypes().getFirst();
+                var elementType = reference.asReferenceType().typeParametersMap().getTypes().get(0);
                 var converted = shim.getSource().getGenerator().getConverters().convert(elementType);
                 shim.addInterface(StaticJavaParser.parseClassOrInterfaceType(HANDLER_CLASS_NAME).setTypeArguments(converted));
                 shim.addInterface(

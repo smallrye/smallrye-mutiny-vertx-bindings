@@ -19,7 +19,7 @@ public class VertxAsyncResultConverter extends BaseShimTypeConverter {
 
     @Override
     public Type convert(ResolvedType type) {
-        var content = type.asReferenceType().getTypeParametersMap().getFirst().b;
+        var content = type.asReferenceType().getTypeParametersMap().get(0).b;
         var converted = super.convertType(content);
         return StaticJavaParser.parseClassOrInterfaceType("io.vertx.core.AsyncResult")
                 .setTypeArguments(converted);

@@ -25,7 +25,7 @@ public class ListAndSetConverter extends BaseShimTypeConverter {
 
     @Override
     public Type convert(ResolvedType type) {
-        var containedType = type.asReferenceType().getTypeParametersMap().getFirst().b;
+        var containedType = type.asReferenceType().getTypeParametersMap().get(0).b;
         var converted = convertType(containedType);
         return StaticJavaParser.parseClassOrInterfaceType(type.asReferenceType().erasure().describe())
                 .setTypeArguments(converted);

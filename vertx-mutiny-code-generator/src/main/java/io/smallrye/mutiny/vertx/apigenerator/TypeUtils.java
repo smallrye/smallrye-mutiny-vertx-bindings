@@ -119,7 +119,7 @@ public class TypeUtils {
         if (parameters == null || parameters.isEmpty()) {
             throw new IllegalArgumentException("The given type is not parameterized: " + type);
         }
-        return parameters.getFirst();
+        return parameters.get(0);
     }
 
     public static ResolvedType getSecondParameterizedType(ResolvedType type) {
@@ -214,7 +214,7 @@ public class TypeUtils {
         if (parameters.size() != 1) {
             return false;
         }
-        ResolvedType type = parameters.getFirst().type();
+        ResolvedType type = parameters.get(0).type();
         return isReadStream(type);
     }
 

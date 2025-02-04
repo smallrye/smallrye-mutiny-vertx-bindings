@@ -21,7 +21,7 @@ public class VertxHandlerConverter extends BaseShimTypeConverter {
 
     @Override
     public Type convert(ResolvedType type) {
-        var content = type.asReferenceType().getTypeParametersMap().getFirst().b;
+        var content = type.asReferenceType().getTypeParametersMap().get(0).b;
         var converted = convertType(content);
 
         // If converted is Void -> Runnable

@@ -65,13 +65,13 @@ public class ConstantShimModule implements ShimModule {
                 vertxGenType = fqn;
             } else if (fqn.equals(List.class.getName())) {
                 isList = true;
-                ResolvedType first = constant.getType().asReferenceType().typeParametersMap().getTypes().getFirst();
+                ResolvedType first = constant.getType().asReferenceType().typeParametersMap().getTypes().get(0);
                 isVertxGen = clazz.getSource().getGenerator().getCollectionResult().isVertxGen(first.erasure().describe());
                 vertxGenType = first.erasure().describe();
                 shimElementType = clazz.convert(first);
             } else if (fqn.equals(Set.class.getName())) {
                 isSet = true;
-                ResolvedType first = constant.getType().asReferenceType().typeParametersMap().getTypes().getFirst();
+                ResolvedType first = constant.getType().asReferenceType().typeParametersMap().getTypes().get(0);
                 isVertxGen = clazz.getSource().getGenerator().getCollectionResult().isVertxGen(first.erasure().describe());
                 vertxGenType = first.erasure().describe();
                 shimElementType = clazz.convert(first);

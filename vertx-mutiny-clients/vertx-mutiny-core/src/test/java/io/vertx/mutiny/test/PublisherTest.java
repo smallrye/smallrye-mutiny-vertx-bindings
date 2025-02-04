@@ -41,7 +41,7 @@ public class PublisherTest {
         JsonParser parser = JsonParser.newParser(items.map(Buffer::buffer))
                 .exceptionHandler(t -> t.printStackTrace())
                 .objectValueMode();
-        JsonObject object = parser.toMulti().collect().asList().await().indefinitely().getFirst().objectValue();
+        JsonObject object = parser.toMulti().collect().asList().await().indefinitely().get(0).objectValue();
         assertThat(object.getString("foo")).isEqualTo("bar");
         assertThat(object.getString("abc")).isEqualTo("baz");
     }

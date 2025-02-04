@@ -121,7 +121,7 @@ public class VertxGenCollection {
         // For each list with more than one module - merge them.
         for (List<VertxGenModule> list : map.values()) {
             if (list.size() > 1) {
-                VertxGenModule merged = list.getFirst(); // This will be the module in which we merge.
+                VertxGenModule merged = list.get(0); // This will be the module in which we merge.
                 for (int i = 1; i < list.size(); i++) {
                     merged = VertxGenModule.merge(merged, list.get(i));
                 }
@@ -379,8 +379,8 @@ public class VertxGenCollection {
                 throw new IllegalArgumentException(
                         "No module name, but multiple modules found: " + modules.stream().map(VertxGenModule::name).toList());
             }
-            logger.info("No module name, using the (only) module found: {}", modules.getFirst().name());
-            return modules.getFirst();
+            logger.info("No module name, using the (only) module found: {}", modules.get(0).name());
+            return modules.get(0);
         }
         return modules.stream().filter(v -> v.name().equals(moduleName)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No module found with the module name " + moduleName));

@@ -20,7 +20,7 @@ public class VertxFutureTypeConverter extends BaseShimTypeConverter {
 
     @Override
     public Type convert(ResolvedType type) {
-        ResolvedType contentType = type.asReferenceType().getTypeParametersMap().getFirst().b;
+        ResolvedType contentType = type.asReferenceType().getTypeParametersMap().get(0).b;
         var converted = convertType(contentType);
         return StaticJavaParser.parseClassOrInterfaceType(UNI)
                 .setTypeArguments(converted);

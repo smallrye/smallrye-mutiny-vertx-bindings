@@ -53,7 +53,7 @@ public class ReadStreamModule implements ShimModule {
         if (readStreamType == null) {
             return;
         }
-        ResolvedType originalItemType = readStreamType.typeParametersMap().getTypes().getFirst();
+        ResolvedType originalItemType = readStreamType.typeParametersMap().getTypes().get(0);
         Type itemType = shim.getSource().getGenerator().getConverters().convert(originalItemType);
 
         if (shim.isClass()) {

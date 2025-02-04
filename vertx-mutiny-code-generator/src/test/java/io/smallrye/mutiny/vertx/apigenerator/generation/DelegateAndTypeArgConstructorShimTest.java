@@ -48,7 +48,7 @@ public class DelegateAndTypeArgConstructorShimTest {
         MethodSpec constructor = Env.findConstructor(output, "me.escoffier.test.MyInterface");
         assertThat(constructor.name()).isEqualTo("<init>");
         assertThat(constructor.parameters()).hasSize(1);
-        assertThat(constructor.parameters().getFirst().type())
+        assertThat(constructor.parameters().get(0).type())
                 .isEqualTo(ClassName.get("me.escoffier.test", "MyInterface"));
         assertThat(constructor.modifiers()).contains(Modifier.PUBLIC);
         assertThat(constructor.code().toString()).contains("this.delegate = delegate;")
@@ -89,7 +89,7 @@ public class DelegateAndTypeArgConstructorShimTest {
         MethodSpec constructor = Env.findConstructor(output, "me.escoffier.test.MyInterface<X, Y>");
         assertThat(constructor.name()).isEqualTo("<init>");
         assertThat(constructor.parameters()).hasSize(1);
-        assertThat(constructor.parameters().getFirst().type()).isEqualTo(expectedDelegateType);
+        assertThat(constructor.parameters().get(0).type()).isEqualTo(expectedDelegateType);
         assertThat(constructor.modifiers()).contains(Modifier.PUBLIC);
         assertThat(constructor.code().toString())
                 .contains("this.delegate = delegate;")
@@ -100,7 +100,7 @@ public class DelegateAndTypeArgConstructorShimTest {
                 TypeArg.class.getName() + "<X>", TypeArg.class.getName() + "<Y>");
         assertThat(constructor.name()).isEqualTo("<init>");
         assertThat(constructor.parameters()).hasSize(3);
-        assertThat(constructor.parameters().getFirst().type()).isEqualTo(expectedDelegateType);
+        assertThat(constructor.parameters().get(0).type()).isEqualTo(expectedDelegateType);
         assertThat(constructor.modifiers()).contains(Modifier.PUBLIC);
         assertThat(constructor.code().toString())
                 .contains("this.delegate = delegate;")

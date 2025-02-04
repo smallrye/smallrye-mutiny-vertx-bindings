@@ -349,7 +349,7 @@ public class ReadWriteStreamTest {
             assertThat(m.name()).isEqualTo("toMulti");
             assertThat(m.modifiers()).contains(Modifier.SYNCHRONIZED);
             assertThat(m.returnType().toString()).isEqualTo(Multi.class.getName() + "<" + String.class.getName() + ">");
-            assertThat(m.annotations().getFirst().type().toString()).isEqualTo(CheckReturnValue.class.getName());
+            assertThat(m.annotations().get(0).type().toString()).isEqualTo(CheckReturnValue.class.getName());
             assertThat(m.code().toString())
                     .contains("MultiHelper.toMulti(this.getDelegate()")
                     .contains("return multi;");
@@ -409,7 +409,7 @@ public class ReadWriteStreamTest {
             assertThat(m.name()).isEqualTo("toMulti");
             assertThat(m.modifiers()).contains(Modifier.SYNCHRONIZED);
             assertThat(m.returnType().toString()).isEqualTo(Multi.class.getName() + "<T>");
-            assertThat(m.annotations().getFirst().type().toString()).isEqualTo(CheckReturnValue.class.getName());
+            assertThat(m.annotations().get(0).type().toString()).isEqualTo(CheckReturnValue.class.getName());
             assertThat(m.code().toString())
                     .contains("MultiHelper.toMulti(delegate, _conv)")
                     .contains("return multi;");
@@ -476,7 +476,7 @@ public class ReadWriteStreamTest {
             assertThat(m.name()).isEqualTo("toMulti");
             assertThat(m.modifiers()).contains(Modifier.SYNCHRONIZED);
             assertThat(m.returnType().toString()).isEqualTo(Multi.class.getName() + "<org.acme.mutiny.Refed>");
-            assertThat(m.annotations().getFirst().type().toString()).isEqualTo(CheckReturnValue.class.getName());
+            assertThat(m.annotations().get(0).type().toString()).isEqualTo(CheckReturnValue.class.getName());
             assertThat(m.code().toString())
                     .contains("Refed::newInstance")
                     .contains("return multi;");
@@ -544,7 +544,7 @@ public class ReadWriteStreamTest {
             assertThat(m.name()).isEqualTo("toMulti");
             assertThat(m.modifiers()).contains(Modifier.SYNCHRONIZED);
             assertThat(m.returnType().toString()).isEqualTo(Multi.class.getName() + "<org.acme.mutiny.Refed<I>>");
-            assertThat(m.annotations().getFirst().type().toString()).isEqualTo(CheckReturnValue.class.getName());
+            assertThat(m.annotations().get(0).type().toString()).isEqualTo(CheckReturnValue.class.getName());
             assertThat(m.code().toString())
                     .contains("Refed::newInstance")// Would that really work when using Type Parameter?
                     .contains("return multi;");

@@ -49,7 +49,7 @@ public class IteratorShimModule implements ShimModule {
         for (ClassOrInterfaceType type : extendedTypes) {
             ResolvedReferenceType reference = type.resolve().asReferenceType();
             if (reference.getQualifiedName().equalsIgnoreCase(ITERATOR)) {
-                elementType = reference.asReferenceType().typeParametersMap().getTypes().getFirst();
+                elementType = reference.asReferenceType().typeParametersMap().getTypes().get(0);
                 converted = shim.getSource().getGenerator().getConverters().convert(elementType);
                 shim.addInterface(StaticJavaParser.parseClassOrInterfaceType(ITERATOR).setTypeArguments(converted));
             }

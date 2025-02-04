@@ -46,7 +46,7 @@ public class NewInstanceMethodShimTest {
         MethodSpec method = Env.findMethod(output, "newInstance", "me.escoffier.test.MyInterface");
         assertThat(method.name()).isEqualTo("newInstance");
         assertThat(method.parameters()).hasSize(1);
-        assertThat(method.parameters().getFirst().type())
+        assertThat(method.parameters().get(0).type())
                 .isEqualTo(ClassName.get("me.escoffier.test", "MyInterface"));
         assertThat(method.modifiers()).contains(Modifier.PUBLIC);
         assertThat(method.code().toString()).contains("me.escoffier.test.mutiny.MyInterface(delegate)")
@@ -88,7 +88,7 @@ public class NewInstanceMethodShimTest {
                 TypeArg.class.getName() + "<X>", TypeArg.class.getName() + "<Y>");
         assertThat(method.name()).isEqualTo("newInstance");
         assertThat(method.parameters()).hasSize(3);
-        assertThat(method.parameters().getFirst().type()).isEqualTo(expectedDelegateType);
+        assertThat(method.parameters().get(0).type()).isEqualTo(expectedDelegateType);
         assertThat(method.modifiers()).contains(Modifier.PUBLIC);
         assertThat(method.code().toString())
                 .contains("me.escoffier.test.mutiny.MyInterface<X, Y>(delegate, typeArg_0, typeArg_1)");

@@ -45,7 +45,7 @@
     </scm>
 
     <properties>
-        <java.platform.baseline>21</java.platform.baseline>
+        <java.platform.baseline>17</java.platform.baseline>
         <maven.compiler.target>${java.platform.baseline}</maven.compiler.target>
         <maven.compiler.source>${java.platform.baseline}</maven.compiler.source>
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>

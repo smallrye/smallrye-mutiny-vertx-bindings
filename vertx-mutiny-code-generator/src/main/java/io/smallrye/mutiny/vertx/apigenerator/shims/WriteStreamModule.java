@@ -56,7 +56,7 @@ public class WriteStreamModule implements ShimModule {
         if (writeStreamType == null) {
             return;
         }
-        ResolvedType originalItemType = writeStreamType.typeParametersMap().getTypes().getFirst();
+        ResolvedType originalItemType = writeStreamType.typeParametersMap().getTypes().get(0);
         Type itemType = shim.getSource().getGenerator().getConverters().convert(originalItemType);
 
         shim.addField(new SubscriberField(this, itemType));
