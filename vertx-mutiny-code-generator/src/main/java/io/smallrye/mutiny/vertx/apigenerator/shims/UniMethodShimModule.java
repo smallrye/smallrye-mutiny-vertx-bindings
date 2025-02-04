@@ -125,6 +125,14 @@ public class UniMethodShimModule implements ShimModule {
         jd = JavadocHelper.replace(jd, " future ", " underlying uni ");
 
         String signature = method.getMethod().getSignature().asString();
+
+        if (shimElementType.isVoidType() || shimElementType.asString().equals(Void.class.getName())) {
+            return JavadocHelper
+                    .removeReturnTag(jd)
+                    .addBlockTag("see", "%s#%s"
+                            .formatted(shim.getSource().getFullyQualifiedName(), signature));
+        }
+
         return JavadocHelper
                 .addOrReplaceReturnTag(jd, "The operation result")
                 .addBlockTag("see", "%s#%s"

@@ -4,10 +4,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.ext.mail.MailConfig;
@@ -15,27 +14,29 @@ import io.vertx.ext.mail.MailMessage;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.mail.MailClient;
 
-public class MailClientTest {
+class MailClientTest {
 
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mailhog/mailhog:latest")
+    public static GenericContainer<?> container = new GenericContainer<>("mailhog/mailhog:latest")
             .withExposedPorts(1025);
 
-    private Vertx vertx;
+    private static Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void init() {
+        container.start();
         vertx = Vertx.vertx();
         assertThat(vertx, is(notNullValue()));
+
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static void shutdown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
-    public void testMutinyAPI() {
+    void testMutinyAPI() {
         MailClient client = MailClient.createShared(vertx, new MailConfig()
                 .setPort(container.getMappedPort(1025))
                 .setHostname(container.getHost()));
@@ -49,7 +50,7 @@ public class MailClientTest {
     }
 
     @Test
-    public void testBlockingAPI() {
+    void testBlockingAPI() {
         MailClient client = MailClient.createShared(vertx, new MailConfig()
                 .setPort(container.getMappedPort(1025))
                 .setHostname(container.getHost()));
