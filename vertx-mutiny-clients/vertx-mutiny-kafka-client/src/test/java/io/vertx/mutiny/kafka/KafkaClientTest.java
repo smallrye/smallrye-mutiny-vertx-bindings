@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.KafkaContainer;
 
 import io.smallrye.mutiny.Uni;
@@ -20,26 +19,27 @@ import io.vertx.mutiny.kafka.client.consumer.KafkaConsumerRecord;
 import io.vertx.mutiny.kafka.client.producer.KafkaProducer;
 import io.vertx.mutiny.kafka.client.producer.KafkaProducerRecord;
 
-public class KafkaClientTest {
+class KafkaClientTest {
 
-    @Rule
-    public KafkaContainer container = new KafkaContainer();
+    static KafkaContainer container = new KafkaContainer();
 
-    private Vertx vertx;
+    static Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void setUp() {
+        container.start();
         vertx = Vertx.vertx();
         assertThat(vertx).isNotNull();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static void tearDown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
-    public void testMutinyAPI() {
+    void testMutinyAPI() {
         Map<String, String> configOfTheConsumer = new HashMap<>();
         configOfTheConsumer.put("bootstrap.servers", container.getBootstrapServers());
         configOfTheConsumer.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");

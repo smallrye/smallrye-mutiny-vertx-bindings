@@ -24,11 +24,11 @@
                         <module>vertx-mutiny-web-common</module>
         <!--                <module>vertx-mutiny-web</module>-->
         <!--                <module>vertx-mutiny-web-client</module>-->
-        <!--                <module>vertx-mutiny-mongo-client</module>-->
-        <!--                <module>vertx-mutiny-redis-client</module>-->
-        <!--                <module>vertx-mutiny-cassandra-client</module>-->
-        <!--                <module>vertx-mutiny-consul-client</module>-->
-        <!--                <module>vertx-mutiny-kafka-client</module>-->
+                        <module>vertx-mutiny-mongo-client</module>
+                        <module>vertx-mutiny-redis-client</module>
+                        <module>vertx-mutiny-cassandra-client</module>
+                        <module>vertx-mutiny-consul-client</module>
+                        <module>vertx-mutiny-kafka-client</module>
         <!--                <module>vertx-mutiny-amqp-client</module>-->
         <!--                <module>vertx-mutiny-rabbitmq-client</module>-->
         <!--                <module>vertx-mutiny-sql-client</module>-->

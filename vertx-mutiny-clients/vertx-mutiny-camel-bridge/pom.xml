@@ -46,7 +46,6 @@
                     <includeTypes>jar</includeTypes>
                 </configuration>
                 <executions>
-                    <!-- Unpack java sources to target/java-sources -->
                     <execution>
                         <id>unpack-java</id>
                         <phase>generate-sources</phase>
@@ -85,6 +84,7 @@
                     </archive>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
