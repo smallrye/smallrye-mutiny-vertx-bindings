@@ -136,10 +136,20 @@ public class PlainMethodShimModule implements ShimModule {
                             // The newInstance method does not have a type arg parameter if the type is not a parameterized type.
                             boolean isParameterized = TypeUtils.isParameterizedType(listOfOriginalTypeParameters.get(tp_index));
                             if (isParameterized) {
-
+                                List<ResolvedType> parameters = TypeUtils
+                                        .getTypeParameters(listOfOriginalTypeParameters.get(tp_index));
+                                int numberOfTypeArgs = parameters.size();
+                                StringBuilder p = new StringBuilder();
+                                for (int i = 0; i < numberOfTypeArgs; i++) {
+                                    if (p.isEmpty()) {
+                                        p = new StringBuilder("__typeArg_" + i);
+                                    } else {
+                                        p.append(", __typeArg_").append(i);
+                                    }
+                                }
                                 code.addStatement("""
                                         $T __arg_$L = new $T(
-                                            o -> $T.newInstance(($T)o, __typeArg_$L),
+                                            o -> $T.newInstance(($T)o, $L),
                                             o -> o.getDelegate()
                                         )
                                         """,
@@ -150,7 +160,7 @@ public class PlainMethodShimModule implements ShimModule {
                                         JavaType.of(
                                                 listOfOriginalTypeParameters.get(tp_index).asReferenceType().getQualifiedName())
                                                 .toTypeName(), // Cast type (bare and erased)
-                                        tp_index);
+                                        p);
                             } else {
                                 code.addStatement("""
                                         $T __arg_$L = new $T(
