@@ -1014,6 +1014,47 @@ public class ReadWriteStreamTest {
         assertThat(pipe.toString()).doesNotContain("__typeArg_");
     }
 
+    @Test
+    public void testNestedTypeParameter() {
+        Env env = new Env()
+                .addJavaCode("org.acme", "ChangeStreamDocument", """
+                        package org.acme;
+
+                        import io.vertx.codegen.annotations.VertxGen;
+
+                        public interface ChangeStreamDocument<T> {
+                            T getFullDocument();
+                        }
+                        """)
+                .addJavaCode("org.acme", "MyService", """
+                        package org.acme;
+
+                        import io.vertx.codegen.annotations.VertxGen;
+                        import io.vertx.core.streams.ReadStream;
+
+                        @VertxGen
+                        public interface MyService {
+                            ReadStream<ChangeStreamDocument<String>> watch();
+
+                            <T> ReadStream<ChangeStreamDocument<T>> foo(Class<T> clazz);
+                        }
+                        """)
+                .addModuleGen("org.acme", "my-module");
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
+        env.addOutputs(generator.generate());
+
+        MethodSpec method = env.getOutputFor("org.acme.MyService").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().startsWith("watch")).findFirst().orElseThrow();
+        assertThat(method.returnType().toString())
+                .isEqualTo("io.vertx.mutiny.core.streams.ReadStream<org.acme.ChangeStreamDocument<java.lang.String>>");
+
+        method = env.getOutputFor("org.acme.MyService").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().startsWith("foo")).findFirst().orElseThrow();
+        assertThat(method.returnType().toString())
+                .isEqualTo("io.vertx.mutiny.core.streams.ReadStream<org.acme.ChangeStreamDocument<T>>");
+
+    }
+
     private void assertMethod(MethodSpec method, String name, String returnType, String... parameterTypes) {
         assertThat(method.name()).isEqualTo(name);
         assertThat(method.returnType().toString()).isEqualTo(returnType);
