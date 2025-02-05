@@ -429,7 +429,7 @@
                             <!-- Do not check for Vert.x, only focus on the client API -->
                             <checkDependencies>false</checkDependencies>
                             <generateSiteReport>false</generateSiteReport>
-                            <oldVersion>3.14.1</oldVersion>
+                            <oldVersion>3.18.0</oldVersion>
                             <newVersion>${project.version}</newVersion>
 
                             <analysisConfiguration>
