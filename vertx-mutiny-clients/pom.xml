@@ -21,7 +21,7 @@
                         <module>vertx-mutiny-camel-bridge</module>
                         <module>vertx-mutiny-mail-client</module>
                         <module>vertx-mutiny-bridge-common</module>
-        <!--                <module>vertx-mutiny-web-common</module>-->
+                        <module>vertx-mutiny-web-common</module>
         <!--                <module>vertx-mutiny-web</module>-->
         <!--                <module>vertx-mutiny-web-client</module>-->
         <!--                <module>vertx-mutiny-mongo-client</module>-->
