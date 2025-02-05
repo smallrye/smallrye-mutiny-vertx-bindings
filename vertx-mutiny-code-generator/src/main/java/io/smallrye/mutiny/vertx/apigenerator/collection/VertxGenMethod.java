@@ -11,6 +11,8 @@ import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaratio
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 
+import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.vertx.codegen.annotations.Fluent;
 
 public class VertxGenMethod {
@@ -102,8 +104,8 @@ public class VertxGenMethod {
         return isStatic;
     }
 
-    public Javadoc getJavadoc() {
-        return javadoc;
+    public Javadoc getJavadoc(ShimClass shimClass) {
+        return JavadocHelper.toMutinyTypes(javadoc, shimClass);
     }
 
     public List<ResolvedParameter> getParameters() {

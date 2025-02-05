@@ -76,7 +76,7 @@ public class UniMethodShimModule implements ShimModule {
     }
 
     private static Javadoc adaptJavadocToUni(ShimClass shim, VertxGenMethod method) {
-        var jd = JavadocHelper.addToJavadoc(method.getJavadoc(), """
+        var jd = JavadocHelper.addToJavadoc(method.getJavadoc(shim), """
                 <p>
                 Unlike the <em>bare</em> Vert.x variant, this method returns a {@link %s Uni}.
                 The uni emits the result of the operation as item.
@@ -98,7 +98,7 @@ public class UniMethodShimModule implements ShimModule {
     }
 
     private static Javadoc adaptJavadocToAndForget(ShimClass shim, Type shimElementType, VertxGenMethod method) {
-        var jd = JavadocHelper.addToJavadoc(method.getJavadoc(), """
+        var jd = JavadocHelper.addToJavadoc(method.getJavadoc(shim), """
                 <p>
                 Unlike the <em>bare</em> Vert.x variant, this method ignores the {@link %s} result or any failure.
                 </p>
@@ -113,7 +113,7 @@ public class UniMethodShimModule implements ShimModule {
     }
 
     private static Javadoc adaptJavadocToAndAwait(ShimClass shim, Type shimElementType, VertxGenMethod method) {
-        var jd = JavadocHelper.addToJavadoc(method.getJavadoc(),
+        var jd = JavadocHelper.addToJavadoc(method.getJavadoc(shim),
                 """
                         <p>
                         Unlike the <em>bare</em> Vert.x variant, this method returns a {@link %s}.
@@ -212,8 +212,8 @@ public class UniMethodShimModule implements ShimModule {
             builder.addMethod(method.build());
 
             // Extra methods
-            builder.addMethod(generateAwaitMethod(shim, this, shimItemType, getOriginalMethod().getJavadoc()).build());
-            builder.addMethod(generateForgetMethod(shim, this, shimItemType, getOriginalMethod().getJavadoc()).build());
+            builder.addMethod(generateAwaitMethod(shim, this, shimItemType, getOriginalMethod().getJavadoc(shim)).build());
+            builder.addMethod(generateForgetMethod(shim, this, shimItemType, getOriginalMethod().getJavadoc(shim)).build());
         }
     }
 
@@ -299,8 +299,8 @@ public class UniMethodShimModule implements ShimModule {
 
             // Extra methods
             Type collectionType = shim.convert(TypeUtils.getFirstParameterizedType(getOriginalMethod().getReturnedType()));
-            builder.addMethod(generateAwaitMethod(shim, this, collectionType, getOriginalMethod().getJavadoc()).build());
-            builder.addMethod(generateForgetMethod(shim, this, collectionType, getOriginalMethod().getJavadoc()).build());
+            builder.addMethod(generateAwaitMethod(shim, this, collectionType, getOriginalMethod().getJavadoc(shim)).build());
+            builder.addMethod(generateForgetMethod(shim, this, collectionType, getOriginalMethod().getJavadoc(shim)).build());
         }
     }
 
@@ -389,8 +389,8 @@ public class UniMethodShimModule implements ShimModule {
 
             // Extra methods
             Type collectionType = shim.convert(TypeUtils.getFirstParameterizedType(getOriginalMethod().getReturnedType()));
-            builder.addMethod(generateAwaitMethod(shim, this, collectionType, getOriginalMethod().getJavadoc()).build());
-            builder.addMethod(generateForgetMethod(shim, this, collectionType, getOriginalMethod().getJavadoc()).build());
+            builder.addMethod(generateAwaitMethod(shim, this, collectionType, getOriginalMethod().getJavadoc(shim)).build());
+            builder.addMethod(generateForgetMethod(shim, this, collectionType, getOriginalMethod().getJavadoc(shim)).build());
         }
     }
 
@@ -427,7 +427,7 @@ public class UniMethodShimModule implements ShimModule {
             ResolvedType originalReturnType = getOriginalMethod().getReturnedType();
             ResolvedType paramType = TypeUtils.getFirstParameterizedType(originalReturnType);
             this.shimElementType = shim.convert(paramType);
-            this.originalJavadoc = method.getJavadoc();
+            this.originalJavadoc = method.getJavadoc(shim);
         }
 
         @Override
