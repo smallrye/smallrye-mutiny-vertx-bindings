@@ -192,7 +192,7 @@ public class PlainMethodShimModule implements ShimModule {
                             JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
                             String.join(", ", localTypeVars));
                 } else {
-                    code.addStatement("return (_res == null) ? null : new $T(_res)",
+                    code.addStatement("return new $T(_res)",
                             shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
                                     : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName()).toTypeName());
                 }
