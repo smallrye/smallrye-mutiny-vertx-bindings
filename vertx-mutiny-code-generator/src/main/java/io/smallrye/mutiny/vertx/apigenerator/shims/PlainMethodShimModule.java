@@ -46,7 +46,7 @@ public class PlainMethodShimModule implements ShimModule {
 
             if (shim.getSource().getGenerator().getCollectionResult().isVertxGen(TypeUtils.getFullyQualifiedName(returnType))) {
                 shim.addMethod(new PlainMethodReturningVertxGen(this, shim, method, false));
-                if (TypeUtils.isMethodAcceptingASingleReadStream(method.getParameters())) {
+                if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
                     shim.addMethod(new PlainMethodReturningVertxGen(this, shim, method, true));
                 }
             } else if ((TypeUtils.isList(returnType) || TypeUtils.isSet(returnType))
@@ -57,12 +57,10 @@ public class PlainMethodShimModule implements ShimModule {
                         shim.getVertxGen(TypeUtils.getSecondParameterizedType(returnType))));
             } else {
                 shim.addMethod(new PlainDelegatingMethod(this, shim, method, false));
-                if (TypeUtils.isMethodAcceptingASingleReadStream(method.getParameters())) {
+                if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
                     shim.addMethod(new PlainDelegatingMethod(this, shim, method, true));
                 }
             }
-
-            //            // TODO: Consumer, Supplier, Iterable, Iterator, Handler, Function, etc.
         }
     }
 

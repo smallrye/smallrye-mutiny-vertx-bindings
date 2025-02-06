@@ -57,7 +57,7 @@ public class UniMethodShimModule implements ShimModule {
             if (shim.getSource().getGenerator().getCollectionResult()
                     .isVertxGen(TypeUtils.getFullyQualifiedName(futureItemType))) {
                 shim.addMethod(new UniMethodReturningVertxGen(this, shim, method, false));
-                if (TypeUtils.isMethodAcceptingASingleReadStream(method.getParameters())) {
+                if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
                     shim.addMethod(new UniMethodReturningVertxGen(this, shim, method, true));
                 }
             } else if ((TypeUtils.isList(futureItemType) || TypeUtils.isSet(futureItemType))
@@ -68,7 +68,7 @@ public class UniMethodShimModule implements ShimModule {
                 shim.addMethod(new UniMethodReturningMapOfVertxGen(this, shim, method));
             } else {
                 shim.addMethod(new UniDelegatingMethod(this, shim, method, false));
-                if (TypeUtils.isMethodAcceptingASingleReadStream(method.getParameters())) {
+                if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
                     shim.addMethod(new UniDelegatingMethod(this, shim, method, true));
                 }
             }

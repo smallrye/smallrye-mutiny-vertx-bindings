@@ -681,6 +681,7 @@ public class ReadWriteStreamTest {
                             Future<String> acceptReadStreamOfVGAndReturnFutureOfString(ReadStream<Refed<I>> stream);
                             Refed<I> acceptReadStreamOfVGAndReturnVG(ReadStream<Refed<I>> stream);
                             String acceptReadStreamOfVGAndReturnString(ReadStream<Refed<I>> stream);
+                            Future<String> acceptMoreReturnFutureOfString(String s, ReadStream<Refed<I>> stream);
                         }
                         """)
                 .addModuleGen("org.acme", "my-module");
@@ -714,6 +715,11 @@ public class ReadWriteStreamTest {
                 m -> assertMethod(m, "acceptReadStreamOfVGAndReturnString", java.lang.String.class.getName(), readStreamOfVG));
         assertThat(methods).anySatisfy(
                 m -> assertMethod(m, "acceptReadStreamOfVGAndReturnString", java.lang.String.class.getName(), publisherOfVG));
+
+        assertThat(methods).anySatisfy(m -> assertMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, java.lang.String.class.getName(), readStreamOfVG));
+        assertThat(methods).anySatisfy(m -> assertMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, java.lang.String.class.getName(), publisherOfVG));
     }
 
     @Test
@@ -762,6 +768,14 @@ public class ReadWriteStreamTest {
                                    return null;
                             }
                             static String acceptReadStreamOfStringAndReturnString(ReadStream<String> stream) {
+                                   return null;
+                            }
+
+                            static  Future<String> acceptMoreReturnFutureOfString(ReadStream<String> stream, String s) {
+                                   return null;
+                            }
+
+                            static  Refed acceptMorefVGAndReturnVG(String s, ReadStream<Refed> stream) {
                                    return null;
                             }
                         }
@@ -820,6 +834,16 @@ public class ReadWriteStreamTest {
                 java.lang.String.class.getName(), readStreamOfString));
         assertThat(methods).anySatisfy(m -> assertMethod(m, "acceptReadStreamOfStringAndReturnString",
                 java.lang.String.class.getName(), publisherOfString));
+
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, readStreamOfString, java.lang.String.class.getName()));
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, publisherOfString, java.lang.String.class.getName()));
+
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMorefVGAndReturnVG",
+                VG, java.lang.String.class.getName(), readStreamOfVG));
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMorefVGAndReturnVG",
+                VG, java.lang.String.class.getName(), publisherOfVG));
     }
 
     @Test

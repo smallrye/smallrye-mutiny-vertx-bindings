@@ -210,12 +210,16 @@ public class TypeUtils {
                         .equals("io.vertx.core.Future");
     }
 
-    public static boolean isMethodAcceptingASingleReadStream(List<VertxGenMethod.ResolvedParameter> parameters) {
-        if (parameters.size() != 1) {
+    public static boolean hasMethodAReadStreamParameter(List<VertxGenMethod.ResolvedParameter> parameters) {
+        if (parameters.isEmpty()) {
             return false;
         }
-        ResolvedType type = parameters.get(0).type();
-        return isReadStream(type);
+        for (VertxGenMethod.ResolvedParameter parameter : parameters) {
+            if (isReadStream(parameter.type())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isPublisher(Type shimType) {
