@@ -101,7 +101,7 @@ public interface ContextAwareScheduler {
 
         private static Context captureCurrentContextOrFail() throws IllegalStateException {
             Context context = Vertx.currentContext();
-            if (context == null) {
+            if (context.getDelegate() == null) {
                 throw new IllegalStateException("There is no Vert.x context in the current thread: " + Thread.currentThread());
             }
             return context;
