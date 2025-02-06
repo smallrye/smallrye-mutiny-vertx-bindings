@@ -46,7 +46,7 @@ public class PlainMethodShimModule implements ShimModule {
 
             if (shim.getSource().getGenerator().getCollectionResult().isVertxGen(TypeUtils.getFullyQualifiedName(returnType))) {
                 shim.addMethod(new PlainMethodReturningVertxGen(this, shim, method, false));
-                if (TypeUtils.isMethodAcceptingASingleReadStream(method.getParameters())) {
+                if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
                     shim.addMethod(new PlainMethodReturningVertxGen(this, shim, method, true));
                 }
             } else if ((TypeUtils.isList(returnType) || TypeUtils.isSet(returnType))
@@ -57,12 +57,10 @@ public class PlainMethodShimModule implements ShimModule {
                         shim.getVertxGen(TypeUtils.getSecondParameterizedType(returnType))));
             } else {
                 shim.addMethod(new PlainDelegatingMethod(this, shim, method, false));
-                if (TypeUtils.isMethodAcceptingASingleReadStream(method.getParameters())) {
+                if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
                     shim.addMethod(new PlainDelegatingMethod(this, shim, method, true));
                 }
             }
-
-            //            // TODO: Consumer, Supplier, Iterable, Iterator, Handler, Function, etc.
         }
     }
 
@@ -136,10 +134,20 @@ public class PlainMethodShimModule implements ShimModule {
                             // The newInstance method does not have a type arg parameter if the type is not a parameterized type.
                             boolean isParameterized = TypeUtils.isParameterizedType(listOfOriginalTypeParameters.get(tp_index));
                             if (isParameterized) {
-
+                                List<ResolvedType> parameters = TypeUtils
+                                        .getTypeParameters(listOfOriginalTypeParameters.get(tp_index));
+                                int numberOfTypeArgs = parameters.size();
+                                StringBuilder p = new StringBuilder();
+                                for (int i = 0; i < numberOfTypeArgs; i++) {
+                                    if (p.isEmpty()) {
+                                        p = new StringBuilder("__typeArg_" + i);
+                                    } else {
+                                        p.append(", __typeArg_").append(i);
+                                    }
+                                }
                                 code.addStatement("""
                                         $T __arg_$L = new $T(
-                                            o -> $T.newInstance(($T)o, __typeArg_$L),
+                                            o -> $T.newInstance(($T)o, $L),
                                             o -> o.getDelegate()
                                         )
                                         """,
@@ -150,7 +158,7 @@ public class PlainMethodShimModule implements ShimModule {
                                         JavaType.of(
                                                 listOfOriginalTypeParameters.get(tp_index).asReferenceType().getQualifiedName())
                                                 .toTypeName(), // Cast type (bare and erased)
-                                        tp_index);
+                                        p);
                             } else {
                                 code.addStatement("""
                                         $T __arg_$L = new $T(
@@ -184,7 +192,7 @@ public class PlainMethodShimModule implements ShimModule {
                             JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
                             String.join(", ", localTypeVars));
                 } else {
-                    code.addStatement("return (_res == null) ? null : new $T(_res)",
+                    code.addStatement("return new $T(_res)",
                             shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
                                     : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName()).toTypeName());
                 }

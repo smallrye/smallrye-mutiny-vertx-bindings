@@ -189,12 +189,12 @@ public class PlainMethodReturningVertxGenTest {
         Class<?> shim = env.getClass("org.acme.mutiny.MyInterface");
         Object instance = env.invoke(shim, "create");
         assertThat(instance).isNotNull();
-        assertThat((Object) env.invoke(instance, "refed")).isNull();
+        assertThat((Object) env.invoke(instance, "refed")).isNotNull();
         assertThat((Object) env.invoke(instance, "list")).isNull();
         assertThat((Object) env.invoke(instance, "set")).isNull();
         assertThat((Object) env.invoke(instance, "map")).isNull();
 
-        assertThat((Object) env.invoke(shim, "staticRefed")).isNull();
+        assertThat((Object) env.invoke(shim, "staticRefed")).isNotNull();
         assertThat((Object) env.invoke(shim, "staticList")).isNull();
         assertThat((Object) env.invoke(shim, "staticSet")).isNull();
         assertThat((Object) env.invoke(shim, "staticMap")).isNull();

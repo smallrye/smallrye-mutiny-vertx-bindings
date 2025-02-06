@@ -11,6 +11,7 @@ import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.ShimConstants;
 import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenModule;
+import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
 
 public class VertxGenInterfaceConverter extends BaseShimTypeConverter {
@@ -49,7 +50,7 @@ public class VertxGenInterfaceConverter extends BaseShimTypeConverter {
                         Type converted = convert(value);
                         parameters.add(TypeDescriber.safeDescribeType(converted));
                     } else {
-                        parameters.add(value.asReferenceType().getQualifiedName());
+                        parameters.add(ResolvedTypeDescriber.describeResolvedType(value));
                     }
                 }
             }

@@ -681,6 +681,7 @@ public class ReadWriteStreamTest {
                             Future<String> acceptReadStreamOfVGAndReturnFutureOfString(ReadStream<Refed<I>> stream);
                             Refed<I> acceptReadStreamOfVGAndReturnVG(ReadStream<Refed<I>> stream);
                             String acceptReadStreamOfVGAndReturnString(ReadStream<Refed<I>> stream);
+                            Future<String> acceptMoreReturnFutureOfString(String s, ReadStream<Refed<I>> stream);
                         }
                         """)
                 .addModuleGen("org.acme", "my-module");
@@ -714,6 +715,11 @@ public class ReadWriteStreamTest {
                 m -> assertMethod(m, "acceptReadStreamOfVGAndReturnString", java.lang.String.class.getName(), readStreamOfVG));
         assertThat(methods).anySatisfy(
                 m -> assertMethod(m, "acceptReadStreamOfVGAndReturnString", java.lang.String.class.getName(), publisherOfVG));
+
+        assertThat(methods).anySatisfy(m -> assertMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, java.lang.String.class.getName(), readStreamOfVG));
+        assertThat(methods).anySatisfy(m -> assertMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, java.lang.String.class.getName(), publisherOfVG));
     }
 
     @Test
@@ -762,6 +768,14 @@ public class ReadWriteStreamTest {
                                    return null;
                             }
                             static String acceptReadStreamOfStringAndReturnString(ReadStream<String> stream) {
+                                   return null;
+                            }
+
+                            static  Future<String> acceptMoreReturnFutureOfString(ReadStream<String> stream, String s) {
+                                   return null;
+                            }
+
+                            static  Refed acceptMorefVGAndReturnVG(String s, ReadStream<Refed> stream) {
                                    return null;
                             }
                         }
@@ -820,6 +834,16 @@ public class ReadWriteStreamTest {
                 java.lang.String.class.getName(), readStreamOfString));
         assertThat(methods).anySatisfy(m -> assertMethod(m, "acceptReadStreamOfStringAndReturnString",
                 java.lang.String.class.getName(), publisherOfString));
+
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, readStreamOfString, java.lang.String.class.getName()));
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMoreReturnFutureOfString",
+                uniOfString, publisherOfString, java.lang.String.class.getName()));
+
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMorefVGAndReturnVG",
+                VG, java.lang.String.class.getName(), readStreamOfVG));
+        assertThat(methods).anySatisfy(m -> assertStaticMethod(m, "acceptMorefVGAndReturnVG",
+                VG, java.lang.String.class.getName(), publisherOfVG));
     }
 
     @Test
@@ -1012,6 +1036,47 @@ public class ReadWriteStreamTest {
                 .filter(m -> m.name().equals("pipe"))
                 .findFirst().orElseThrow();
         assertThat(pipe.toString()).doesNotContain("__typeArg_");
+    }
+
+    @Test
+    public void testNestedTypeParameter() {
+        Env env = new Env()
+                .addJavaCode("org.acme", "ChangeStreamDocument", """
+                        package org.acme;
+
+                        import io.vertx.codegen.annotations.VertxGen;
+
+                        public interface ChangeStreamDocument<T> {
+                            T getFullDocument();
+                        }
+                        """)
+                .addJavaCode("org.acme", "MyService", """
+                        package org.acme;
+
+                        import io.vertx.codegen.annotations.VertxGen;
+                        import io.vertx.core.streams.ReadStream;
+
+                        @VertxGen
+                        public interface MyService {
+                            ReadStream<ChangeStreamDocument<String>> watch();
+
+                            <T> ReadStream<ChangeStreamDocument<T>> foo(Class<T> clazz);
+                        }
+                        """)
+                .addModuleGen("org.acme", "my-module");
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
+        env.addOutputs(generator.generate());
+
+        MethodSpec method = env.getOutputFor("org.acme.MyService").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().startsWith("watch")).findFirst().orElseThrow();
+        assertThat(method.returnType().toString())
+                .isEqualTo("io.vertx.mutiny.core.streams.ReadStream<org.acme.ChangeStreamDocument<java.lang.String>>");
+
+        method = env.getOutputFor("org.acme.MyService").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().startsWith("foo")).findFirst().orElseThrow();
+        assertThat(method.returnType().toString())
+                .isEqualTo("io.vertx.mutiny.core.streams.ReadStream<org.acme.ChangeStreamDocument<T>>");
+
     }
 
     private void assertMethod(MethodSpec method, String name, String returnType, String... parameterTypes) {
