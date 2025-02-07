@@ -14,10 +14,14 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.Nullable;
 
 public class VertxGenMethod {
 
-    public record ResolvedParameter(String name, ResolvedType type) {
+    public record ResolvedParameter(String name, ResolvedType type, boolean nullable) {
+        public ResolvedParameter(String name, ResolvedType type) {
+            this(name, type, false);
+        }
     }
 
     private final MethodDeclaration method;
@@ -34,6 +38,8 @@ public class VertxGenMethod {
     private final boolean isFinal;
     private final List<ResolvedTypeParameterDeclaration> typeParameters;
 
+    private final boolean isReturnTypeNullable;
+
     public VertxGenMethod(MethodDeclaration method) {
         ResolvedMethodDeclaration resolved = method.resolve();
         this.method = method;
@@ -42,7 +48,8 @@ public class VertxGenMethod {
         this.parameters = new ArrayList<>();
         for (int i = 0; i < resolved.getNumberOfParams(); i++) {
             ResolvedParameterDeclaration param = resolved.getParam(i);
-            parameters.add(new ResolvedParameter(param.getName(), param.getType()));
+            parameters.add(new ResolvedParameter(param.getName(), param.getType(),
+                    method.getParameter(i).getAnnotationByClass(Nullable.class).isPresent()));
         }
         this.exceptions = resolved.getSpecifiedExceptions();
         this.typeParameters = resolved.getTypeParameters();
@@ -52,6 +59,8 @@ public class VertxGenMethod {
         this.isFluent = method.getAnnotationByClass(Fluent.class).isPresent();
         this.javadoc = method.getJavadoc().orElse(null);
         this.isFinal = method.isFinal();
+
+        this.isReturnTypeNullable = method.getAnnotationByClass(Nullable.class).isPresent();
     }
 
     public VertxGenMethod(MethodDeclaration decl, MethodUsage usage) {
@@ -62,6 +71,7 @@ public class VertxGenMethod {
         for (int i = 0; i < usage.getParamTypes().size(); i++) {
             ResolvedType type = usage.getParamTypes().get(i);
             String name = usage.getDeclaration().getParam(i).getName();
+            // We cannot parse Nullable annotation - considering false.
             parameters.add(new ResolvedParameter(name, type));
         }
         this.isStatic = usage.getDeclaration().isStatic();
@@ -72,11 +82,13 @@ public class VertxGenMethod {
             this.isFluent = method.getAnnotationByClass(Fluent.class).isPresent();
             this.javadoc = method.getJavadoc().orElse(null);
             this.isFinal = method.isFinal();
+            this.isReturnTypeNullable = method.getAnnotationByClass(Nullable.class).isPresent();
         } else {
             this.isFinal = false;
             this.isDeprecated = false;
             this.isFluent = false;
             this.javadoc = null;
+            this.isReturnTypeNullable = false;
         }
     }
 
@@ -122,5 +134,9 @@ public class VertxGenMethod {
 
     public boolean isFinal() {
         return isFinal;
+    }
+
+    public boolean isReturnTypeNullable() {
+        return isReturnTypeNullable;
     }
 }

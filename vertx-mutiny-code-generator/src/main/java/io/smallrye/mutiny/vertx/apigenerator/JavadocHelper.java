@@ -124,4 +124,27 @@ public class JavadocHelper {
             elements.add(element);
         }
     }
+
+    public static Javadoc amendJavadocIfReturnTypeIsNullable(Javadoc javadoc) {
+        if (javadoc == null) {
+            return null;
+        }
+        JavadocBlockTag tag = javadoc.getBlockTags().stream()
+                .filter(t -> t.getType() == JavadocBlockTag.Type.RETURN)
+                .findFirst().orElse(null);
+        if (tag == null) {
+            return javadoc;
+        }
+        String text = tag.getContent().toText();
+        if (text.contains("null")) {
+            return javadoc; // Already mentioned
+        }
+        if (!text.endsWith(".")) {
+            text += ".";
+        }
+        JavadocBlockTag newReturnTag = new JavadocBlockTag("return", text + " Can be {@code null}.");
+        javadoc.getBlockTags().remove(tag);
+        javadoc.addBlockTag(newReturnTag);
+        return javadoc;
+    }
 }

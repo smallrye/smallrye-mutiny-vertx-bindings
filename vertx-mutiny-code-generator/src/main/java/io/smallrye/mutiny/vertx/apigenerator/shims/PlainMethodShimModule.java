@@ -1,5 +1,7 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import static io.smallrye.mutiny.vertx.apigenerator.JavadocHelper.amendJavadocIfReturnTypeIsNullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,6 +83,9 @@ public class PlainMethodShimModule implements ShimModule {
                     method.getJavadoc(shim),
                     method);
             originalReturnType = method.getReturnedType();
+            if (method.isReturnTypeNullable()) {
+                setJavadoc(amendJavadocIfReturnTypeIsNullable(getJavadoc()));
+            }
         }
 
         @Override
@@ -187,14 +192,29 @@ public class PlainMethodShimModule implements ShimModule {
                     }
 
                     // Create the result using the `newInstance` call with the type args.
-                    code.addStatement("return (_res == null) ? null : $T.newInstance(($T)_res, $L)",
-                            JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
-                            JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
-                            String.join(", ", localTypeVars));
+                    if (getOriginalMethod().isReturnTypeNullable()) {
+                        code.addStatement("return (_res == null) ? null : $T.newInstance(($T)_res, $L)",
+                                JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
+                                JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
+                                String.join(", ", localTypeVars));
+                    } else {
+                        code.addStatement("return $T.newInstance(($T)_res, $L)",
+                                JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
+                                JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
+                                String.join(", ", localTypeVars));
+                    }
                 } else {
-                    code.addStatement("return new $T(_res)",
-                            shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
-                                    : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName()).toTypeName());
+                    if (getOriginalMethod().isReturnTypeNullable()) {
+                        code.addStatement("return (_res == null) ? null : new $T(_res)",
+                                shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
+                                        : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
+                                                .toTypeName());
+                    } else {
+                        code.addStatement("return new $T(_res)",
+                                shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
+                                        : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
+                                                .toTypeName());
+                    }
                 }
             }
 
@@ -223,6 +243,9 @@ public class PlainMethodShimModule implements ShimModule {
             this.isSet = isSet;
             this.itemType = TypeUtils.getFirstParameterizedType(method.getReturnedType());
             this.shimItemType = shim.convert(TypeUtils.getFirstParameterizedType(method.getReturnedType()));
+            if (method.isReturnTypeNullable()) {
+                setJavadoc(amendJavadocIfReturnTypeIsNullable(getJavadoc()));
+            }
         }
 
         @Override
@@ -291,6 +314,9 @@ public class PlainMethodShimModule implements ShimModule {
                     method);
             this.itemType = TypeUtils.getSecondParameterizedType(method.getReturnedType());
             this.shimItemType = shim.convert(TypeUtils.getSecondParameterizedType(method.getReturnedType()));
+            if (method.isReturnTypeNullable()) {
+                setJavadoc(amendJavadocIfReturnTypeIsNullable(getJavadoc()));
+            }
         }
 
         @Override
@@ -363,6 +389,9 @@ public class PlainMethodShimModule implements ShimModule {
                     method.getJavadoc(shim),
                     method);
             this.isVoid = method.getReturnedType().isVoid();
+            if (method.isReturnTypeNullable()) {
+                setJavadoc(amendJavadocIfReturnTypeIsNullable(getJavadoc()));
+            }
         }
 
         @Override

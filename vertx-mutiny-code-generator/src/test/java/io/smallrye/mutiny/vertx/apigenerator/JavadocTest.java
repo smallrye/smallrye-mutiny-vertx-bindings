@@ -59,4 +59,58 @@ public class JavadocTest {
                 .contains("org.acme.mutiny.foo.Refed");
     }
 
+    @Test
+    void ensureNoDoubleReturnWhenAmendingJavadocBecauseOfNullable() {
+        Env env = new Env()
+                .addModuleGen("org.acme", "test")
+                .addJavaCode("org.acme", "MyInterface", """
+                        package org.acme;
+                        import io.vertx.codegen.annotations.VertxGen;
+                        import io.vertx.codegen.annotations.Nullable;
+                        @VertxGen
+                        public interface MyInterface {
+                            /**
+                             * @return a {@link String}
+                             */
+                            @Nullable String foo();
+
+                             /**
+                             * @return a {@link String}, can be null.
+                             */
+                            @Nullable String bar();
+
+                          /**
+                           * Return the first trailer value with the specified name
+                           *
+                           * @param trailerName  the trailer name
+                           * @return the trailer value
+                           */
+                          @Nullable String getTrailer(String trailerName);
+                        }
+                        """);
+
+        MutinyGenerator generator = new MutinyGenerator(env.root());
+        env.addOutputs(generator.generate());
+        env.compile();
+
+        MethodSpec foo = env.getOutputFor("org.acme.MyInterface").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().equals("foo")).findFirst().orElseThrow();
+        assertThat(foo.toString())
+                .containsOnlyOnce("return a {@link String}")
+                .contains("Can be {@code null}");
+
+        MethodSpec bar = env.getOutputFor("org.acme.MyInterface").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().equals("bar")).findFirst().orElseThrow();
+        assertThat(bar.toString())
+                .containsOnlyOnce("return a {@link String}")
+                .doesNotContain("Can be {@code null}");
+
+        MethodSpec trailer = env.getOutputFor("org.acme.MyInterface").javaFile().typeSpec().methodSpecs().stream()
+                .filter(m -> m.name().equals("getTrailer")).findFirst().orElseThrow();
+
+        assertThat(trailer.toString())
+                .containsOnlyOnce("@param trailerName")
+                .containsOnlyOnce("@return the trailer value. Can be {@code null}.");
+    }
+
 }
