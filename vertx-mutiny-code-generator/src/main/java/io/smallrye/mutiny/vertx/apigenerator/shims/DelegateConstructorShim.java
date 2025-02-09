@@ -49,7 +49,7 @@ public class DelegateConstructorShim implements ShimModule {
         private final VertxGenInterface source;
 
         public DelegateConstructor(DelegateConstructorShim module, VertxGenInterface source) {
-            super(module, List.of(new ShimMethodParameter("delegate", source.getType(), null)));
+            super(module, List.of(new ShimMethodParameter("delegate", source.getType(), null, false)));
             this.source = source;
         }
 

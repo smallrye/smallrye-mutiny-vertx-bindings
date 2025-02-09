@@ -34,13 +34,13 @@ public class DelegateAsObjectAndTypeArgsConstructorShimModule implements ShimMod
         // Need to determine the method parameters
         List<ShimMethodParameter> parameters = new ArrayList<>();
         parameters.add(new ShimMethodParameter("delegate",
-                StaticJavaParser.parseClassOrInterfaceType(Object.class.getName()), null));
+                StaticJavaParser.parseClassOrInterfaceType(Object.class.getName()), null, false));
         int index = 0;
         for (TypeParameter tv : shim.getSource().getTypeParameters()) {
             parameters.add(new ShimMethodParameter("typeArg_" + index,
                     StaticJavaParser.parseClassOrInterfaceType(TypeArg.class.getName())
                             .setTypeArguments(StaticJavaParser.parseTypeParameter(tv.getNameAsString())),
-                    null));
+                    null, false));
             index++;
         }
         shim.addConstructor(new DelegateAndTypeArgsConstructor(this, shim.getSource(), parameters));

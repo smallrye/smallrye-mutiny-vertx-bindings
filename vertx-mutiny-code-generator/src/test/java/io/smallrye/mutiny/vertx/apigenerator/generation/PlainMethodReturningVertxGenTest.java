@@ -127,6 +127,7 @@ public class PlainMethodReturningVertxGenTest {
                         package org.acme;
 
                         import io.vertx.codegen.annotations.VertxGen;
+                        import io.vertx.codegen.annotations.Nullable;
                         import java.util.List;
                         import java.util.Map;
                         import java.util.Set;
@@ -134,11 +135,16 @@ public class PlainMethodReturningVertxGenTest {
                         @VertxGen
                         public interface MyInterface {
                             Refed refed();
+                            @Nullable Refed refedNullable();
                             List<Refed> list();
                             Set<Refed> set();
                             Map<String, Refed> map();
 
                             static Refed staticRefed() {
+                                return null;
+                            }
+
+                            static @Nullable Refed staticRefedNullable() {
                                 return null;
                             }
 
@@ -158,6 +164,11 @@ public class PlainMethodReturningVertxGenTest {
                                 return new MyInterface() {
                                     @Override
                                     public Refed refed() {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public Refed refedNullable() {
                                         return null;
                                     }
 
@@ -189,12 +200,14 @@ public class PlainMethodReturningVertxGenTest {
         Class<?> shim = env.getClass("org.acme.mutiny.MyInterface");
         Object instance = env.invoke(shim, "create");
         assertThat(instance).isNotNull();
-        assertThat((Object) env.invoke(instance, "refed")).isNotNull();
+        assertThat((Object) env.invoke(instance, "refed")).isNotNull(); // Not nullable
+        assertThat((Object) env.invoke(instance, "refedNullable")).isNull();
         assertThat((Object) env.invoke(instance, "list")).isNull();
         assertThat((Object) env.invoke(instance, "set")).isNull();
         assertThat((Object) env.invoke(instance, "map")).isNull();
 
         assertThat((Object) env.invoke(shim, "staticRefed")).isNotNull();
+        assertThat((Object) env.invoke(shim, "staticRefedNullable")).isNull();
         assertThat((Object) env.invoke(shim, "staticList")).isNull();
         assertThat((Object) env.invoke(shim, "staticSet")).isNull();
         assertThat((Object) env.invoke(shim, "staticMap")).isNull();

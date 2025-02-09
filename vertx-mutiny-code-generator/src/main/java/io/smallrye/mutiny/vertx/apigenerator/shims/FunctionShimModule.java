@@ -102,7 +102,7 @@ public class FunctionShimModule implements ShimModule {
                     module,
                     "apply",
                     shim.convert(originOutputType),
-                    List.of(new ShimMethodParameter("item", shim.convert(originItemType), originItemType)),
+                    List.of(new ShimMethodParameter("item", shim.convert(originItemType), originItemType, false)),
                     List.of(),
                     false, false, null, null);
         }

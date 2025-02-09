@@ -36,13 +36,13 @@ public class NewInstanceMethodShimModule implements ShimModule {
         shim.addMethod(new NewInstanceMethod(this, shim));
         if (!shim.getSource().getTypeParameters().isEmpty()) {
             List<ShimMethodParameter> parameters = new ArrayList<>();
-            parameters.add(new ShimMethodParameter("delegate", shim.getSource().getType(), null));
+            parameters.add(new ShimMethodParameter("delegate", shim.getSource().getType(), null, false));
             int index = 0;
             for (TypeParameter tv : shim.getSource().getTypeParameters()) {
                 parameters.add(new ShimMethodParameter("typeArg_" + index,
                         StaticJavaParser.parseClassOrInterfaceType(TypeArg.class.getName())
                                 .setTypeArguments(StaticJavaParser.parseTypeParameter(tv.getNameAsString())),
-                        null));
+                        null, false));
                 index++;
             }
             shim.addMethod(new NewInstanceMethodWithTypeArgs(this, shim, parameters));
@@ -71,7 +71,7 @@ public class NewInstanceMethodShimModule implements ShimModule {
             super(module,
                     "newInstance",
                     shim.getType(),
-                    List.of(new ShimMethodParameter("delegate", shim.getSource().getType(), null)),
+                    List.of(new ShimMethodParameter("delegate", shim.getSource().getType(), null, false)),
                     List.of(),
                     true,
                     false,

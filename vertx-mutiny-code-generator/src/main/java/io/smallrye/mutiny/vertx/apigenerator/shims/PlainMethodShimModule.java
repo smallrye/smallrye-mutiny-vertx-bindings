@@ -1,11 +1,14 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import static io.smallrye.mutiny.vertx.apigenerator.JavadocHelper.amendJavadocIfReturnTypeIsNullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.CodeBlock;
@@ -14,10 +17,12 @@ import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 
 import io.smallrye.mutiny.vertx.TypeArg;
+import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
 import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
@@ -64,6 +69,19 @@ public class PlainMethodShimModule implements ShimModule {
         }
     }
 
+    private static Javadoc adaptJavadoc(ShimClass shim, VertxGenMethod method, List<ShimMethodParameter> parameters) {
+        Javadoc javadoc = method.getJavadoc(shim);
+        if (method.isReturnTypeNullable()) {
+            javadoc = amendJavadocIfReturnTypeIsNullable(javadoc);
+        }
+        for (ShimMethodParameter parameter : parameters) {
+            if (parameter.nullable()) {
+                javadoc = JavadocHelper.amendJavadocIfParameterTypeIsNullable(javadoc, parameter);
+            }
+        }
+        return javadoc;
+    }
+
     private static class PlainMethodReturningVertxGen extends BaseShimMethod {
 
         private final ResolvedType originalReturnType;
@@ -81,6 +99,7 @@ public class PlainMethodShimModule implements ShimModule {
                     method.getJavadoc(shim),
                     method);
             originalReturnType = method.getReturnedType();
+            setJavadoc(adaptJavadoc(shim, method, getParameters()));
         }
 
         @Override
@@ -187,14 +206,29 @@ public class PlainMethodShimModule implements ShimModule {
                     }
 
                     // Create the result using the `newInstance` call with the type args.
-                    code.addStatement("return (_res == null) ? null : $T.newInstance(($T)_res, $L)",
-                            JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
-                            JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
-                            String.join(", ", localTypeVars));
+                    if (getOriginalMethod().isReturnTypeNullable()) {
+                        code.addStatement("return (_res == null) ? null : $T.newInstance(($T)_res, $L)",
+                                JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
+                                JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
+                                String.join(", ", localTypeVars));
+                    } else {
+                        code.addStatement("return $T.newInstance(($T)_res, $L)",
+                                JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
+                                JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName(),
+                                String.join(", ", localTypeVars));
+                    }
                 } else {
-                    code.addStatement("return new $T(_res)",
-                            shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
-                                    : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName()).toTypeName());
+                    if (getOriginalMethod().isReturnTypeNullable()) {
+                        code.addStatement("return (_res == null) ? null : new $T(_res)",
+                                shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
+                                        : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
+                                                .toTypeName());
+                    } else {
+                        code.addStatement("return new $T(_res)",
+                                shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
+                                        : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
+                                                .toTypeName());
+                    }
                 }
             }
 
@@ -223,6 +257,7 @@ public class PlainMethodShimModule implements ShimModule {
             this.isSet = isSet;
             this.itemType = TypeUtils.getFirstParameterizedType(method.getReturnedType());
             this.shimItemType = shim.convert(TypeUtils.getFirstParameterizedType(method.getReturnedType()));
+            setJavadoc(adaptJavadoc(shim, method, getParameters()));
         }
 
         @Override
@@ -291,6 +326,7 @@ public class PlainMethodShimModule implements ShimModule {
                     method);
             this.itemType = TypeUtils.getSecondParameterizedType(method.getReturnedType());
             this.shimItemType = shim.convert(TypeUtils.getSecondParameterizedType(method.getReturnedType()));
+            setJavadoc(adaptJavadoc(shim, method, getParameters()));
         }
 
         @Override
@@ -363,6 +399,7 @@ public class PlainMethodShimModule implements ShimModule {
                     method.getJavadoc(shim),
                     method);
             this.isVoid = method.getReturnedType().isVoid();
+            setJavadoc(adaptJavadoc(shim, method, getParameters()));
         }
 
         @Override
