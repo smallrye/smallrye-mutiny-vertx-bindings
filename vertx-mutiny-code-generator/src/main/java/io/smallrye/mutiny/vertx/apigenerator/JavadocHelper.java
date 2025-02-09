@@ -10,6 +10,7 @@ import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
 
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
 
 public class JavadocHelper {
@@ -146,5 +147,36 @@ public class JavadocHelper {
         javadoc.getBlockTags().remove(tag);
         javadoc.addBlockTag(newReturnTag);
         return javadoc;
+    }
+
+    public static Javadoc amendJavadocIfParameterTypeIsNullable(Javadoc javadoc, ShimMethodParameter parameter) {
+        if (javadoc == null) {
+            return null;
+        }
+        if (parameter.nullable()) {
+            // Get associated parameter tag
+            JavadocBlockTag tag = javadoc.getBlockTags().stream()
+                    .filter(t -> t.getType() == JavadocBlockTag.Type.PARAM && t.getName().orElse("").equals(parameter.name()))
+                    .findFirst().orElse(null);
+            if (tag == null) {
+                return javadoc;
+            } else {
+                String text = tag.getContent().toText();
+                if (text.contains("null")) {
+                    return javadoc; // Already mentioned
+                }
+                if (!text.endsWith(".")) {
+                    text += ".";
+                }
+                JavadocBlockTag newTag = JavadocBlockTag.createParamBlockTag(parameter.name(), text + " Can be {@code null}.");
+                // We need to place the new tag at the same index as the old one.
+                int idx = javadoc.getBlockTags().indexOf(tag);
+                javadoc.getBlockTags().remove(tag);
+                javadoc.getBlockTags().add(idx, newTag);
+                return javadoc;
+            }
+        } else {
+            return javadoc;
+        }
     }
 }

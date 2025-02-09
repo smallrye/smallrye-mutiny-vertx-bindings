@@ -75,6 +75,18 @@ public class UniMethodShimModule implements ShimModule {
         }
     }
 
+    private static Javadoc adaptParameterJavadoc(ShimClass shim, Javadoc javadoc, List<ShimMethodParameter> parameters) {
+        if (javadoc == null) {
+            return null;
+        }
+        for (ShimMethodParameter parameter : parameters) {
+            if (parameter.nullable()) {
+                javadoc = JavadocHelper.amendJavadocIfParameterTypeIsNullable(javadoc, parameter);
+            }
+        }
+        return javadoc;
+    }
+
     private static Javadoc adaptJavadocToUni(ShimClass shim, VertxGenMethod method) {
         var jd = JavadocHelper.addToJavadoc(method.getJavadoc(shim), """
                 <p>
@@ -169,6 +181,7 @@ public class UniMethodShimModule implements ShimModule {
                     method);
             itemType = TypeUtils.getFirstParameterizedType(getOriginalMethod().getReturnedType());
             shimItemType = shim.convert(itemType);
+            setJavadoc(adaptParameterJavadoc(shim, getJavadoc(), getParameters()));
         }
 
         @Override
@@ -253,6 +266,7 @@ public class UniMethodShimModule implements ShimModule {
                     .getFirstParameterizedType(TypeUtils.getFirstParameterizedType(getOriginalMethod().getReturnedType())));
             this.originalElementType = TypeUtils
                     .getFirstParameterizedType(TypeUtils.getFirstParameterizedType(getOriginalMethod().getReturnedType()));
+            setJavadoc(adaptParameterJavadoc(shim, getJavadoc(), getParameters()));
         }
 
         @Override
@@ -339,6 +353,7 @@ public class UniMethodShimModule implements ShimModule {
             var map = TypeUtils.getFirstParameterizedType(future);
             originalValueType = TypeUtils.getSecondParameterizedType(map);
             this.shimValueType = shim.convert(originalValueType);
+            setJavadoc(adaptParameterJavadoc(shim, getJavadoc(), getParameters()));
         }
 
         @Override
@@ -428,6 +443,7 @@ public class UniMethodShimModule implements ShimModule {
             ResolvedType paramType = TypeUtils.getFirstParameterizedType(originalReturnType);
             this.shimElementType = shim.convert(paramType);
             this.originalJavadoc = method.getJavadoc(shim);
+            setJavadoc(adaptParameterJavadoc(shim, getJavadoc(), getParameters()));
         }
 
         @Override
