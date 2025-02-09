@@ -12,7 +12,7 @@ import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 
-public record ShimMethodParameter(String name, Type shimType, ResolvedType originalType) {
+public record ShimMethodParameter(String name, Type shimType, ResolvedType originalType, boolean nullable) {
 
     public static final String DELEGATING_CONSUMER_HANDLER = "io.smallrye.mutiny.vertx.DelegatingConsumerHandler";
     public static final String DELEGATING_HANDLER = "io.smallrye.mutiny.vertx.DelegatingHandler";
@@ -60,15 +60,31 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
         }
 
         if (shim.isVertxGen(originalType)) {
-            return CodeBlock.builder().addStatement("$T $L = $L.getDelegate()",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name).build();
+            if (nullable) {
+                return CodeBlock.builder().addStatement("$T $L = $L == null ? null : $L.getDelegate()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name).build();
+            } else {
+                return CodeBlock.builder().addStatement("$T $L = $L.getDelegate()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name).build();
+            }
         } else {
-            return CodeBlock.builder().addStatement("$T $L = $L",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name).build();
+            if (nullable) {
+                return CodeBlock.builder().addStatement("$T $L = $L == null ? null : $L",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name).build();
+            } else {
+                return CodeBlock.builder().addStatement("$T $L = $L",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name).build();
+            }
         }
 
     }
@@ -83,6 +99,7 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
 
         // If neither the input nor the output is a Vert.x Gen, we can use the function as is.
         if (!inputIsVertxGen && !outputIsVertxGen && !isOutputFuture) {
+            // No nullable case - we can use the function as is, and if null, it will be null.
             return builder.addStatement("$T $L = $L",
                     JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
                     varname,
@@ -93,28 +110,56 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
             // The output is a future - we need to check if it's a Future of Vert.x Gen
             boolean futureOfVertxGen = shim.isVertxGen(TypeUtils.getFirstParameterizedType(output));
             if (futureOfVertxGen) {
-                return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(item).map(i -> i.getDelegate()))",
-                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                        varname,
-                        UNI_HELPER_TYPE_NAME,
-                        name).build();
+                if (nullable) {
+                    return builder.addStatement(
+                            "$T $L = $L == null ? null : item -> $T.toFuture($L.apply(item).map(i -> i.getDelegate()))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            name,
+                            UNI_HELPER_TYPE_NAME,
+                            name).build();
+                } else {
+                    return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(item).map(i -> i.getDelegate()))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            UNI_HELPER_TYPE_NAME,
+                            name).build();
+                }
             } else {
-                return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(item))",
-                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                        varname,
-                        UNI_HELPER_TYPE_NAME,
-                        name).build();
+                if (nullable) {
+                    return builder.addStatement("$T $L = $L == null ? null : item -> $T.toFuture($L.apply(item))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            name,
+                            UNI_HELPER_TYPE_NAME,
+                            name).build();
+                } else {
+                    return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(item))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            UNI_HELPER_TYPE_NAME,
+                            name).build();
+                }
             }
         }
 
         // The input is Vert.x Gen,  but not the output.
         if (inputIsVertxGen && !outputIsVertxGen && !isOutputFuture) {
             TypeName shimClassTypeName = JavaType.of(shim.getVertxGen(input).getShimClassName()).toTypeName();
-            return builder.addStatement("$T $L = item -> $L.apply(new $T(item))",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name,
-                    shimClassTypeName).build();
+            if (nullable) {
+                return builder.addStatement("$T $L = $L == null ? null : item -> $L.apply(new $T(item))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name,
+                        shimClassTypeName).build();
+            } else {
+                return builder.addStatement("$T $L = item -> $L.apply(new $T(item))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        shimClassTypeName).build();
+            }
         }
 
         if (inputIsVertxGen && !outputIsVertxGen) {
@@ -122,49 +167,96 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
             boolean futureOfVertxGen = shim.isVertxGen(TypeUtils.getFirstParameterizedType(output));
             if (futureOfVertxGen) {
                 TypeName shimClassTypeName = JavaType.of(shim.getVertxGen(input).getShimClassName()).toTypeName();
-                return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(new $T(item)).map(i -> i.getDelegate()))",
-                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                        varname,
-                        UNI_HELPER_TYPE_NAME,
-                        name,
-                        shimClassTypeName).build();
+                if (nullable) {
+                    return builder.addStatement(
+                            "$T $L = $L == null ? null : item -> $T.toFuture($L.apply(new $T(item)).map(i -> i.getDelegate()))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            name,
+                            UNI_HELPER_TYPE_NAME,
+                            name,
+                            shimClassTypeName).build();
+                } else {
+                    return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(new $T(item)).map(i -> i.getDelegate()))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            UNI_HELPER_TYPE_NAME,
+                            name,
+                            shimClassTypeName).build();
+                }
             } else {
                 TypeName shimClassTypeName = JavaType.of(shim.getVertxGen(input).getShimClassName()).toTypeName();
-                return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(new $T(item)))",
-                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                        varname,
-                        UNI_HELPER_TYPE_NAME,
-                        name,
-                        shimClassTypeName).build();
+                if (nullable) {
+                    return builder.addStatement("$T $L = $L == null ? null : item -> $T.toFuture($L.apply(new $T(item)))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            name,
+                            UNI_HELPER_TYPE_NAME,
+                            name,
+                            shimClassTypeName).build();
+                } else {
+                    return builder.addStatement("$T $L = item -> $T.toFuture($L.apply(new $T(item)))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            UNI_HELPER_TYPE_NAME,
+                            name,
+                            shimClassTypeName).build();
+                }
             }
         }
 
         // The output is Vert.x Gen (we need to unwrap the output), but not the input.
         if (!inputIsVertxGen) {
-            return builder.addStatement("$T $L = item -> $L.apply(item).getDelegate()",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name).build();
+            if (nullable) {
+                return builder.addStatement("$T $L = $L == null ? null : item -> $L.apply(item).getDelegate()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name).build();
+            } else {
+                return builder.addStatement("$T $L = item -> $L.apply(item).getDelegate()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name).build();
+            }
         }
 
         TypeName shimClassTypeName = JavaType.of(shim.getVertxGen(input).getShimClassName()).toTypeName();
         // Both the input and the output are Vert.x Gen, we need to unwrap the input and wrap the output.
-        return builder.addStatement("$T $L = item -> $L.apply(new $T(item)).getDelegate()",
-                JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                varname,
-                name,
-                shimClassTypeName)
-                .build();
+        if (nullable) {
+            return builder.addStatement("$T $L = $L == null ? null : item -> $L.apply(new $T(item)).getDelegate()",
+                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                    varname,
+                    name,
+                    name,
+                    shimClassTypeName)
+                    .build();
+        } else {
+            return builder.addStatement("$T $L = item -> $L.apply(new $T(item)).getDelegate()",
+                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                    varname,
+                    name,
+                    shimClassTypeName)
+                    .build();
+        }
 
     }
 
     private CodeBlock handlerParameterOfTypeSupplier(ShimClass shim, String varname) {
         var builder = CodeBlock.builder();
         if (shim.isVertxGen(TypeUtils.getFirstParameterizedType(originalType))) {
-            builder.addStatement("$T $L = () -> $L.getDelegate()))",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name);
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : () -> $L.get().getDelegate()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name);
+            } else {
+                builder.addStatement("$T $L = () -> $L.get().getDelegate()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name);
+            }
         } else {
             builder.addStatement("$T $L = $L",
                     JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
@@ -177,30 +269,61 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
     private CodeBlock handleParameterOfTypeSupplierOfFuture(ShimClass shim, String varname) {
         var builder = CodeBlock.builder();
         if (shim.isVertxGen(TypeUtils.getFirstParameterizedType(TypeUtils.getFirstParameterizedType(originalType)))) {
-            builder.addStatement("$T $L = () -> $T.toFuture($L.get().map(i -> i.getDelegate()))",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    UNI_HELPER_TYPE_NAME,
-                    name);
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : () -> $T.toFuture($L.get().map(i -> i.getDelegate()))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        UNI_HELPER_TYPE_NAME,
+                        name);
+            } else {
+                builder.addStatement("$T $L = () -> $T.toFuture($L.get().map(i -> i.getDelegate()))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        UNI_HELPER_TYPE_NAME,
+                        name);
+            }
         } else {
-            builder.addStatement("$T $L = () -> $T.toFuture($L.get())",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    UNI_HELPER_TYPE_NAME,
-                    name);
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : () -> $T.toFuture($L.get())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        UNI_HELPER_TYPE_NAME,
+                        name);
+            } else {
+                builder.addStatement("$T $L = () -> $T.toFuture($L.get())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        UNI_HELPER_TYPE_NAME,
+                        name);
+            }
         }
         return builder.build();
     }
 
     private CodeBlock handleParameterOfTypeConsumer(ShimClass shim, String varname) {
         var builder = CodeBlock.builder();
-        if (shim.isVertxGen(TypeUtils.getFirstParameterizedType(originalType))) {
+        ResolvedType typeOfConsumedItems = TypeUtils.getFirstParameterizedType(originalType);
+        if (shim.isVertxGen(typeOfConsumedItems)) {
             // We have a Consumer of Vert.x Gen type, we need to unwrap each item.
-            builder.addStatement("$T $L = item -> $L.accept(item.getDelegate())",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name);
+            TypeName shimClassTypeName = JavaType.of(shim.getVertxGen(typeOfConsumedItems).getShimClassName()).toTypeName();
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : item -> $L.accept(new $T(item))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name,
+                        shimClassTypeName);
+            } else {
+                builder.addStatement("$T $L = item -> $L.accept(new $T(item))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        shimClassTypeName);
+            }
         } else {
+            // Reuse the consumer as is - no need to check for nullable, it will be `null` in this case.
             builder.addStatement("$T $L = $L",
                     JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
                     varname,
@@ -213,12 +336,22 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
         var builder = CodeBlock.builder();
         if (shim.isVertxGen(TypeUtils.getSecondParameterizedType(originalType))) {
             // We have a Map of Vert.x Gen type, we need to unwrap each item.
-            builder.addStatement(
-                    "$T $L = $L.entrySet().stream().collect($T.toMap(java.util.Map.Entry::getKey, entry -> entry.getValue().getDelegate()))",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name,
-                    Collectors.class);
+            if (nullable) {
+                builder.addStatement(
+                        "$T $L = $L == null ? null : $L.entrySet().stream().collect($T.toMap(java.util.Map.Entry::getKey, entry -> entry.getValue().getDelegate()))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name,
+                        Collectors.class);
+            } else {
+                builder.addStatement(
+                        "$T $L = $L.entrySet().stream().collect($T.toMap(java.util.Map.Entry::getKey, entry -> entry.getValue().getDelegate()))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        Collectors.class);
+            }
         } else {
             builder.addStatement("$T $L = $L",
                     JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
@@ -232,11 +365,21 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
         var builder = CodeBlock.builder();
         if (shim.isVertxGen(TypeUtils.getFirstParameterizedType(originalType))) {
             // We have a List of Vert.x Gen type, we need to unwrap each item.
-            builder.addStatement("$T $L = $L.stream().map(item -> item.getDelegate()).collect($T.toList())",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name,
-                    Collectors.class);
+            if (nullable) {
+                builder.addStatement(
+                        "$T $L = $L == null ? null : $L.stream().map(item -> item.getDelegate()).collect($T.toList())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name,
+                        Collectors.class);
+            } else {
+                builder.addStatement("$T $L = $L.stream().map(item -> item.getDelegate()).collect($T.toList())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        Collectors.class);
+            }
         } else {
             builder.addStatement("$T $L = $L",
                     JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
@@ -250,11 +393,21 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
         var builder = CodeBlock.builder();
         if (shim.isVertxGen(TypeUtils.getFirstParameterizedType(originalType))) {
             // We have a Set of Vert.x Gen type, we need to unwrap each item.
-            builder.addStatement("$T $L = $L.stream().map(item -> item.getDelegate()).collect($T.toSet())",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name,
-                    Collectors.class);
+            if (nullable) {
+                builder.addStatement(
+                        "$T $L = $L == null ? null : $L.stream().map(item -> item.getDelegate()).collect($T.toSet())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name,
+                        Collectors.class);
+            } else {
+                builder.addStatement("$T $L = $L.stream().map(item -> item.getDelegate()).collect($T.toSet())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        Collectors.class);
+            }
         } else {
             builder.addStatement("$T $L = $L",
                     JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
@@ -271,28 +424,55 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
 
         if (type.isVoid() || type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(Void.class.getName())) {
             // We have a handler of Void, the parameter is a runnable
-            builder.addStatement("$T $L = _ignored -> $L.run()",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    name);
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : (_ignored -> $L.run())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        name);
+            } else {
+                builder.addStatement("$T $L = _ignored -> $L.run()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name);
+            }
         } else if (!shim.isVertxGen(type)) {
             // If the original type is a handler and the type does not require conversion, we need to wrap it into a DelegatingHandler
-            builder.addStatement("$T $L = new $T<>($L)",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
-                    name);
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : new $T<>($L)",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
+                        name);
+            } else {
+                builder.addStatement("$T $L = new $T<>($L)",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
+                        name);
+            }
         } else {
             // If the original type is a handler and the type requires conversion, we need to wrap it into a DelegatingHandler and a DelegatingConsumerHandler
             TypeName shimClassTypeName = JavaType.of(shim.getVertxGen(type).getShimClassName()).toTypeName();
-
-            builder.addStatement("$T $L = new $T<>(new $T<>($L), item -> new $T(item))",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    DELEGATING_HANDLER_TYPE_NAME,
-                    DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
-                    name,
-                    shimClassTypeName);
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : new $T<>(new $T<>($L), item -> new $T(item))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name,
+                        DELEGATING_HANDLER_TYPE_NAME,
+                        DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
+                        name,
+                        shimClassTypeName);
+            } else {
+                builder.addStatement("$T $L = new $T<>(new $T<>($L), item -> new $T(item))",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        DELEGATING_HANDLER_TYPE_NAME,
+                        DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
+                        name,
+                        shimClassTypeName);
+            }
         }
         return builder.build();
     }
@@ -301,18 +481,37 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
         CodeBlock.Builder builder = CodeBlock.builder();
         ResolvedType originalItemType = TypeUtils.getFirstParameterizedType(originalType);
         if (shim.isVertxGen(originalItemType)) {
-            builder.addStatement("$T $L = $T.asReadStream($L, obj -> ($T) obj.getDelegate())",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    ReadStreamSubscriber.class,
-                    name(),
-                    JavaType.of((ResolvedTypeDescriber.describeResolvedType(originalItemType))).toTypeName());
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? null : $T.asReadStream($L, obj -> ($T) obj.getDelegate())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name(),
+                        ReadStreamSubscriber.class,
+                        name(),
+                        JavaType.of((ResolvedTypeDescriber.describeResolvedType(originalItemType))).toTypeName());
+            } else {
+                builder.addStatement("$T $L = $T.asReadStream($L, obj -> ($T) obj.getDelegate())",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        ReadStreamSubscriber.class,
+                        name(),
+                        JavaType.of((ResolvedTypeDescriber.describeResolvedType(originalItemType))).toTypeName());
+            }
         } else {
-            builder.addStatement("$T $L = $T.asReadStream($L, obj -> obj).resume()",
-                    JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                    varname,
-                    ReadStreamSubscriber.class,
-                    name());
+            if (nullable) {
+                builder.addStatement("$T $L = $L == null ? $T.asReadStream($L, obj -> obj).resume()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        name(),
+                        ReadStreamSubscriber.class,
+                        name());
+            } else {
+                builder.addStatement("$T $L = $T.asReadStream($L, obj -> obj).resume()",
+                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                        varname,
+                        ReadStreamSubscriber.class,
+                        name());
+            }
         }
         return builder.build();
     }

@@ -39,7 +39,7 @@ public class TypeUtils {
             } else {
                 shimParameterType = shim.convert(parameter.type());
             }
-            params.add(new ShimMethodParameter(parameter.name(), shimParameterType, parameter.type()));
+            params.add(new ShimMethodParameter(parameter.name(), shimParameterType, parameter.type(), parameter.nullable()));
         }
         return params;
     }

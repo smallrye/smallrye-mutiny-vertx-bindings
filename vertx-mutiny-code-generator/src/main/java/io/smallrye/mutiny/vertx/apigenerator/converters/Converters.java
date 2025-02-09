@@ -33,6 +33,7 @@ public class Converters {
         converters.add(new VertxHandlerConverter().configure(generator));
         converters.add(new VertxAsyncResultConverter().configure(generator));
         converters.add(new FunctionConverter().configure(generator));
+        converters.add(new ConsumerConverter().configure(generator));
     }
 
     public Type convert(ResolvedType type) {

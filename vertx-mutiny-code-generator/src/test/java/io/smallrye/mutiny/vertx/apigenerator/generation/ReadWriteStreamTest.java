@@ -581,28 +581,34 @@ public class ReadWriteStreamTest {
                         public interface Refed {
                         }
                         """)
-                .addJavaCode("org.acme", "MyInterface.java", """
-                        package org.acme;
+                .addJavaCode("org.acme", "MyInterface.java",
+                        """
+                                package org.acme;
 
-                        import io.vertx.core.streams.ReadStream;
-                        import io.vertx.codegen.annotations.VertxGen;
-                        import io.vertx.core.Future;
+                                import io.vertx.core.streams.ReadStream;
+                                import io.vertx.codegen.annotations.VertxGen;
+                                import io.vertx.core.Future;
+                                import io.vertx.codegen.annotations.Nullable;
 
-                        @VertxGen
-                        public interface MyInterface {
-                            Future<Refed> acceptReadStreamOfVGAndReturnFutureOfVG(ReadStream<Refed> stream);
-                            Future<Refed> acceptReadStreamOfStringAndReturnFutureOfVG(ReadStream<String> stream);
+                                @VertxGen
+                                public interface MyInterface {
+                                    Future<Refed> acceptReadStreamOfVGAndReturnFutureOfVG(ReadStream<Refed> stream);
+                                    Future<Refed> acceptReadStreamOfStringAndReturnFutureOfVG(ReadStream<String> stream);
 
-                            Future<String> acceptReadStreamOfVGAndReturnFutureOfString(ReadStream<Refed> stream);
-                            Future<String> acceptReadStreamOfStringAndReturnFutureOfString(ReadStream<String> stream);
+                                    // Just there to verify generation.
+                                    Future<Refed> acceptReadStreamOfVGAndReturnFutureOfVGNullable(@Nullable ReadStream<Refed> stream);
+                                    Future<Refed> acceptReadStreamOfStringAndReturnFutureOfVGNullable(@Nullable ReadStream<String> stream);
 
-                            Refed acceptReadStreamOfVGAndReturnVG(ReadStream<Refed> stream);
-                            Refed acceptReadStreamOfStringAndReturnVG(ReadStream<String> stream);
+                                    Future<String> acceptReadStreamOfVGAndReturnFutureOfString(ReadStream<Refed> stream);
+                                    Future<String> acceptReadStreamOfStringAndReturnFutureOfString(ReadStream<String> stream);
 
-                            String acceptReadStreamOfVGAndReturnString(ReadStream<Refed> stream);
-                            String acceptReadStreamOfStringAndReturnString(ReadStream<String> stream);
-                        }
-                        """)
+                                    Refed acceptReadStreamOfVGAndReturnVG(ReadStream<Refed> stream);
+                                    Refed acceptReadStreamOfStringAndReturnVG(ReadStream<String> stream);
+
+                                    String acceptReadStreamOfVGAndReturnString(ReadStream<Refed> stream);
+                                    String acceptReadStreamOfStringAndReturnString(ReadStream<String> stream);
+                                }
+                                """)
                 .addModuleGen("org.acme", "my-module");
 
         MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
