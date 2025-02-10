@@ -9,6 +9,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimField;
@@ -68,7 +69,8 @@ public class DelegateShimModule implements ShimModule {
         public void generate(ShimClass shim, TypeSpec.Builder builder) {
             MethodSpec.Builder method = MethodSpec.methodBuilder(getName());
             method.addModifiers(javax.lang.model.element.Modifier.PUBLIC);
-            method.returns(Shim.getTypeNameFromType(getReturnType()));
+            TypeName erased = Shim.getTypeNameFromType(StaticJavaParser.parseType(getReturnType().asClassOrInterfaceType().getNameWithScope()));
+            method.returns(erased);
             method.addStatement("return delegate");
             addGetDelegateJavadoc(method);
             builder.addMethod(method.build());

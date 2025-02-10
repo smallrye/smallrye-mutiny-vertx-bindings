@@ -47,6 +47,7 @@ public class UniMethodShimModule implements ShimModule {
     public void analyze(ShimClass shim) {
         for (VertxGenMethod method : shim.getSource().getMethods()) {
             ResolvedType returnType = method.getReturnedType();
+            System.out.println("Method is " + method.getMethod().getDeclarationAsString() + " " + returnType);
             // Exclude method returning a Future
             if (!TypeUtils.isFuture(returnType)) {
                 continue;

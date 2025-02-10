@@ -31,7 +31,7 @@
                         <module>vertx-mutiny-kafka-client</module>
                         <module>vertx-mutiny-amqp-client</module>
                         <module>vertx-mutiny-rabbitmq-client</module>
-        <!--                <module>vertx-mutiny-sql-client</module>-->
+                        <module>vertx-mutiny-sql-client</module>
         <!--                <module>vertx-mutiny-db2-client</module>-->
         <!--                <module>vertx-mutiny-pg-client</module>-->
         <!--                <module>vertx-mutiny-mssql-client</module>-->

@@ -71,6 +71,11 @@ public class IterableShimModule implements ShimModule {
             return;
         }
 
+        // Check that the source does not define an `iterator` method.
+        if (shim.getSource().hasMethod("iterator", List.of())) {
+            return;
+        }
+
         shim.addMethod(new IteratorMethod(this, typeOfItems, converted, isItemVertxGen));
         shim.addMethod(new ToMultiMethod(this, converted));
     }

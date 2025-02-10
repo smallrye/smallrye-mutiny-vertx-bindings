@@ -9,6 +9,7 @@ import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
+import com.github.javaparser.resolution.model.typesystem.LazyType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
@@ -44,7 +45,8 @@ public class VertxGenMethod {
         ResolvedMethodDeclaration resolved = method.resolve();
         this.method = method;
         this.methodName = resolved.getName();
-        this.returnedType = resolved.getReturnType();
+        this.returnedType = method.getType().resolve();
+        System.out.println("Return type  of method " + methodName + " is " + returnedType);
         this.parameters = new ArrayList<>();
         for (int i = 0; i < resolved.getNumberOfParams(); i++) {
             ResolvedParameterDeclaration param = resolved.getParam(i);
@@ -66,7 +68,14 @@ public class VertxGenMethod {
     public VertxGenMethod(MethodDeclaration decl, MethodUsage usage) {
         this.method = decl;
         this.methodName = usage.getName();
-        this.returnedType = usage.returnType();
+        if (usage.returnType() instanceof LazyType) {
+            System.out.println(decl.getTypeParameters());
+            System.out.println(decl.getType() + " / " + decl.getType().asClassOrInterfaceType());
+            this.returnedType = decl.getType().resolve();
+        } else {
+            this.returnedType = usage.returnType();
+        }
+        System.out.println("Usage based: Return type  of method " + methodName + " is " + returnedType);
         this.parameters = new ArrayList<>();
         for (int i = 0; i < usage.getParamTypes().size(); i++) {
             ResolvedType type = usage.getParamTypes().get(i);

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.javaparser.resolution.model.typesystem.LazyType;
+import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,8 +250,8 @@ public class VertxGenCollection {
                     }
 
                     // So, the method is legit and should be considered.
-                    // If the method is declared on an interface that has type parameters, we need to see how they are mapped to the type parameters of the interface
-
+                    // If the method is declared on an interface that has type parameters, we need to see how they are mapped to the type parameters of the interface.
+                    System.out.println("Class type parameters: " + typeParameterMapping + " / " + typeDeclaringMethod.getTypeParameters());
                     if (typeDeclaringMethod.getTypeParameters().isEmpty()) {
                         // No type parameters, we can add the method directly, but we need to check if it conflicts with an existing method
                         if (!isMethodAlreadyInList(resolvedDeclaration, methods)) {
@@ -259,9 +261,16 @@ public class VertxGenCollection {
                         // We have type parameters, we need to see how they are mapped to our interface.
                         MethodUsage copy = method;
                         for (ResolvedTypeParameterDeclaration p : typeDeclaringMethod.getTypeParameters()) {
+                            ResolvedType type = typeParameterMapping.get(typeDeclaringMethod.getQualifiedName() + "." + p.getName());
+                            if (type instanceof LazyType) {
+                                // Not known yet, we need to resolve it.
+                                type = ((LazyType) type).getType();
+                            }
                             copy = copy.replaceTypeParameter(p,
-                                    typeParameterMapping.get(typeDeclaringMethod.getQualifiedName() + "." + p.getName()));
+                                    type);
                         }
+
+                        System.out.println("copy is " + copy.getQualifiedSignature());
 
                         // The method is updated, we need to see if it conflicts.
                         if (!isMethodAlreadyInList(copy, methods)) {
@@ -282,6 +291,7 @@ public class VertxGenCollection {
     }
 
     private boolean isMethodAlreadyInList(MethodUsage copy, List<VertxGenMethod> methods) {
+        System.out.println("Method to be added: " + copy.getQualifiedSignature() + " / " + copy.returnType());
         // First look at the method by name
         for (VertxGenMethod method : methods) {
             if (method.getName().equals(copy.getName())) {
