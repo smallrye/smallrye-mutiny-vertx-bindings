@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.redpanda.RedpandaContainer;
 
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;
@@ -21,7 +21,7 @@ import io.vertx.mutiny.kafka.client.producer.KafkaProducerRecord;
 
 class KafkaClientTest {
 
-    static KafkaContainer container = new KafkaContainer();
+    static RedpandaContainer container = new RedpandaContainer("docker.redpanda.com/redpandadata/redpanda:latest");
 
     static Vertx vertx;
 
