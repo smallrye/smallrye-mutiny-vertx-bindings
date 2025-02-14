@@ -1,7 +1,7 @@
 package io.vertx.mutiny.uritemplate;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.uritemplate.UriTemplate;
 import io.vertx.uritemplate.Variables;
