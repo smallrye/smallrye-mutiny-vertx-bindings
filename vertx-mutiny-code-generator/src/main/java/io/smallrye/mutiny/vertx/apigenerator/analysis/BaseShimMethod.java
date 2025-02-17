@@ -131,7 +131,8 @@ public class BaseShimMethod implements ShimMethod {
             method.addAnnotation(Deprecated.class);
         }
         if (getJavadoc() != null) {
-            method.addJavadoc(getJavadoc().toText());
+            // We need to sanitize text like '$i' for JavaPoet
+            method.addJavadoc(getJavadoc().toText().replace("$", "$$"));
         }
         method.addModifiers(Modifier.PUBLIC);
         if (isStatic()) {
