@@ -13,6 +13,8 @@ import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 
+import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
+
 public class BaseShimField implements ShimField {
 
     private final String name;
@@ -76,7 +78,7 @@ public class BaseShimField implements ShimField {
             List<TypeName> typeArguments = new ArrayList<>();
             type.asClassOrInterfaceType().getTypeArguments().get().forEach(t -> {
                 if (t.isReferenceType()) {
-                    typeArguments.add(ClassName.bestGuess(t.asString()));
+                    typeArguments.add(JavaType.of(t.asString()).toTypeName());
                 }
             });
             cn = ParameterizedTypeName.get(raw, typeArguments.toArray(new TypeName[0]));
