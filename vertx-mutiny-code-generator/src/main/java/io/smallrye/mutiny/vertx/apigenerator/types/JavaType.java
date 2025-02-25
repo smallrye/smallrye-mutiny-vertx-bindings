@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import com.palantir.javapoet.ArrayTypeName;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
@@ -39,7 +40,10 @@ public record JavaType(String fqn, List<JavaType> parameterTypes) {
         if (fqn.equals("void")) {
             return TypeName.VOID;
         }
-
+        if (fqn.endsWith("[]")) {
+            TypeName arrayTypeName = new JavaType(fqn.substring(0, fqn.length() - 2)).toTypeName();
+            return ArrayTypeName.of(arrayTypeName);
+        }
         if (!hasParameterTypes()) {
             return ClassName.bestGuess(fqn);
         }

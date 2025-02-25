@@ -76,4 +76,15 @@ class JavaTypeTest {
         TypeName typeName = parsed.toTypeName();
         assertThat(typeName.toString()).isEqualTo("Foo<A, B<Bar, plop.Baz>, C<Yolo>>");
     }
+
+    @Test
+    void arrays() {
+        JavaType parsed = JavaType.of("byte[]");
+        TypeName typeName = parsed.toTypeName();
+        assertThat(typeName.toString()).isEqualTo("byte[]");
+
+        parsed = JavaType.of("java.lang.String[]");
+        typeName = parsed.toTypeName();
+        assertThat(typeName.toString()).isEqualTo("java.lang.String[]");
+    }
 }
