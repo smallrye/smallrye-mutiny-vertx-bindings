@@ -60,6 +60,8 @@ public class PlainMethodShimModule implements ShimModule {
             } else if (TypeUtils.isMap(returnType) && shim.isVertxGen(TypeUtils.getSecondParameterizedType(returnType))) {
                 shim.addMethod(new PlainMethodReturningMapOfVertxGen(this, shim, method,
                         shim.getVertxGen(TypeUtils.getSecondParameterizedType(returnType))));
+            } else if (TypeUtils.isHandler(returnType)) {
+                shim.addMethod(new PlainMethodReturningVertxHandler(this, shim, method));
             } else {
                 shim.addMethod(new PlainDelegatingMethod(this, shim, method, false));
                 if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
@@ -420,7 +422,6 @@ public class PlainMethodShimModule implements ShimModule {
             // Unless it's void.
 
             // In the case of static, we need to use the class name instead of `getDelegate()`.
-
             if (isVoid) {
                 if (isStatic()) {
                     code.addStatement("$T.$L($L)", ClassName.bestGuess(shim.getSource().getFullyQualifiedName()), getName(),
@@ -444,6 +445,51 @@ public class PlainMethodShimModule implements ShimModule {
                                 String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
                     }
                 }
+            }
+
+            method.addCode(code.build());
+            builder.addMethod(method.build());
+        }
+    }
+
+    private static class PlainMethodReturningVertxHandler extends BaseShimMethod {
+
+        private final ResolvedType handlerType;
+
+        public PlainMethodReturningVertxHandler(ShimModule module, ShimClass shim, VertxGenMethod method) {
+            super(
+                    module,
+                    method.getName(),
+                    TypeUtils.convertBareToShimReturnType(shim, method),
+                    TypeUtils.convertBareToShimParameters(shim, method),
+                    TypeUtils.convertBaseToShimThrows(shim, method),
+                    method.isStatic(),
+                    method.isFinal(),
+                    method.getJavadoc(shim),
+                    method);
+            handlerType = TypeUtils.getFirstParameterizedType(method.getReturnedType());
+        }
+
+        @Override
+        public void generate(ShimClass shim, TypeSpec.Builder builder) {
+            // Declaration
+            MethodSpec.Builder method = generateDeclaration(shim, builder);
+
+            // Body
+            CodeBlock.Builder code = CodeBlock.builder();
+            addGeneratedBy(code);
+            // For each parameter, we need to convert it to the bare shimType if needed.
+            for (var parameter : getParameters()) {
+                code.add(parameter.toBareVariableDeclaration("_" + parameter.name(), shim));
+            }
+
+            String args = String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList());
+            TypeName handlerTypeName = JavaType.of(handlerType.erasure().describe()).toTypeName();
+            if (isStatic()) {
+                ClassName target = ClassName.bestGuess(shim.getSource().getFullyQualifiedName());
+                code.addStatement("return __res -> $T.$L($L).handle(($T) __res)", target, getName(), args, handlerTypeName);
+            } else {
+                code.addStatement("return __res -> getDelegate().$L($L).handle(($T) __res)", getName(), args, handlerTypeName);
             }
 
             method.addCode(code.build());

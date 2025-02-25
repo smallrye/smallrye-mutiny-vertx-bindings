@@ -445,4 +445,34 @@ public class ConsumerTest {
         env.compile();
     }
 
+    @Test
+    void handlerAsyncResultAsReturnType() {
+        Env env = new Env();
+        env
+                .addJavaCode("org.acme", "MyInterface.java", """
+                        package org.acme;
+
+                        import io.vertx.core.Handler;
+                        import io.vertx.core.AsyncResult;
+                        import io.vertx.codegen.annotations.VertxGen;
+
+                        @VertxGen
+                        public interface MyInterface  {
+
+                            Handler<AsyncResult<String>> handlerProvider(String foo);
+
+                            static Handler<AsyncResult<String>> staticHandlerProvider(String foo) {
+                                return ar -> {
+                                    System.out.println(ar.succeeded());
+                                };
+                            }
+                        }
+                        """)
+                .addModuleGen("org.acme", "my-module");
+
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
+        env.addOutputs(generator.generate());
+        env.compile();
+    }
+
 }
