@@ -1,15 +1,15 @@
 package io.smallrye.mutiny.vertx.auth;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.CompletionException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
-import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.authentication.UsernamePasswordCredentials;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.auth.User;
 import io.vertx.mutiny.ext.auth.authorization.AuthorizationContext;
@@ -25,7 +25,7 @@ public class PropertiesAuthTest {
     private PropertyFileAuthentication authn;
     private PropertyFileAuthorization authz;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
         authn = PropertyFileAuthentication
@@ -33,21 +33,21 @@ public class PropertiesAuthTest {
         authz = PropertyFileAuthorization.create(vertx, this.getClass().getResource("/test-auth.properties").getFile());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
     }
 
     @Test
     public void testSimpleAuthenticate() {
-        JsonObject authInfo = new JsonObject().put("username", "tim").put("password", "sausages");
+        UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("tim", "sausages");
         User user = authn.authenticate(authInfo).await().indefinitely();
         assertNotNull(user);
     }
 
     @Test
     public void testSimpleAuthenticateFailWrongPassword() {
-        JsonObject authInfo = new JsonObject().put("username", "tim").put("password", "wrongpassword");
+        UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("tim", "wrongpassword");
         try {
             authn.authenticate(authInfo).await().indefinitely();
         } catch (CompletionException e) {
@@ -57,7 +57,7 @@ public class PropertiesAuthTest {
 
     @Test
     public void testSimpleAuthenticateFailWrongUser() {
-        JsonObject authInfo = new JsonObject().put("username", "frank").put("password", "sausages");
+        UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("tim", "sausages");
         try {
             authn.authenticate(authInfo).await().indefinitely();
         } catch (CompletionException e) {
@@ -75,7 +75,7 @@ public class PropertiesAuthTest {
     }
 
     private Uni<User> login() {
-        JsonObject authInfo = new JsonObject().put("username", "tim").put("password", "sausages");
+        UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("tim", "sausages");
         return authn.authenticate(authInfo);
     }
 
@@ -110,7 +110,7 @@ public class PropertiesAuthTest {
 
     @Test
     public void testHasWildcardPermission() {
-        JsonObject authInfo = new JsonObject().put("username", "paulo").put("password", "secret");
+        UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("paulo", "secret");
         User user = authn.authenticate(authInfo).await().indefinitely();
 
         assertNotNull(user);
@@ -123,7 +123,7 @@ public class PropertiesAuthTest {
 
     @Test
     public void testHasWildcardMatchPermission() {
-        JsonObject authInfo = new JsonObject().put("username", "editor").put("password", "secret");
+        UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("editor", "secret");
         User user = authn.authenticate(authInfo).await().indefinitely();
 
         assertNotNull(user);
