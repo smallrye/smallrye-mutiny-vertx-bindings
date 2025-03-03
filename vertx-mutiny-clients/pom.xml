@@ -40,7 +40,7 @@
                         <module>vertx-mutiny-mqtt</module>
                         <module>vertx-mutiny-auth-common</module>
                         <module>vertx-mutiny-auth-jwt</module>
-        <!--                <module>vertx-mutiny-auth-oauth2</module>-->
+                        <module>vertx-mutiny-auth-oauth2</module>
                         <module>vertx-mutiny-auth-otp</module>
                         <module>vertx-mutiny-auth-htdigest</module>
                         <module>vertx-mutiny-auth-htpasswd</module>
