@@ -52,8 +52,8 @@
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
 
         <vertx.version>5.0.0.CR5</vertx.version>
-        <mutiny.version>2.8.0</mutiny.version>
-        <jackson.version>2.18.2</jackson.version>
+        <mutiny.version>2.9.0</mutiny.version>
+        <jackson.version>2.19.0</jackson.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>
 
         <rxjava3.version>3.1.10</rxjava3.version>
@@ -62,19 +62,19 @@
         <reactor-core.version>3.7.3</reactor-core.version>
         <rxjava2-interop.version>0.13.7</rxjava2-interop.version>
 
-        <javaparser.version>3.26.3</javaparser.version>
-        <javapoet.version>0.6.0</javapoet.version>
-        <picocli.version>4.7.6</picocli.version>
-        <logback-classic.version>1.5.16</logback-classic.version>
+        <javaparser.version>3.26.4</javaparser.version>
+        <javapoet.version>0.7.0</javapoet.version>
+        <picocli.version>4.7.7</picocli.version>
+        <logback-classic.version>1.5.18</logback-classic.version>
         <slf4j-api.version>2.0.0</slf4j-api.version>
 
-        <testcontainers.version>1.20.5</testcontainers.version>
+        <testcontainers.version>1.21.0</testcontainers.version>
 
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.0</junit-jupiter.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <smallrye-common.version>2.10.0</smallrye-common.version>
+        <smallrye-common.version>2.12.0</smallrye-common.version>
         <apacheds-test-framework.version>2.0.0.AM27</apacheds-test-framework.version>
 
         <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
@@ -82,7 +82,7 @@
         <revapi-reporter-json.version>0.5.0</revapi-reporter-json.version>
         <revapi-reporter-text.version>0.15.0</revapi-reporter-text.version>
 
-        <jandex-maven-plugin.version>3.2.7</jandex-maven-plugin.version>
+        <jandex-maven-plugin.version>3.3.1</jandex-maven-plugin.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
