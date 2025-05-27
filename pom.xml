@@ -51,7 +51,7 @@
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
 
-        <vertx.version>5.0.0.CR5</vertx.version>
+        <vertx.version>5.0.0.CR8</vertx.version>
         <mutiny.version>2.9.0</mutiny.version>
         <jackson.version>2.19.0</jackson.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>

@@ -2,8 +2,6 @@ package io.smallrye.mutiny.vertx.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.concurrent.CompletionException;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +48,7 @@ public class PropertiesAuthTest {
         UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("tim", "wrongpassword");
         try {
             authn.authenticate(authInfo).await().indefinitely();
-        } catch (CompletionException e) {
+        } catch (Throwable e) {
             assertTrue(e.getMessage().contains("invalid username/password"));
         }
     }
@@ -60,7 +58,7 @@ public class PropertiesAuthTest {
         UsernamePasswordCredentials authInfo = new UsernamePasswordCredentials("tim", "sausages");
         try {
             authn.authenticate(authInfo).await().indefinitely();
-        } catch (CompletionException e) {
+        } catch (Throwable e) {
             assertTrue(e.getMessage().contains("unknown user"));
         }
     }

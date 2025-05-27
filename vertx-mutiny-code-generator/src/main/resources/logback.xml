@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="io.smallrye.mutiny.vertx.apigenerator" level="warn"/>
+    <logger name="io.smallrye.mutiny.vertx.apigenerator" level="debug"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
