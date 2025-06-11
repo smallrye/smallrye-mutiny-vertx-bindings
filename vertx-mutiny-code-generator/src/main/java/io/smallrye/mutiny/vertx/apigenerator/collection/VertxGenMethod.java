@@ -48,9 +48,12 @@ public class VertxGenMethod {
         this.parameters = new ArrayList<>();
         for (int i = 0; i < resolved.getNumberOfParams(); i++) {
             ResolvedParameterDeclaration param = resolved.getParam(i);
-            parameters.add(new ResolvedParameter(param.getName(), param.getType(),
+            parameters.add(new ResolvedParameter(
+                    param.getName(),
+                    param.getType(),
                     method.getParameter(i).getAnnotationByClass(Nullable.class).isPresent()));
         }
+
         this.exceptions = resolved.getSpecifiedExceptions();
         this.typeParameters = resolved.getTypeParameters();
 

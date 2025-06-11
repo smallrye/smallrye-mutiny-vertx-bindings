@@ -87,4 +87,18 @@ class JavaTypeTest {
         typeName = parsed.toTypeName();
         assertThat(typeName.toString()).isEqualTo("java.lang.String[]");
     }
+
+    @Test
+    void wildcardExtends() {
+        JavaType parsed = JavaType.of("java.util.List<? extends java.lang.String>");
+        TypeName typeName = parsed.toTypeName();
+        assertThat(typeName.toString()).isEqualTo("java.util.List<? extends java.lang.String>");
+    }
+
+    @Test
+    void wildcardSuper() {
+        JavaType parsed = JavaType.of("java.util.List<? super java.lang.String>");
+        TypeName typeName = parsed.toTypeName();
+        assertThat(typeName.toString()).isEqualTo("java.util.List<? super java.lang.String>");
+    }
 }

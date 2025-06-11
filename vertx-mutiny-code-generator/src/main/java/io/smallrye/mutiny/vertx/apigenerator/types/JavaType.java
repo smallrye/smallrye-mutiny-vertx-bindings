@@ -10,6 +10,7 @@ import com.palantir.javapoet.ArrayTypeName;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeName;
+import com.palantir.javapoet.WildcardTypeName;
 
 public record JavaType(String fqn, List<JavaType> parameterTypes) {
 
@@ -50,7 +51,13 @@ public record JavaType(String fqn, List<JavaType> parameterTypes) {
         TypeName[] typeNames = new TypeName[parameterTypes.size()];
         for (int i = 0; i < parameterTypes.size(); i++) {
             JavaType type = parameterTypes.get(i);
-            if (type.hasParameterTypes()) {
+            if (type.fqn().startsWith("? extends ")) {
+                TypeName extendedTypeName = new JavaType(type.fqn().substring("? extends ".length())).toTypeName();
+                typeNames[i] = WildcardTypeName.subtypeOf(extendedTypeName);
+            } else if (type.fqn().startsWith("? super ")) {
+                TypeName superTypeName = new JavaType(type.fqn().substring("? super ".length())).toTypeName();
+                typeNames[i] = WildcardTypeName.supertypeOf(superTypeName);
+            } else if (type.hasParameterTypes()) {
                 typeNames[i] = type.toTypeName();
             } else {
                 typeNames[i] = ClassName.bestGuess(type.fqn().trim());
@@ -74,7 +81,10 @@ public record JavaType(String fqn, List<JavaType> parameterTypes) {
     }
 
     public static JavaType of(String representation) {
-        String repr = representation.replaceAll("\\h", "");
+        String repr = representation
+                .replaceAll("\\h", "")
+                .replaceAll("\\?extends", "? extends ")
+                .replaceAll("\\?super", "? super ");
         if (repr.contains("<")) {
             if (!repr.endsWith(">")) {
                 throw new IllegalArgumentException("Invalid Java shimType representation: " + repr);

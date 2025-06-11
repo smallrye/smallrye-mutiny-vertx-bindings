@@ -65,10 +65,15 @@ public class VertxGenAnalysis {
         modules.add(new WriteStreamModule());
 
         List<ShimClass> shims = new ArrayList<>();
+
+        for (VertxGenInterface anInterface : generator.getCollectionResult().interfaces()) {
+            logger.debug("Interface {} has been collected", anInterface.getFullyQualifiedName());
+        }
         for (VertxGenInterface itf : generator.getCollectionResult().interfaces()) {
             logger.debug("Analyzing {}", itf.getFullyQualifiedName());
             ShimClass shim = new ShimClass(itf);
             for (ShimModule module : modules) {
+                logger.debug("Analyzing module {}", module);
                 if (module.accept(shim)) {
                     module.analyze(shim);
                 }

@@ -204,10 +204,16 @@ public class TypeUtils {
     }
 
     public static boolean isSupplierOfFuture(ResolvedType type) {
-        return type.isReferenceType()
-                && type.asReferenceType().getQualifiedName().equals(Supplier.class.getName())
-                && TypeUtils.getFirstParameterizedType(type).asReferenceType().getQualifiedName()
-                        .equals("io.vertx.core.Future");
+        boolean isSupplier = type.isReferenceType()
+                && type.asReferenceType().getQualifiedName().equals(Supplier.class.getName());
+        if (isSupplier) {
+            ResolvedType firstParameterizedType = TypeUtils.getFirstParameterizedType(type);
+            if (firstParameterizedType.isWildcard()) {
+                firstParameterizedType = firstParameterizedType.erasure();
+            }
+            return firstParameterizedType.asReferenceType().getQualifiedName().equals("io.vertx.core.Future");
+        }
+        return false;
     }
 
     public static boolean hasMethodAReadStreamParameter(List<VertxGenMethod.ResolvedParameter> parameters) {
