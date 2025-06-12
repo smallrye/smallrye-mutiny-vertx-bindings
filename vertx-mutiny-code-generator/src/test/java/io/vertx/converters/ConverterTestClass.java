@@ -91,4 +91,8 @@ public interface ConverterTestClass {
     Supplier<DummyDataObject> supplierOfDataObject();
 
     Supplier<ConverterTestClass> supplierOfVertxGen();
+
+    Supplier<? extends List<String>> supplierOfWildcardListOfString();
+
+    Supplier<? super List<String>> supplierOfWildcardSuperListOfString();
 }

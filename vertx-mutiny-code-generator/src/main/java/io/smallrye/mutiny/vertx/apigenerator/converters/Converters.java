@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.WildcardType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
@@ -45,8 +47,17 @@ public class Converters {
                 return converter.convert(type);
             }
         }
-        String described = ResolvedTypeDescriber.describeResolvedType(type);
-        return StaticJavaParser.parseType(described);
+        if (!type.isWildcard()) {
+            String described = ResolvedTypeDescriber.describeResolvedType(type);
+            return StaticJavaParser.parseType(described);
+        } else {
+            String described = ResolvedTypeDescriber.describeResolvedType(type.erasure());
+            Type parsedType = StaticJavaParser.parseType(described);
+            if (type.asWildcard().isSuper()) {
+                return new WildcardType(null, parsedType.asReferenceType(), new NodeList<>());
+            }
+            return new WildcardType(parsedType.asReferenceType());
+        }
     }
 
 }

@@ -131,6 +131,18 @@ public class ConverterTest {
         assertReturnedType("supplierOfVertxGen", "java.util.function.Supplier<io.vertx.converters.mutiny.ConverterTestClass>");
     }
 
+    @Test
+    public void wildcardSupplier() {
+        assertReturnedType("supplierOfWildcardListOfString",
+                "java.util.function.Supplier<? extends java.util.List<java.lang.String>>");
+    }
+
+    @Test
+    public void wildcardSuperSupplier() {
+        assertReturnedType("supplierOfWildcardSuperListOfString",
+                "java.util.function.Supplier<? super java.util.List<java.lang.String>>");
+    }
+
     private void assertReturnedType(String methodName, String expected) {
         VertxGenMethod method = itf.getMethod(methodName);
         var res = generator.getConverters().convert(method.getReturnedType());
