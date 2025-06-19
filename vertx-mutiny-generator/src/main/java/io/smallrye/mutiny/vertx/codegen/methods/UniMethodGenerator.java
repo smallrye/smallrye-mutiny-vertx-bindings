@@ -4,6 +4,7 @@ import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.AsyncResultUni;
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
 import io.smallrye.mutiny.vertx.UniHelper;
+import io.smallrye.mutiny.vertx.codegen.MutinyGenerator;
 import io.smallrye.mutiny.vertx.codegen.lang.CodeGenHelper;
 import io.vertx.codegen.ClassModel;
 import io.vertx.codegen.Helper;
@@ -160,7 +161,7 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         }).collect(Collectors.joining(", ")));
         TypeInfo arg = ((ParameterizedTypeInfo) (descriptor.getOriginalMethod().getReturnType())).getArg(0);
         if (arg.getKind() == API) {
-            writer.print(").map(x -> " + arg.getSimpleName() + ".newInstance(x)));");
+            writer.print(").map(x -> " + arg.translateName(MutinyGenerator.ID) + ".newInstance(x)));");
         } else {
             writer.print("));");
         }
