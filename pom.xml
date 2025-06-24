@@ -51,9 +51,9 @@
         <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
 
-        <vertx.version>5.0.0</vertx.version>
-        <mutiny.version>2.9.0</mutiny.version>
-        <jackson.version>2.19.0</jackson.version>
+        <vertx.version>5.0.1</vertx.version>
+        <mutiny.version>2.9.2</mutiny.version>
+        <jackson.version>2.19.1</jackson.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>
 
         <rxjava3.version>3.1.10</rxjava3.version>
@@ -62,13 +62,13 @@
         <reactor-core.version>3.7.3</reactor-core.version>
         <rxjava2-interop.version>0.13.7</rxjava2-interop.version>
 
-        <javaparser.version>3.26.4</javaparser.version>
+        <javaparser.version>3.27.0</javaparser.version>
         <javapoet.version>0.7.0</javapoet.version>
         <picocli.version>4.7.7</picocli.version>
         <logback-classic.version>1.5.18</logback-classic.version>
         <slf4j-api.version>2.0.0</slf4j-api.version>
 
-        <testcontainers.version>1.21.0</testcontainers.version>
+        <testcontainers.version>1.21.2</testcontainers.version>
 
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.0</junit-jupiter.version>
