@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         name: checkout
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         name: set up jdk ${{matrix.java.version}}
         with:
           distribution: temurin
