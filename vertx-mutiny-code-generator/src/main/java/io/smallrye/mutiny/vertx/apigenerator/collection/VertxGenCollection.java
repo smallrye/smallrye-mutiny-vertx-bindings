@@ -1,5 +1,7 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
+import static io.smallrye.mutiny.vertx.apigenerator.TypeUtils.isFuture;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
+import com.github.javaparser.resolution.model.typesystem.LazyType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
@@ -247,9 +250,21 @@ public class VertxGenCollection {
                         continue;
                     }
 
+                    if (!isFuture(method.returnType())) {
+                        // we remove methods already defined in the ancestor if the ancestor is a VertxGen annotated class (it must also be concrete)
+                        // methods returning Future must not be removed as "...AndAwait", "...AndForget" will be generated
+                        // The return type of "...AndForget" method will differ from that of the method defined in the parent
+                        var itf = method.getDeclaration().getQualifiedName().replace("." + method.getName(), "");
+                        var vgc = lookupVertxGenClass(itf);
+                        if (vgc != null && vgc.concrete()) {
+                            logger.debug("Ignoring method `{}` in interface `{}` as it is already defined in `{}`",
+                                    method.getName(), fqn, itf);
+                            continue;
+                        }
+                    }
+
                     // So, the method is legit and should be considered.
                     // If the method is declared on an interface that has type parameters, we need to see how they are mapped to the type parameters of the interface
-
                     if (typeDeclaringMethod.getTypeParameters().isEmpty()) {
                         // No type parameters, we can add the method directly, but we need to check if it conflicts with an existing method
                         if (!isMethodAlreadyInList(resolvedDeclaration, methods)) {

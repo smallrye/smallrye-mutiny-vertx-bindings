@@ -64,9 +64,9 @@ public class CollectionTest {
         assertThat(interfaces).hasSize(2);
         VertxGenInterface found = generator.getCollectionResult().getInterface("io.vertx.sources.parent.InterfaceB");
         assertThat(found).isNotNull();
-        assertThat(found.getMethods()).hasSize(2);
+        assertThat(found.getMethods()).hasSize(1);
         assertThat(found.getMethods().stream().map(VertxGenMethod::getName).collect(Collectors.toSet()))
-                .containsExactlyInAnyOrder("foo", "bar");
+                .containsExactlyInAnyOrder("bar");
 
         ShimClass first = generator.analyze().getShimFor("io.vertx.sources.parent.mutiny.InterfaceB");
         assertThat(first).isNotNull();
