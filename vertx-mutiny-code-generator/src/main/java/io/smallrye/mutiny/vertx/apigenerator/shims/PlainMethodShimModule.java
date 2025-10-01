@@ -22,6 +22,7 @@ import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
@@ -157,13 +158,42 @@ public class PlainMethodShimModule implements ShimModule {
                             if (isParameterized) {
                                 List<ResolvedType> parameters = TypeUtils
                                         .getTypeParameters(listOfOriginalTypeParameters.get(tp_index));
+                                NodeList<Type> mutinifiedParameters = type.asClassOrInterfaceType()
+                                        .getTypeArguments().orElse(new NodeList<>());
                                 int numberOfTypeArgs = parameters.size();
                                 StringBuilder p = new StringBuilder();
                                 for (int i = 0; i < numberOfTypeArgs; i++) {
-                                    if (p.isEmpty()) {
-                                        p = new StringBuilder("__typeArg_" + i);
+                                    // Two cases :
+                                    // - (i) the actual type var are available as TypeVarField
+                                    //       (it is the case if the class itself is parameterized, they are part of the constructor)
+                                    // - (ii) they are not available as TypeVarField, we must build them
+                                    if (shim.getFields().stream()
+                                            .anyMatch(el -> el instanceof DelegateShimModule.TypeVarField)) {
+                                        if (p.isEmpty()) {
+                                            p = new StringBuilder("__typeArg_" + i);
+                                        } else {
+                                            p.append(", __typeArg_").append(i);
+                                        }
                                     } else {
-                                        p.append(", __typeArg_").append(i);
+                                        var tn2 = JavaType
+                                                .of(TypeArg.class.getName() + "<"
+                                                        + TypeDescriber.safeDescribeType(mutinifiedParameters.get(i)) + ">")
+                                                .toTypeName();
+                                        if (mutinifiedParameters.isEmpty())
+                                            throw new RuntimeException(String.format("Can't cast the type %s in %s",
+                                                    parameters.get(i), shim.getFullyQualifiedName()));
+                                        var declaration = String.format("""
+                                                        new %s(
+                                                        o2 -> %s.newInstance((%s)o2),
+                                                        o2 -> o2.getDelegate()
+                                                )
+                                                """, tn2, mutinifiedParameters.get(i), parameters.get(i)
+                                                .asReferenceType().getQualifiedName());
+                                        if (p.isEmpty()) {
+                                            p = new StringBuilder(declaration);
+                                        } else {
+                                            p.append(declaration);
+                                        }
                                     }
                                 }
                                 code.addStatement("""
@@ -198,15 +228,22 @@ public class PlainMethodShimModule implements ShimModule {
                             }
 
                         } else {
-                            code.addStatement("$T __arg_$L = $T.unknown()",
-                                    tn,
-                                    tp_index,
-                                    TypeArg.class);
+                            if (type.asClassOrInterfaceType().getNameAsString().equals("R") && shim.getFields().stream()
+                                    .anyMatch(el -> el instanceof DelegateShimModule.TypeVarField)) {
+                                code.addStatement("$T __arg_$L = $L", tn, tp_index,
+                                        shim.getFields().stream()
+                                                .filter(el -> el instanceof DelegateShimModule.TypeVarField)
+                                                .toList().get(0).getName());
+                            } else {
+                                code.addStatement("$T __arg_$L = $T.unknown()",
+                                        tn,
+                                        tp_index,
+                                        TypeArg.class);
+                            }
                         }
                         localTypeVars.add("__arg_" + tp_index);
                         tp_index++;
                     }
-
                     // Create the result using the `newInstance` call with the type args.
                     if (getOriginalMethod().isReturnTypeNullable()) {
                         code.addStatement("return (_res == null) ? null : $T.newInstance(($T)_res, $L)",
@@ -220,16 +257,29 @@ public class PlainMethodShimModule implements ShimModule {
                                 String.join(", ", localTypeVars));
                     }
                 } else {
-                    if (getOriginalMethod().isReturnTypeNullable()) {
-                        code.addStatement("return (_res == null) ? null : new $T(_res)",
-                                shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
-                                        : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
-                                                .toTypeName());
+                    if (originalReturnType.isReferenceType()
+                            && !originalReturnType.asReferenceType().typeParametersMap().isEmpty()) {
+                        if (getOriginalMethod().isReturnTypeNullable()) {
+                            code.addStatement("return (_res == null) ? null : $T.newInstance(($T)_res)",
+                                    JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
+                                    JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName());
+                        } else {
+                            code.addStatement("return $T.newInstance(($T)_res)",
+                                    JavaType.of(shim.getVertxGen(originalReturnType).getShimClassName()).toTypeName(),
+                                    JavaType.of(originalReturnType.asReferenceType().getQualifiedName()).toTypeName());
+                        }
                     } else {
-                        code.addStatement("return new $T(_res)",
-                                shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
-                                        : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
-                                                .toTypeName());
+                        if (getOriginalMethod().isReturnTypeNullable()) {
+                            code.addStatement("return (_res == null) ? null : new $T(_res)",
+                                    shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
+                                            : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
+                                                    .toTypeName());
+                        } else {
+                            code.addStatement("return new $T(_res)",
+                                    shim.getVertxGen(originalReturnType).concrete() ? Shim.getTypeNameFromType(getReturnType())
+                                            : JavaType.of(shim.getVertxGen(originalReturnType).getShimCompanionName())
+                                                    .toTypeName());
+                        }
                     }
                 }
             }
@@ -420,19 +470,17 @@ public class PlainMethodShimModule implements ShimModule {
             // We just delegate:
             // return getDelegate().method(_param1, _param2);
             // Unless it's void.
-
             // In the case of static, we need to use the class name instead of `getDelegate()`.
-            if (isVoid) {
+            var originalMethodReturnTypeName = JavaType
+                    .of(ResolvedTypeDescriber.describeResolvedType(getOriginalMethod().getReturnedType())).toTypeName();
+            // if the method returns a type R and has an available typevar field, we must wrap the result into this type
+            if (originalMethodReturnTypeName.toString().equals("R") &&
+                    shim.getFields().stream().anyMatch(el -> el instanceof DelegateShimModule.TypeVarField)) {
                 if (isStatic()) {
-                    code.addStatement("$T.$L($L)", ClassName.bestGuess(shim.getSource().getFullyQualifiedName()), getName(),
-                            String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
-                } else {
-                    code.addStatement("getDelegate().$L($L)", getName(),
-                            String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
-                }
-            } else {
-                if (isStatic()) {
-                    code.addStatement("return $T.$L($L)", ClassName.bestGuess(shim.getSource().getFullyQualifiedName()),
+                    code.addStatement("return ($T)$L.wrap($T.$L($L))", this.getReturnType().toString(),
+                            shim.getFields().stream().filter(el -> el instanceof DelegateShimModule.TypeVarField)
+                                    .toList().get(0).getName(),
+                            ClassName.bestGuess(shim.getSource().getFullyQualifiedName()),
                             getName(),
                             String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
                 } else {
@@ -441,8 +489,35 @@ public class PlainMethodShimModule implements ShimModule {
                                 String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
                         code.addStatement("return this");
                     } else {
-                        code.addStatement("return getDelegate().$L($L)", getName(),
+                        code.addStatement("return ($L)$L.wrap(getDelegate().$L())", (this.getReturnType().toString()),
+                                shim.getFields().stream().filter(el -> el instanceof DelegateShimModule.TypeVarField)
+                                        .toList().get(0).getName(),
+                                getName());
+                    }
+                }
+            } else {
+                if (isVoid) {
+                    if (isStatic()) {
+                        code.addStatement("$T.$L($L)", ClassName.bestGuess(shim.getSource().getFullyQualifiedName()), getName(),
                                 String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
+                    } else {
+                        code.addStatement("getDelegate().$L($L)", getName(),
+                                String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
+                    }
+                } else {
+                    if (isStatic()) {
+                        code.addStatement("return $T.$L($L)", ClassName.bestGuess(shim.getSource().getFullyQualifiedName()),
+                                getName(),
+                                String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
+                    } else {
+                        if (isFluent()) {
+                            code.addStatement("getDelegate().$L($L)", getName(),
+                                    String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
+                            code.addStatement("return this");
+                        } else {
+                            code.addStatement("return getDelegate().$L($L)", getName(),
+                                    String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
+                        }
                     }
                 }
             }

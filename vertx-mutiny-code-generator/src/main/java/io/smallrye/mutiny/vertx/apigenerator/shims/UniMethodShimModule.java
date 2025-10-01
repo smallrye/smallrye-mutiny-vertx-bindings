@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.lang.model.element.Modifier;
 
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.javadoc.Javadoc;
@@ -24,6 +25,7 @@ import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimField;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
@@ -48,12 +50,16 @@ public class UniMethodShimModule implements ShimModule {
         for (VertxGenMethod method : shim.getSource().getMethods()) {
             ResolvedType returnType = method.getReturnedType();
             // Exclude method returning a Future
-            if (!TypeUtils.isFuture(returnType)) {
+            try {
+                if (!TypeUtils.isFuture(returnType)) {
+                    continue;
+                }
+            } catch (ClassCastException ignored) {
+                System.err.println(ignored);
                 continue;
             }
 
             ResolvedType futureItemType = TypeUtils.getFirstParameterizedType(returnType);
-
             if (shim.getSource().getGenerator().getCollectionResult()
                     .isVertxGen(TypeUtils.getFullyQualifiedName(futureItemType))) {
                 shim.addMethod(new UniMethodReturningVertxGen(this, shim, method, false));
@@ -189,6 +195,8 @@ public class UniMethodShimModule implements ShimModule {
             var futureTypeName = JavaType.of(ResolvedTypeDescriber.describeResolvedType(getOriginalMethod().getReturnedType()))
                     .toTypeName();
             var shimTypeName = JavaType.of(TypeDescriber.safeDescribeType(shimItemType)).toTypeName();
+            var shimStaticClass = JavaType.of(TypeDescriber.safeDescribeType(shimItemType)).fqn();
+            var itemStaticClass = shim.getVertxGen(itemType).fullyQualifiedName();
 
             // Declaration
             MethodSpec.Builder method = generateDeclaration(shim, builder);
@@ -203,8 +211,11 @@ public class UniMethodShimModule implements ShimModule {
 
             // Delegate, Create Uni and transform the item:
             // Supplier<Future<X>> _res = () -> getDelegate().method(_param1, _param2);
-            // return Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(S::new);
-
+            // either
+            // (i) return Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(S::new);
+            // OR
+            // (ii) Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(el -> io.vertx.mutiny.T.newInstance((io.vertx.T)el));
+            // (ii) is applied if the T in Future<T> in the original method is an interface annotated with VertxGen
             if (isStatic()) {
                 code.addStatement("$T<$T> _res = () -> $T.$L($L)", ClassName.get(Supplier.class), futureTypeName,
                         JavaType.of(shim.getSource().getFullyQualifiedName()).toTypeName(),
@@ -216,10 +227,25 @@ public class UniMethodShimModule implements ShimModule {
                         String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
             }
 
-            code.addStatement("return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map($T::new)",
-                    Uni.class,
-                    shim.getVertxGen(itemType).concrete() ? shimTypeName
-                            : JavaType.of(shim.getVertxGen(itemType).getShimCompanionName()).toTypeName());
+            var typeArguments = getReturnType().asClassOrInterfaceType().getTypeArguments().orElse(new NodeList<>());
+            // TODO I think there's a better API than removing .mutiny by hand, haven't found it though
+            if (typeArguments.stream().anyMatch(type -> shim.getSource().getGenerator().getCollectionResult()
+                    .isVertxGen(type.asClassOrInterfaceType().getNameWithScope().replace(".mutiny", "")))) {
+                code.addStatement(
+                        "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(el -> " +
+                                "$L.newInstance(($L)el))",
+                        Uni.class,
+                        (shim.getVertxGen(itemType).concrete() ? shimStaticClass
+                                : shimItemType.asClassOrInterfaceType().getNameWithScope()),
+                        (shim.getVertxGen(itemType).concrete() ? itemType.asReferenceType().getQualifiedName()
+                                : shim.getVertxGen(itemType).fullyQualifiedName()));
+            } else {
+                code.addStatement(
+                        "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map($T::new)",
+                        Uni.class,
+                        shim.getVertxGen(itemType).concrete() ? shimTypeName
+                                : JavaType.of(shim.getVertxGen(itemType).getShimCompanionName()).toTypeName());
+            }
 
             method.addCode(code.build());
             builder.addMethod(method.build());
@@ -476,8 +502,34 @@ public class UniMethodShimModule implements ShimModule {
                         String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
             }
 
-            code.addStatement("return $T.createFrom().completionStage(() -> _res.get().toCompletionStage())",
-                    Uni.class);
+            ShimField typeCast = null;
+            var typeArguments = getReturnType().asClassOrInterfaceType()
+                    .getTypeArguments().orElse(new NodeList<>());
+            if (!typeArguments.isEmpty()) {
+                if (typeArguments.size() > 1) {
+                    throw new RuntimeException("Return types with double casts is not supported yet");
+                }
+                var typeName = typeArguments.getFirst().get();
+                var typeCastList = shim.getFields().stream()
+                        .filter(field -> field instanceof DelegateShimModule.TypeVarField)
+                        .filter(field -> field.getType().asClassOrInterfaceType().getTypeArguments().isPresent())
+                        .filter(field -> field.getType().asClassOrInterfaceType().getTypeArguments().get().stream()
+                                .anyMatch(type -> type.asString().equals(typeName.asString())))
+                        .toList();
+                if (!typeCastList.isEmpty()) {
+                    typeCast = typeCastList.get(0);
+                }
+            }
+            if (typeCast != null) {
+                code.addStatement(
+                        "return $T.createFrom().completionStage(() -> _res.get()" +
+                                ".toCompletionStage().thenApply($L::wrap))",
+                        Uni.class, typeCast.getName());
+            } else {
+                code.addStatement(
+                        "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage())",
+                        Uni.class);
+            }
 
             method.addCode(code.build());
             builder.addMethod(method.build());
