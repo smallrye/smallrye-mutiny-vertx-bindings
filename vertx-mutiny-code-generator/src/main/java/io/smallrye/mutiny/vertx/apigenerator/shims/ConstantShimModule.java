@@ -110,7 +110,8 @@ public class ConstantShimModule implements ShimModule {
                     code = "%s.%s".formatted(originalClassName, getName());
                 }
             } else if (isVertxGen) {
-                code = "%s.newInstance((%s) %s.%s)".formatted(getType().asString(), vertxGenType, originalClassName, getName());
+                var type = getType().asClassOrInterfaceType().getNameWithScope().toString();
+                code = "%s.newInstance((%s) %s.%s)".formatted(type, vertxGenType, originalClassName, getName());
             } else {
                 code = "%s.%s".formatted(originalClassName, getName());
             }

@@ -73,7 +73,6 @@ public class VertxGenAnalysis {
             logger.debug("Analyzing {}", itf.getFullyQualifiedName());
             ShimClass shim = new ShimClass(itf);
             for (ShimModule module : modules) {
-                logger.debug("Analyzing module {}", module);
                 if (module.accept(shim)) {
                     module.analyze(shim);
                 }
