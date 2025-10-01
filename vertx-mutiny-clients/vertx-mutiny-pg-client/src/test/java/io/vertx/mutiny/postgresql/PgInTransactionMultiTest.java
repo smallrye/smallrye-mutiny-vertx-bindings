@@ -2,14 +2,14 @@ package io.vertx.mutiny.postgresql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.TransactionMultiTest;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
@@ -18,19 +18,19 @@ public class PgInTransactionMultiTest extends TransactionMultiTest {
 
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         container.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdown() {
         container.stop();
     }
 
     Vertx vertx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
 
@@ -41,12 +41,12 @@ public class PgInTransactionMultiTest extends TransactionMultiTest {
                 .setUser(container.getUsername())
                 .setPassword(container.getPassword());
 
-        pool = PgPool.pool(vertx, options, new PoolOptions());
+        pool = Pool.pool(vertx, options, new PoolOptions());
 
         initDb();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         pool.close();
         vertx.closeAndAwait();

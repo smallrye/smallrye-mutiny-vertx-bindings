@@ -50,6 +50,17 @@ public class PlainMethodShimModule implements ShimModule {
                 continue; // Handled by the FutureShimModule
             }
 
+            // check that method is not already present in order to keep ONLY the most specialized method
+            var identicalNamedMethods = shim.getMethods().stream()
+                    .filter(m -> m.getName().equals(method.getName())).toList();
+            for (ShimMethod identicalNamedMethod : identicalNamedMethods) {
+                // this issue currently only arises with sqlclient.RowSet.iterator() defined twice and returning both an Iterator and a RowIterator
+                // TODO find a way to systematically find the most specialized method in order to remove others.
+                if (identicalNamedMethod.getReturnType().toString().equals("java.util.Iterator<R>")) {
+                    shim.getMethods().remove(identicalNamedMethod);
+                }
+            }
+
             if (shim.getSource().getGenerator().getCollectionResult().isVertxGen(TypeUtils.getFullyQualifiedName(returnType))) {
                 shim.addMethod(new PlainMethodReturningVertxGen(this, shim, method, false));
                 if (TypeUtils.hasMethodAReadStreamParameter(method.getParameters())) {
