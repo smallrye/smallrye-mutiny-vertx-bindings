@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 

@@ -172,6 +172,10 @@ public class VertxGenCollection {
                         .orElseThrow(() -> new IllegalStateException("VertxGen annotation expected"));
                 boolean concrete = AnnotationHelper.getAttribute(annotation, CONCRETE_ATTRIBUTE)
                         .map(p -> p.getValue().asBooleanLiteralExpr().getValue()).orElse(true);
+                // TODO this might be incorporated directly in Vertx
+                if (fqn.equals("io.vertx.sqlclient.SqlResult")) {
+                    concrete = false;
+                }
 
                 // We need to collect the methods in 2 phases:
                 // 1) we only consider the method from the interface itself
@@ -273,9 +277,21 @@ public class VertxGenCollection {
                     } else {
                         // We have type parameters, we need to see how they are mapped to our interface.
                         MethodUsage copy = method;
+
                         for (ResolvedTypeParameterDeclaration p : typeDeclaringMethod.getTypeParameters()) {
-                            copy = copy.replaceTypeParameter(p,
-                                    typeParameterMapping.get(typeDeclaringMethod.getQualifiedName() + "." + p.getName()));
+                            var test = copy.replaceTypeParameter(p,
+                                    typeParameterMapping
+                                            .get(typeDeclaringMethod.getQualifiedName() + "." + p.getName()));
+                            if (test.returnType() instanceof LazyType && !test.returnType().isReferenceType()) {
+                                // TODO the replacement is a bit too specific
+                                // it is only called for the `value` method of `io.vertx.sqlclient.RowSet` for now.
+                                copy = copy.replaceTypeParameter(p, vg.getExtendedTypes().get(1).getTypeArguments()
+                                        .get().getFirst().get().resolve());
+                            } else {
+                                copy = copy.replaceTypeParameter(p,
+                                        typeParameterMapping
+                                                .get(typeDeclaringMethod.getQualifiedName() + "." + p.getName()));
+                            }
                         }
 
                         // The method is updated, we need to see if it conflicts.
@@ -448,6 +464,10 @@ public class VertxGenCollection {
                 boolean concrete = AnnotationHelper
                         .getAttribute(declaration.getAnnotationByClass(VertxGen.class).orElseThrow(), CONCRETE_ATTRIBUTE)
                         .map(p -> p.getValue().asBooleanLiteralExpr().getValue()).orElse(true);
+                // TODO might want to change it in Vertx
+                if (declaration.getFullyQualifiedName().get().equals("io.vertx.sqlclient.SqlResult")) {
+                    concrete = false;
+                }
                 // Need to identify the module
                 VertxGenModule mod = lookupForModule(unit.getPackageDeclaration().get().getNameAsString());
                 if (mod != null) {

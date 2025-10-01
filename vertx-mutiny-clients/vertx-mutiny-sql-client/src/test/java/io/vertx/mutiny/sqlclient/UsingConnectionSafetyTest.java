@@ -5,7 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.util.function.Function;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 

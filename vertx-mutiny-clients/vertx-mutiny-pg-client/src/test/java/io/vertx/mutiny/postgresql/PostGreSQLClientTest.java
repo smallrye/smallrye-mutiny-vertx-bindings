@@ -2,11 +2,10 @@ package io.vertx.mutiny.postgresql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.tuples.Tuple2;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
@@ -24,10 +23,8 @@ public class PostGreSQLClientTest extends PGTestBase {
                 .setUser(container.getUsername())
                 .setPassword(container.getPassword());
 
-        Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
-
-        RowSet<?> join = client.query("SELECT 1")
-                .executeAndAwait();
+        Pool client = Pool.pool(vertx, options, new PoolOptions().setMaxSize(5));
+        var join = client.query("SELECT 1").executeAndAwait();
         assertThat(join).isNotNull();
         assertThat(join.size()).isEqualTo(1);
     }
@@ -41,7 +38,7 @@ public class PostGreSQLClientTest extends PGTestBase {
                 .setUser(container.getUsername())
                 .setPassword(container.getPassword());
 
-        Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
+        Pool client = Pool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
         Uni<Tuple2<RowSet<Row>, RowSet<Row>>> uni = client.getConnection()
                 .flatMap(c -> Uni.combine().all().unis(c.preparedQuery("SELECT 1").execute(),
@@ -62,7 +59,7 @@ public class PostGreSQLClientTest extends PGTestBase {
                 .setDatabase(container.getDatabaseName())
                 .setUser(container.getUsername())
                 .setPassword(container.getPassword());
-        Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
+        Pool client = Pool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
         Uni<Void> uni = client
                 .getConnection()

@@ -15,6 +15,8 @@
         <gen-source-groupId>io.vertx</gen-source-groupId>
         <gen-source-artifactId>vertx-mssql-client</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
+
+        <gen-module>vertx-mssql-client</gen-module>
     </properties>
 
     <dependencies>
@@ -46,6 +48,28 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -72,11 +96,32 @@
                             <outputDirectory>${gen.output}</outputDirectory>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>unpack-vertx-core</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includes>io/vertx/**/*.java</includes>
+                            <excludes>**/impl/**/*.java</excludes>
+                            <includeArtifactIds>vertx-core, vertx-sql-client</includeArtifactIds>
+                            <outputDirectory>${project.basedir}/target/additional-sources/vertx-core</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -85,34 +130,58 @@
                     </archive>
                 </configuration>
             </plugin>
-
             <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <version>5.1-jdk8</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
                 <configuration>
-                    <systemProperties>
-                        <java.util.logging.SimpleFormatter.format>%4$s: %3$s - %5$s %6$s%n
-                        </java.util.logging.SimpleFormatter.format>
-                        <mvel2.disable.jit>true</mvel2.disable.jit>
-                    </systemProperties>
+
                 </configuration>
                 <executions>
-                    <!-- Run the annotation processor on java sources and generate the API -->
                     <execution>
-                        <id>generate-api</id>
+                        <id>generate</id>
+                        <phase>
+                            generate-sources
+                        </phase>
                         <goals>
-                            <goal>process</goal>
+                            <goal>java</goal>
                         </goals>
-                        <phase>generate-sources</phase>
                         <configuration>
-                            <sourceDirectory>${project.build.directory}/sources/java</sourceDirectory>
-                            <processors>
-                                <processor>io.vertx.codegen.CodeGenProcessor</processor>
-                            </processors>
-                            <optionMap>
-                                <codegen.generators>mutiny</codegen.generators>
-                            </optionMap>
+                            <mainClass>io.smallrye.mutiny.vertx.apigenerator.Main</mainClass>
+                            <arguments>
+                                <arg>--module-name=${gen-module}</arg>
+                                <arg>--source=${project.basedir}/target/sources</arg>
+                                <arg>--output=${project.basedir}/target/generated-sources/codegen</arg>
+                                <arg>--additional-source=${project.basedir}/target/additional-sources/vertx-core</arg>
+                            </arguments>
+                            <includePluginDependencies>true</includePluginDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.smallrye.reactive</groupId>
+                        <artifactId>vertx-mutiny-code-generator</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/codegen</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
