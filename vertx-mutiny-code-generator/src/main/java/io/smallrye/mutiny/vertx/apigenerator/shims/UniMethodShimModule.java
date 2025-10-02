@@ -11,6 +11,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.CodeBlock;
@@ -228,9 +229,11 @@ public class UniMethodShimModule implements ShimModule {
             }
 
             var typeArguments = getReturnType().asClassOrInterfaceType().getTypeArguments().orElse(new NodeList<>());
-            // TODO I think there's a better API than removing .mutiny by hand, haven't found it though
+            // TODO I think there's a better API than removing going through originalReturnType.typeParametersMap() to retrievethe name of the orginal type argument of Future but I don't know which
+            var originalReturnType = (ReferenceTypeImpl) getOriginalMethod().getReturnedType();
             if (typeArguments.stream().anyMatch(type -> shim.getSource().getGenerator().getCollectionResult()
-                    .isVertxGen(type.asClassOrInterfaceType().getNameWithScope().replace(".mutiny", "")))) {
+                    .isVertxGen(
+                            originalReturnType.typeParametersMap().getTypes().get(0).asReferenceType().getQualifiedName()))) {
                 code.addStatement(
                         "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(el -> " +
                                 "$L.newInstance(($L)el))",
