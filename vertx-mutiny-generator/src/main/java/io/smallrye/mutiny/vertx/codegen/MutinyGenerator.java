@@ -322,7 +322,7 @@ public class MutinyGenerator extends Generator<ClassModel> {
                         "A method returning a 'Future' has been found - missing handler method for '" + method.getName()
                                 + "' declared in " + method.getOwnerTypes().stream().map(TypeInfo::getName)
                                 .collect(joining()));
-                uni.generateOther(method);
+                uni.generateOther(model, method);
                 await.generateOther(method);
                 forget.generateOther(model, method);
             } else {
