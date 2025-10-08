@@ -15,13 +15,12 @@ import io.vertx.codegen.type.ParameterizedTypeInfo;
 import io.vertx.codegen.type.TypeInfo;
 import io.vertx.core.Handler;
 
-import java.util.concurrent.Flow.Publisher;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Flow.Publisher;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -61,11 +60,11 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         writer.println();
     }
 
-    public void generateOther(MethodInfo method) {
+    public void generateOther(ClassModel model, MethodInfo method) {
         MutinyMethodDescriptor uniMethod = computeMethodInfoOther(method);
         generateJavadoc(uniMethod);
         generateMethodDeclaration(uniMethod);
-        generateBodyOther(uniMethod);
+        generateBodyOther(model, uniMethod);
         writer.println();
     }
 
@@ -131,11 +130,12 @@ public class UniMethodGenerator extends MutinyMethodGenerator {
         return param.getType().isParameterized()  && param.getType().getRaw().getName().equals(Uni.class.getName());
     }
 
-    private void generateBodyOther(MutinyMethodDescriptor descriptor) {
+    private void generateBodyOther(ClassModel model, MutinyMethodDescriptor descriptor) {
         MethodInfo method = descriptor.getMethod();
 
         writer.println(" { ");
-        writer.print("    return " + UniHelper.class.getName() + ".toUni(delegate.");
+        String delegate = method.isStaticMethod() ? Helper.getNonGenericType(model.getIfaceFQCN()) : "delegate";
+        writer.print("    return " + UniHelper.class.getName() + ".toUni(" + delegate + ".");
         writer.print(method.getName());
         writer.print("(");
         List<ParamInfo> params = method.getParams();
