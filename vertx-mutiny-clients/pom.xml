@@ -88,6 +88,8 @@
         <!--                <module>vertx-mutiny-service-discovery-bridge-zookeeper</module>-->
                         <module>vertx-mutiny-uri-template</module>
         <!--                <module>vertx-mutiny-http-proxy</module>-->
+
+        <!-- TODO add OpenAPI modules from https://github.com/smallrye/smallrye-mutiny-vertx-bindings/pull/1176 -->
     </modules>
 
 </project>
