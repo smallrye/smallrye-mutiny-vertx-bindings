@@ -48,7 +48,7 @@
                         <module>vertx-mutiny-auth-webauthn4j</module>
                         <module>vertx-mutiny-auth-properties</module>
                         <module>vertx-mutiny-auth-ldap</module>
-        <!--                <module>vertx-mutiny-auth-sql-client</module>-->
+                        <module>vertx-mutiny-auth-sql-client</module>
         <!--                <module>vertx-mutiny-health-checks</module>-->
         <!--                <module>vertx-mutiny-jdbc-client</module>-->
                         <module>vertx-mutiny-json-schema</module>
