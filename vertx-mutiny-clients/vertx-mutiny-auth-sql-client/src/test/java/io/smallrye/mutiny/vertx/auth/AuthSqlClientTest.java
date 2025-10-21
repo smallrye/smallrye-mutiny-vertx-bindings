@@ -1,15 +1,13 @@
 package io.smallrye.mutiny.vertx.auth;
 
-import static org.junit.Assert.*;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
-import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.authentication.UsernamePasswordCredentials;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.auth.User;
 import io.vertx.mutiny.ext.auth.authentication.AuthenticationProvider;
@@ -17,13 +15,12 @@ import io.vertx.mutiny.ext.auth.authorization.AuthorizationProvider;
 import io.vertx.mutiny.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.mutiny.ext.auth.sqlclient.SqlAuthentication;
 import io.vertx.mutiny.ext.auth.sqlclient.SqlAuthorization;
-import io.vertx.mutiny.mysqlclient.MySQLPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
 public class AuthSqlClientTest {
 
-    @ClassRule
     public static GenericContainer<?> container = new GenericContainer<>("mysql:8")
             .withEnv("MYSQL_USER", "mysql")
             .withEnv("MYSQL_PASSWORD", "password")
@@ -34,12 +31,13 @@ public class AuthSqlClientTest {
                     BindMode.READ_ONLY);
 
     private Vertx vertx;
-    private MySQLPool mysql;
+    private Pool mysql;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        container.start();
         vertx = Vertx.vertx();
-        mysql = MySQLPool.pool(
+        mysql = Pool.pool(
                 vertx,
                 new MySQLConnectOptions()
                         .setPort(container.getMappedPort(3306))
@@ -51,35 +49,33 @@ public class AuthSqlClientTest {
                         .setMaxSize(5));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         mysql.closeAndAwait();
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
     public void testAuthenticate() {
         AuthenticationProvider authn = SqlAuthentication.create(mysql);
 
-        JsonObject authInfo = new JsonObject();
-        authInfo.put("username", "lopus").put("password", "secret");
-
-        User user = authn.authenticate(authInfo).await().indefinitely();
-        assertNotNull(user);
-        assertEquals("lopus", user.principal().getString("username"));
+        var creds = new UsernamePasswordCredentials("lopus", "secret");
+        User user = authn.authenticate(creds).await().indefinitely();
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(creds.getUsername(), user.principal().getString("username"));
     }
 
     @Test
     public void testAuthenticateBadPassword() {
         AuthenticationProvider authn = SqlAuthentication.create(mysql);
 
-        JsonObject authInfo = new JsonObject();
-        authInfo.put("username", "lopus").put("password", "s3cr3t");
+        var creds = new UsernamePasswordCredentials("lopus", "s3cr3t");
 
         try {
-            authn.authenticate(authInfo).await().indefinitely();
+            authn.authenticate(creds).await().indefinitely();
         } catch (Exception e) {
-            assertEquals("Invalid username/password", e.getCause().getMessage());
+            Assertions.assertEquals("Invalid username/password", e.getMessage());
         }
     }
 
@@ -87,26 +83,24 @@ public class AuthSqlClientTest {
     public void testAuthenticateBadUser() {
         AuthenticationProvider authn = SqlAuthentication.create(mysql);
 
-        JsonObject authInfo = new JsonObject();
-        authInfo.put("username", "lopes").put("password", "s3cr3t");
+        var creds = new UsernamePasswordCredentials("lopes", "s3cr3t");
         try {
-            authn.authenticate(authInfo).await().indefinitely();
+            authn.authenticate(creds).await().indefinitely();
         } catch (Exception e) {
-            assertEquals("Invalid username/password", e.getCause().getMessage());
+            Assertions.assertEquals("Invalid username/password", e.getMessage());
         }
     }
 
     @Test
     public void testAuthoriseHasRole() {
-        JsonObject authInfo = new JsonObject();
-        authInfo.put("username", "lopus").put("password", "secret");
+        var creds = new UsernamePasswordCredentials("lopus", "secret");
 
         AuthenticationProvider authn = SqlAuthentication.create(mysql);
 
-        User user = authn.authenticate(authInfo).await().indefinitely();
-        assertNotNull(user);
+        User user = authn.authenticate(creds).await().indefinitely();
+        Assertions.assertNotNull(user);
         AuthorizationProvider authz = SqlAuthorization.create(mysql);
         authz.getAuthorizations(user).await().indefinitely();
-        assertTrue(RoleBasedAuthorization.create("dev").match(user));
+        Assertions.assertTrue(RoleBasedAuthorization.create("dev").match(user));
     }
 }
