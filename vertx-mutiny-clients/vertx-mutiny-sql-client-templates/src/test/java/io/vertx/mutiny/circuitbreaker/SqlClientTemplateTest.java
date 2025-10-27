@@ -5,14 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.templates.SqlTemplate;
 import io.vertx.pgclient.PgConnectOptions;
@@ -21,19 +19,20 @@ import io.vertx.sqlclient.PoolOptions;
 
 public class SqlClientTemplateTest {
 
-    @Rule
     public PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
 
     private Vertx vertx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        container.start();
         vertx = Vertx.vertx();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
@@ -45,7 +44,7 @@ public class SqlClientTemplateTest {
                 .setUser(container.getUsername())
                 .setPassword(container.getPassword());
 
-        Pool client = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(5));
+        Pool client = Pool.pool(vertx, options, new PoolOptions().setMaxSize(5));
 
         Map<String, Object> parameters = Collections.singletonMap("id", 1);
 
