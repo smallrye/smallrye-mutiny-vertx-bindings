@@ -239,12 +239,23 @@ public class PlainMethodShimModule implements ShimModule {
                             }
 
                         } else {
-                            if (type.asClassOrInterfaceType().getNameAsString().equals("R") && shim.getFields().stream()
+                            if (TypeUtils.isGenericTypeParameter(type) && shim.getFields().stream()
                                     .anyMatch(el -> el instanceof DelegateShimModule.TypeVarField)) {
-                                code.addStatement("$T __arg_$L = $L", tn, tp_index,
-                                        shim.getFields().stream()
-                                                .filter(el -> el instanceof DelegateShimModule.TypeVarField)
-                                                .toList().get(0).getName());
+                                var argTypes = shim.getFields().stream()
+                                        .filter(el -> el instanceof DelegateShimModule.TypeVarField)
+                                        .filter(el -> el.getType().asClassOrInterfaceType()
+                                                .getTypeArguments().get().get(0).toString()
+                                                .equals(type.asClassOrInterfaceType().getNameAsString()))
+                                        .toList();
+                                if (argTypes.isEmpty()) {
+                                    code.addStatement("$T __arg_$L = $T.unknown()",
+                                            tn,
+                                            tp_index,
+                                            TypeArg.class);
+                                } else {
+                                    code.addStatement("$T __arg_$L = $L", tn, tp_index,
+                                            argTypes.get(0).getName());
+                                }
                             } else {
                                 code.addStatement("$T __arg_$L = $T.unknown()",
                                         tn,
@@ -485,7 +496,7 @@ public class PlainMethodShimModule implements ShimModule {
             var originalMethodReturnTypeName = JavaType
                     .of(ResolvedTypeDescriber.describeResolvedType(getOriginalMethod().getReturnedType())).toTypeName();
             // if the method returns a type R and has an available typevar field, we must wrap the result into this type
-            if (originalMethodReturnTypeName.toString().equals("R") &&
+            if (TypeUtils.isGenericTypeParameter(originalMethodReturnTypeName.toString()) &&
                     shim.getFields().stream().anyMatch(el -> el instanceof DelegateShimModule.TypeVarField)) {
                 if (isStatic()) {
                     code.addStatement("return ($T)$L.wrap($T.$L($L))", this.getReturnType().toString(),

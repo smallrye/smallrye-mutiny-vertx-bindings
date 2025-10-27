@@ -27,6 +27,16 @@ public class TypeUtils {
         return convertBareToShimParameters(shim, parameters, false);
     }
 
+    public static boolean isGenericTypeParameter(Type type) {
+        var typeNameAsString = type.asClassOrInterfaceType().getNameAsString();
+        return isGenericTypeParameter(typeNameAsString);
+    }
+
+    public static boolean isGenericTypeParameter(String typeName) {
+        // following the convention for naming type parameters
+        return typeName.length() == 1 && typeName.toUpperCase().equals(typeName);
+    }
+
     public static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim,
             List<VertxGenMethod.ResolvedParameter> parameters, boolean readStreamAsPublisher) {
         List<ShimMethodParameter> params = new ArrayList<>();
