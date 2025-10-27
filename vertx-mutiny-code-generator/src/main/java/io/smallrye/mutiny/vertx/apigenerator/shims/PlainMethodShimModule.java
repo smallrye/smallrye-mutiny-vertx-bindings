@@ -511,10 +511,11 @@ public class PlainMethodShimModule implements ShimModule {
                                 String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
                         code.addStatement("return this");
                     } else {
-                        code.addStatement("return ($L)$L.wrap(getDelegate().$L())", (this.getReturnType().toString()),
+                        code.addStatement("return ($L)$L.wrap(getDelegate().$L($L))", (this.getReturnType().toString()),
                                 shim.getFields().stream().filter(el -> el instanceof DelegateShimModule.TypeVarField)
                                         .toList().get(0).getName(),
-                                getName());
+                                getName(),
+                                String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
                     }
                 }
             } else {
