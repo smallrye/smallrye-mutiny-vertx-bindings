@@ -148,11 +148,26 @@ public class SimpleMethodGenerator extends MutinyMethodGenerator {
     }
 
     public void generateOther(ClassModel model, MethodInfo method) {
+        if (isStreamMethod(model, method)) {
+            genStreamMethod(model, writer);
+            return;
+        }
         MutinyMethodDescriptor simpleMethod = computeMethodInfoOther(method);
         generateJavadoc(simpleMethod);
         generateMethodDeclaration(simpleMethod);
         generateBody(model, simpleMethod);
 
+        writer.println();
+    }
+
+    private boolean isStreamMethod(ClassModel model, MethodInfo method) {
+        return model.isIterable() && method.getName().equals("stream") && method.getParams().isEmpty() && method.getReturnType().getRaw().getName().equals("java.util.stream.Stream");
+    }
+
+    private void genStreamMethod(ClassModel model, PrintWriter writer) {
+        writer.printf("  public java.util.stream.Stream<%s> stream() {%n", CodeGenHelper.genTranslatedTypeName(model.getIterableArg()));
+        writer.println("    return java.util.stream.StreamSupport.stream(spliterator(), false);");
+        writer.println("  }");
         writer.println();
     }
 }
