@@ -1,8 +1,9 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
 
@@ -472,6 +474,48 @@ public class ConsumerTest {
 
         MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
         env.addOutputs(generator.generate());
+        env.compile();
+    }
+
+    @Test
+    void promiseConsumerAsParameter() {
+        Env env = new Env();
+        env
+                .addJavaCode("org.acme", "MyInterface.java", """
+                        package org.acme;
+
+                        import java.util.function.Consumer;
+                        import io.vertx.codegen.annotations.Fluent;
+                        import io.vertx.codegen.annotations.VertxGen;
+                        import io.vertx.core.Future;
+                        import io.vertx.core.Handler;
+                        import io.vertx.core.Promise;
+
+                        @VertxGen
+                        public interface MyInterface  {
+
+                            Future<String> foo(Consumer<Promise<String>> bar);
+
+                            void yolo(Consumer<Promise<String>> yo);
+
+                            @Fluent
+                            MyInterface withHandler(Handler<Promise<String>> handler);
+                        }
+                        """)
+                .addModuleGen("org.acme", "my-module");
+
+        MutinyGenerator generator = new MutinyGenerator(env.root(), "my-module", Paths.get("target/vertx-core-sources"));
+        env.addOutputs(generator.generate());
+
+        List<ShimMethod> shimMethods = env.getOutputFor("org.acme.MyInterface").shim().getMethods();
+        assertThatList(shimMethods).anyMatch(method -> "foo".equals(method.getName()) &&
+                "io.smallrye.mutiny.Uni<java.lang.String>".equals(method.getParameters().get(0).shimType().asString()));
+        assertThatList(shimMethods).anyMatch(method -> "yolo".equals(method.getName()) &&
+                "io.smallrye.mutiny.Uni<java.lang.String>".equals(method.getParameters().get(0).shimType().asString()));
+        assertThatList(shimMethods).anyMatch(method -> "withHandler".equals(method.getName()) &&
+                "io.smallrye.mutiny.Uni<java.lang.String>".equals(method.getParameters().get(0).shimType().asString()) &&
+                "org.acme.mutiny.MyInterface".equals(method.getReturnType().asString()));
+
         env.compile();
     }
 

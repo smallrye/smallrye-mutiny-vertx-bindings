@@ -23,6 +23,11 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
     public static final TypeName UNI_HELPER_TYPE_NAME = JavaType.of(UNI_HELPER).toTypeName();
 
     public CodeBlock toBareVariableDeclaration(String varname, ShimClass shim) {
+
+        if (TypeUtils.isHandlerOfPromise(originalType)) {
+            return handleParameterOfTypeHandlerOfPromise(varname);
+        }
+
         if (TypeUtils.isHandler(originalType)) {
             return handleParameterOfTypeHandler(shim, varname);
         }
@@ -37,6 +42,10 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
 
         if (TypeUtils.isMap(originalType)) {
             return handleParameterOfTypeMap(shim, varname);
+        }
+
+        if (TypeUtils.isConsumerOfPromise(originalType)) {
+            return handleParameterOfTypeConsumerOfPromise(shim, varname);
         }
 
         if (TypeUtils.isConsumer(originalType)) {
@@ -87,6 +96,15 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
             }
         }
 
+    }
+
+    private CodeBlock handleParameterOfTypeHandlerOfPromise(String varname) {
+        var builder = CodeBlock.builder();
+        builder.addStatement("$T $L = io.smallrye.mutiny.vertx.UniHelper.toHandlerOfPromise($L)",
+                JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                varname,
+                name);
+        return builder.build();
     }
 
     private CodeBlock handleParameterOfTypeFunction(ShimClass shim, String varname) {
@@ -299,6 +317,15 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
                         name);
             }
         }
+        return builder.build();
+    }
+
+    private CodeBlock handleParameterOfTypeConsumerOfPromise(ShimClass shim, String varname) {
+        var builder = CodeBlock.builder();
+        builder.addStatement("$T $L = item -> io.smallrye.mutiny.vertx.UniHelper.toPromise($L)",
+                JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                varname,
+                name);
         return builder.build();
     }
 

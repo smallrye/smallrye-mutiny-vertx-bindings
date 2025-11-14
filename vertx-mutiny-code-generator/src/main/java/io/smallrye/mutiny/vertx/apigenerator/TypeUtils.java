@@ -185,11 +185,39 @@ public class TypeUtils {
         return type.asReferenceType().getQualifiedName().equals("io.vertx.core.Handler");
     }
 
+    public static boolean isHandlerOfPromise(ResolvedType type) {
+        boolean isHandler = type.isReferenceType()
+                && type.asReferenceType().getQualifiedName().equals("io.vertx.core.Handler");
+        if (isHandler) {
+            ResolvedType firstParameterizedType = TypeUtils.getFirstParameterizedType(type);
+            if (firstParameterizedType.isWildcard()) {
+                firstParameterizedType = firstParameterizedType.erasure();
+            }
+            if (firstParameterizedType.isReferenceType()) {
+                return firstParameterizedType.asReferenceType().getQualifiedName().equals("io.vertx.core.Promise");
+            }
+        }
+        return false;
+    }
+
     public static boolean isConsumer(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Consumer.class.getName());
+    }
+
+    public static boolean isConsumerOfPromise(ResolvedType type) {
+        boolean isConsumer = type.isReferenceType()
+                && type.asReferenceType().getQualifiedName().equals(Consumer.class.getName());
+        if (isConsumer) {
+            ResolvedType firstParameterizedType = TypeUtils.getFirstParameterizedType(type);
+            if (firstParameterizedType.isWildcard()) {
+                firstParameterizedType = firstParameterizedType.erasure();
+            }
+            return firstParameterizedType.asReferenceType().getQualifiedName().equals("io.vertx.core.Promise");
+        }
+        return false;
     }
 
     public static boolean isSupplier(ResolvedType type) {
