@@ -35,7 +35,7 @@ class WebClientTest {
     HttpServer startServer(Consumer<HttpServerRequest> handler) {
         return vertx.createHttpServer()
                 .requestHandler(handler)
-                .listenAndAwait();
+                .listenAndAwait(8081);
     }
 
     @Test
