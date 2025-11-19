@@ -57,6 +57,7 @@ public class ShimGenerator {
                 builder.addSuperinterface(JavaType.of(val).toTypeName());
             }
         }
+        builder.addSuperinterface(JavaType.of("io.smallrye.mutiny.vertx.MutinyDelegate").toTypeName());
 
         builder.addModifiers(Modifier.PUBLIC)
                 .addJavadoc(sanitize(shim.getJavaDoc().toText()))
