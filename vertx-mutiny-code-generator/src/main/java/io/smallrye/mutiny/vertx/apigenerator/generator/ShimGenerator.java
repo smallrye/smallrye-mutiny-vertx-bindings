@@ -57,6 +57,13 @@ public class ShimGenerator {
                 builder.addSuperinterface(JavaType.of(val).toTypeName());
             }
         }
+        /*
+            #TODO this check is a bit ugly but we need to implement MutinyDelegate for some checks in MutinyHelper
+            TestRouteHandler is the only class impacted by this check
+         */
+        if (shim.getFullyQualifiedName().contains("TestRouteHandler")) {
+            builder.addSuperinterface(JavaType.of("io.smallrye.mutiny.vertx.MutinyDelegate").toTypeName());
+        }
 
         builder.addModifiers(Modifier.PUBLIC)
                 .addJavadoc(sanitize(shim.getJavaDoc().toText()))

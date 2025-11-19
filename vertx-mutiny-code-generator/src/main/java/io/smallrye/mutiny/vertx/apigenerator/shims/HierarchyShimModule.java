@@ -1,5 +1,7 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import java.util.List;
+
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -28,11 +30,22 @@ public class HierarchyShimModule implements ShimModule {
 
             ResolvedType resolved = itf.resolve();
             String fqn = resolved.asReferenceType().getQualifiedName();
+            List<ResolvedType> typeParameters = resolved.asReferenceType().typeParametersValues();
             if (shim.getSource().getGenerator().getCollectionResult().isVertxGen(fqn)) {
                 if (shim.getSource().getGenerator().getCollectionResult().getVertxGenClass(fqn).concrete()) {
                     shim.setParentClass(shim.convert(resolved));
                 } else {
                     shim.addInterface(shim.convert(resolved));
+                }
+            }
+            if (!typeParameters.isEmpty()) {
+                for (ResolvedType typeParameter : typeParameters) {
+                    if (typeParameter.isReferenceType()) {
+                        String tfqn = typeParameter.asReferenceType().getQualifiedName();
+                        if (shim.getSource().getGenerator().getCollectionResult().isVertxGen(tfqn) &&
+                                shim.getFullyQualifiedName().contains("TestRouteHandler")) {
+                        }
+                    }
                 }
             }
         }
