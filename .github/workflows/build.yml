@@ -33,7 +33,7 @@ jobs:
     name: build with jdk ${{matrix.java.version}}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         name: checkout
       - uses: actions/setup-java@v5
         name: set up jdk ${{matrix.java.version}}
