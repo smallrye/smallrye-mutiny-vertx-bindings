@@ -44,6 +44,21 @@
         <tag>HEAD</tag>
     </scm>
 
+    <developers>
+        <developer>
+            <id>cescoffier</id>
+            <name>Clement Escoffier</name>
+            <email>clement[AT]apache[DOT]org</email>
+            <url>https://github.com/cescoffier</url>
+        </developer>
+        <developer>
+            <id>jponge</id>
+            <name>Julien Ponge</name>
+            <email>julien[AT]ponge[DOT]org</email>
+            <url>https://github.com/jponge</url>
+        </developer>
+    </developers>
+
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 
@@ -72,6 +87,7 @@
 
         <jandex-maven-plugin.version>3.5.2</jandex-maven-plugin.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
+        <bom-builder3.version>1.3.1</bom-builder3.version>
     </properties>
 
     <dependencyManagement>
