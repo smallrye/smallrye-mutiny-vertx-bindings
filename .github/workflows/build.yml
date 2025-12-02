@@ -28,7 +28,7 @@ jobs:
         java: [
           { 'version': '17', 'opts': '' },
           { 'version': '21', 'opts': '' },
-          { 'version': '23', 'opts': '' }
+          { 'version': '25', 'opts': '' }
         ]
     name: build with jdk ${{matrix.java.version}}
 
