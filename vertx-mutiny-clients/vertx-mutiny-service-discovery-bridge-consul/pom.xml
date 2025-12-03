@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.20.5-SNAPSHOT</version>
+        <version>3.21.0</version>
     </parent>
 
     <artifactId>smallrye-mutiny-vertx-service-discovery-bridge-consul</artifactId>
@@ -137,4 +137,8 @@
             </properties>
         </profile>
     </profiles>
+
+  <scm>
+    <tag>3.21.0</tag>
+  </scm>
 </project>
