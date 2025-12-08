@@ -28,7 +28,7 @@ jobs:
         java: [
           { 'version': '17', 'opts': '' },
           { 'version': '21', 'opts': '' },
-          { 'version': '23', 'opts': '' }
+          { 'version': '25', 'opts': '' }
         ]
     name: build with jdk ${{matrix.java.version}}
 
@@ -42,6 +42,6 @@ jobs:
           java-version: ${{matrix.java.version}}
           cache: maven
       - name: validate format
-        run: ./mvnw -s .build/maven-ci-settings.xml -f pom.xml -B -pl '!vertx-mutiny-clients-bom' ${{matrix.java.opts}} formatter:validate
+        run: ./mvnw -s .build/maven-ci-settings.xml -f pom.xml -B ${{matrix.java.opts}} formatter:validate
       - name: build with maven
         run: ./mvnw -s .build/maven-ci-settings.xml -f pom.xml -B verify ${{matrix.java.opts}}
