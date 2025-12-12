@@ -26,6 +26,12 @@
             <version>${vertx.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-codegen-api</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
         <!-- Vert.x Mutiny Core -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -38,11 +44,13 @@
             <artifactId>smallrye-mutiny-vertx-web-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-auth-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-bridge-common</artifactId>
@@ -55,49 +63,59 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-auth-htdigest</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-auth-webauthn4j</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-auth-oauth2</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-auth-otp</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>smallrye-mutiny-vertx-uri-template</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>smallrye-mutiny-vertx-health-check</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-web-client</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -132,7 +150,7 @@
                         <configuration>
                             <includes>io/vertx/**/*.java</includes>
                             <excludes>**/impl/**/*.java</excludes>
-                            <includeArtifactIds>vertx-core,vertx-web-common,vertx-auth-common,vertx-bridge-common,vertx-auth-jwt,vertx-auth-htdigest,vertx-auth-webauthn4j,vertx-auth-oauth2,vertx-auth-otp,vertx-uri-template,vertx-health-checks</includeArtifactIds>
+                            <includeArtifactIds>vertx-core,vertx-web-common,vertx-auth-common, vertx-bridge-common,vertx-auth-jwt,vertx-auth-htdigest, vertx-auth-webauthn4j,vertx-auth-oauth2,vertx-auth-otp,vertx-uri-template,vertx-health-checks</includeArtifactIds>
                             <outputDirectory>${project.basedir}/target/additional-sources/vertx-core</outputDirectory>
                         </configuration>
                     </execution>
@@ -175,6 +193,27 @@
                             <includePluginDependencies>true</includePluginDependencies>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>generate-test</id>
+                        <phase>
+                            generate-test-sources
+                        </phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>io.smallrye.mutiny.vertx.apigenerator.Main</mainClass>
+                            <arguments>
+                                <arg>--module-name=webtest</arg>
+                                <arg>--source=${project.basedir}/src/test/java/io/vertx/mutiny/web</arg>
+                                <arg>--output=${project.basedir}/target/generated-test-sources/codegen</arg>
+                                <arg>--additional-source=${project.basedir}/target/additional-sources/vertx-core</arg>
+                                <arg>--additional-source=${project.basedir}/target/sources</arg>
+                            </arguments>
+                            <includePluginDependencies>true</includePluginDependencies>
+                        </configuration>
+                    </execution>
                 </executions>
                 <dependencies>
                     <dependency>
@@ -198,6 +237,18 @@
                         <configuration>
                             <sources>
                                 <source>target/generated-sources/codegen</source>
+                            </sources>
+                        </configuration>
+                    </execution><!-- Run the annotation processor on java test sources -->
+                    <execution>
+                        <id>add-tests-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-test-sources/codegen</source>
                             </sources>
                         </configuration>
                     </execution>

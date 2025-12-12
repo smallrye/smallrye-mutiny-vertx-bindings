@@ -1,22 +1,22 @@
 package io.vertx.mutiny.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.core.buffer.Buffer;
-import io.vertx.mutiny.core.http.HttpClient;
+import io.vertx.mutiny.core.http.HttpClientAgent;
 import io.vertx.mutiny.core.http.HttpClientRequest;
 import io.vertx.mutiny.core.http.HttpServer;
 import io.vertx.mutiny.ext.web.Router;
@@ -32,9 +32,9 @@ public class RouterTest {
     private Vertx vertx;
     private Router router;
     private HttpServer server;
-    private HttpClient client;
+    private HttpClientAgent client;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
         router = Router.router(vertx);
@@ -44,7 +44,7 @@ public class RouterTest {
         client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(server.actualPort()));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (client != null) {
             client.close().onFailure().recoverWithNull().await().indefinitely();
