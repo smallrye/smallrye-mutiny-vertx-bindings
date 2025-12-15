@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.21.3-SNAPSHOT</version>
+        <version>3.21.3</version>
     </parent>
 
     <artifactId>smallrye-mutiny-vertx-junit5</artifactId>
@@ -118,4 +118,8 @@
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>3.21.3</tag>
+  </scm>
 </project>
