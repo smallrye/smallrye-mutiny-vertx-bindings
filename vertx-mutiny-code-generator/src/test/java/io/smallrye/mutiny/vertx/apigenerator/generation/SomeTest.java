@@ -13,6 +13,7 @@ import com.palantir.javapoet.JavaFile;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 
+import io.smallrye.mutiny.vertx.MutinyDelegate;
 import io.smallrye.mutiny.vertx.MutinyGen;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
@@ -49,7 +50,7 @@ public class SomeTest {
         assertThat(code.toString())
                 .contains("{@link me.escoffier.test.MyInterface")
                 .contains("@see me.escoffier.test.MyInterface");
-        assertThat(code.typeSpec().superinterfaces()).isEmpty();
+        assertThat(code.typeSpec().superinterfaces()).containsExactly(TypeName.get(MutinyDelegate.class));
         assertThat(code.typeSpec().superclass()).isEqualTo(TypeName.get(Object.class));
 
         env.compile();
@@ -85,7 +86,7 @@ public class SomeTest {
         assertThat(code.toString())
                 .contains("{@link me.escoffier.test.MyInterface")
                 .contains("@see me.escoffier.test.MyInterface");
-        assertThat(code.typeSpec().superinterfaces()).isEmpty();
+        assertThat(code.typeSpec().superinterfaces()).containsExactly(TypeName.get(MutinyDelegate.class));
         assertThat(code.typeSpec().superclass()).isEqualTo(TypeName.get(Object.class));
 
         env.compile();

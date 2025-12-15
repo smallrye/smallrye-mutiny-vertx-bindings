@@ -1,5 +1,6 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.type.Type;
@@ -9,6 +10,7 @@ import com.palantir.javapoet.TypeName;
 
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
 import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
+import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 
@@ -492,13 +494,43 @@ public record ShimMethodParameter(String name, Type shimType, ResolvedType origi
                         name,
                         shimClassTypeName);
             } else {
-                builder.addStatement("$T $L = new $T<>(new $T<>($L), item -> new $T(item))",
-                        JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
-                        varname,
-                        DELEGATING_HANDLER_TYPE_NAME,
-                        DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
-                        name,
-                        shimClassTypeName);
+                if (shim.isVertxGen(type)) {
+                    String firstElem = String.format("io.smallrye.mutiny.vertx.MutinyHelper.convertConsumer(%s)",
+                            name);
+
+                    var typeParameters = type.asReferenceType().typeParametersValues();
+                    String typeParameter = null;
+                    var typeParametersToWrite = new ArrayList<String>();
+                    for (ResolvedType parameter : typeParameters) {
+                        var typeField = shim.getFields().stream()
+                                .filter(field -> field instanceof DelegateShimModule.TypeVarField &&
+                                        field.getType().asClassOrInterfaceType().getTypeArguments().get().get(0)
+                                                .asClassOrInterfaceType().getName().toString().equals(parameter.describe()))
+                                .map(ShimField::getName).toList();
+                        if (typeField.isEmpty()) {
+                            typeParametersToWrite.add("__TYPE_ARG");
+                        } else {
+                            typeParametersToWrite.add(typeField.get(0));
+                        }
+                    }
+                    builder.addStatement(
+                            "$T $L = io.smallrye.mutiny.vertx.MutinyHelper.convertHandler($L, event -> $T.newInstance(($L)event $L))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            firstElem,
+                            shimClassTypeName,
+                            type.asReferenceType().getQualifiedName(),
+                            typeParametersToWrite.isEmpty() ? ""
+                                    : String.format(", %s", String.join(",", typeParametersToWrite)));
+                } else {
+                    builder.addStatement("$T $L = new $T<>(new $T<>($L), item -> new $T(item))",
+                            JavaType.of(ResolvedTypeDescriber.describeResolvedType(originalType)).toTypeName(),
+                            varname,
+                            DELEGATING_HANDLER_TYPE_NAME,
+                            DELEGATING_CONSUMER_HANDLER_TYPE_NAME,
+                            name,
+                            shimClassTypeName);
+                }
             }
         }
         return builder.build();
