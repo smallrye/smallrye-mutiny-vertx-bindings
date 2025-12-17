@@ -29,9 +29,9 @@ public class HandlerShimModule implements ShimModule {
 
     @Override
     public boolean accept(ShimClass shim) {
-        if (!shim.getSource().isConcrete()) {
-            return false;
-        }
+        //        if (!shim.getSource().isConcrete()) {
+        //            return false;
+        //        }
         NodeList<ClassOrInterfaceType> extendedTypes = shim.getSource().getDeclaration().getExtendedTypes();
         if (extendedTypes.isEmpty()) {
             return false;
@@ -41,6 +41,9 @@ public class HandlerShimModule implements ShimModule {
             ResolvedReferenceType reference = type.resolve().asReferenceType();
             if (reference.getQualifiedName().equalsIgnoreCase(HANDLER_CLASS_NAME)) {
                 return true;
+            } else {
+                return reference.getAllAncestors().stream()
+                        .anyMatch(el -> el.getQualifiedName().equalsIgnoreCase(HANDLER_CLASS_NAME));
             }
         }
         return false;
@@ -53,19 +56,33 @@ public class HandlerShimModule implements ShimModule {
             ResolvedReferenceType reference = type.resolve().asReferenceType();
             if (reference.getQualifiedName().equalsIgnoreCase(HANDLER_CLASS_NAME)) {
                 var elementType = reference.asReferenceType().typeParametersMap().getTypes().get(0);
-                var converted = shim.getSource().getGenerator().getConverters().convert(elementType);
-                shim.addInterface(StaticJavaParser.parseClassOrInterfaceType(HANDLER_CLASS_NAME).setTypeArguments(converted));
-                shim.addInterface(
-                        StaticJavaParser.parseClassOrInterfaceType(Consumer.class.getName()).setTypeArguments(converted));
-                shim.addMethod(new AcceptMethod(this, shim, elementType));
-
-                // Only add the handle method if the source class does not define it
-                if (shim.getSource().getDeclaration().getMethodsByName("handle").isEmpty()) {
-                    shim.addMethod(new HandleMethod(this, shim, elementType));
-                }
+                processElementType(shim, elementType);
+            } else if (reference.getAllAncestors().stream()
+                    .anyMatch(el -> el.getQualifiedName().equalsIgnoreCase(HANDLER_CLASS_NAME))) {
+                var elementType = reference.getAllAncestors().stream()
+                        .filter(el -> el.getQualifiedName().equalsIgnoreCase(HANDLER_CLASS_NAME))
+                        .findAny().get();
+                processElementType(shim, elementType);
             }
         }
 
+    }
+
+    public void processElementType(ShimClass shim, ResolvedType elementType) {
+        var converted = shim.getSource().getGenerator().getConverters().convert(elementType);
+        if (converted.asClassOrInterfaceType().getName().toString().equals("Consumer")) {
+            converted = converted.asClassOrInterfaceType().getTypeArguments().get().get(0);
+            elementType = elementType.asReferenceType().getTypeParametersMap().get(0).b;
+        }
+        shim.addInterface(StaticJavaParser.parseClassOrInterfaceType(HANDLER_CLASS_NAME).setTypeArguments(converted));
+        shim.addInterface(
+                StaticJavaParser.parseClassOrInterfaceType(Consumer.class.getName()).setTypeArguments(converted));
+        shim.addMethod(new AcceptMethod(this, shim, elementType));
+
+        // Only add the handle method if the source class does not define it
+        if (shim.getSource().getDeclaration().getMethodsByName("handle").isEmpty()) {
+            shim.addMethod(new HandleMethod(this, shim, elementType));
+        }
     }
 
     /**

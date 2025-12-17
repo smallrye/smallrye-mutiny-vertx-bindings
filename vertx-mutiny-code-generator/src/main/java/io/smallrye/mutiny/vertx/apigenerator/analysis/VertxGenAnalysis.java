@@ -83,6 +83,7 @@ public class VertxGenAnalysis {
                 ShimCompanionClass companion = shim.getCompanion();
                 List<ShimModule> companionModules = new ArrayList<>();
                 companionModules.add(new DelegateShimModule());
+                companionModules.add(new HandlerShimModule());
                 companionModules.add(new DelegateConstructorShim());
                 companionModules.add(new DelegateAndTypeArgsConstructorShimModule());
                 companionModules.add(new NoArgConstructorShimModule());
