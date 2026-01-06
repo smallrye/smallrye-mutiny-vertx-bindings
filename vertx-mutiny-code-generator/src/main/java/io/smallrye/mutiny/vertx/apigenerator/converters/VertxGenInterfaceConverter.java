@@ -35,7 +35,6 @@ public class VertxGenInterfaceConverter extends BaseShimTypeConverter {
 
     @Override
     public Type convert(ResolvedType type) {
-        // #TODO keep extends and implements !!!!!
         String qualifiedName = type.asReferenceType().getQualifiedName();
         VertxGenModule module = generator.getCollectionResult().getModuleForVertxGen(qualifiedName);
         if (type.asReferenceType().typeParametersMap().isEmpty()) {

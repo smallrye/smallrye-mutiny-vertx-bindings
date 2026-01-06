@@ -29,9 +29,6 @@ public class HandlerShimModule implements ShimModule {
 
     @Override
     public boolean accept(ShimClass shim) {
-        //        if (!shim.getSource().isConcrete()) {
-        //            return false;
-        //        }
         NodeList<ClassOrInterfaceType> extendedTypes = shim.getSource().getDeclaration().getExtendedTypes();
         if (extendedTypes.isEmpty()) {
             return false;
