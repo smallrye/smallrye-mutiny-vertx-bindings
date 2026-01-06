@@ -38,8 +38,9 @@ public class VertxGenInterfaceConverter extends BaseShimTypeConverter {
         String qualifiedName = type.asReferenceType().getQualifiedName();
         VertxGenModule module = generator.getCollectionResult().getModuleForVertxGen(qualifiedName);
         if (type.asReferenceType().typeParametersMap().isEmpty()) {
-            return StaticJavaParser.parseClassOrInterfaceType(ShimConstants
+            var myClass = StaticJavaParser.parseClassOrInterfaceType(ShimConstants
                     .getClassName(module, qualifiedName));
+            return myClass;
         } else {
             List<String> parameters = new ArrayList<>();
             for (ResolvedType value : TypeUtils.getTypeParameters(type)) {
