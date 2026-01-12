@@ -8,11 +8,15 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.palantir.javapoet.CodeBlock;
+import com.palantir.javapoet.MethodSpec;
+import com.palantir.javapoet.TypeSpec;
 
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 
 /**
  * A shim module checking if the source implement the {@code Function} interface and if so, adds the corresponding interface
@@ -97,6 +101,11 @@ public class FunctionShimModule implements ShimModule {
      */
     public static class ApplyMethod extends BaseShimMethod {
 
+        boolean itemTypeIsVertxGen;
+        boolean returnTypeIsVertxGen;
+        ResolvedType originItemType;
+        ResolvedType originOutputType;
+
         public ApplyMethod(ShimModule module, ShimClass shim, ResolvedType originItemType, ResolvedType originOutputType) {
             super(
                     module,
@@ -105,9 +114,34 @@ public class FunctionShimModule implements ShimModule {
                     List.of(new ShimMethodParameter("item", shim.convert(originItemType), originItemType, false)),
                     List.of(),
                     false, false, null, null);
+            itemTypeIsVertxGen = shim.isVertxGen(originItemType);
+            returnTypeIsVertxGen = shim.isVertxGen(originOutputType);
+            this.originItemType = originItemType;
+            this.originOutputType = originOutputType;
         }
 
-        // TODO: Implement the method generation
+        @Override
+        public void generate(ShimClass shim, TypeSpec.Builder builder) {
+            MethodSpec.Builder method = generateDeclaration(shim, builder);
+            CodeBlock.Builder code = CodeBlock.builder();
+            addGeneratedBy(code);
+            if (itemTypeIsVertxGen) {
+                code.addStatement("$T ret = getDelegate().apply($L.getDelegate())",
+                        JavaType.of(originOutputType.describe()).toTypeName(),
+                        String.join(", ", getParameters().stream().map(ShimMethodParameter::name).toList()));
+            } else {
+                code.addStatement("$T ret = getDelegate().apply($L)",
+                        JavaType.of(originOutputType.describe()).toTypeName(),
+                        String.join(",", getParameters().stream().map(ShimMethodParameter::name).toList()));
+            }
+            if (returnTypeIsVertxGen) {
+                code.addStatement("return $T.newInstance(ret)",
+                        JavaType.of(getReturnType().toString()).toTypeName());
+            } else {
+                code.addStatement("return ret");
+            }
+            method.addCode(code.build());
+            builder.addMethod(method.build());
+        }
     }
-
 }
