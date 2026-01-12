@@ -35,7 +35,7 @@ public class FunctionShimTest {
 
         ShimClass shim = generator.analyze().getShimFor("io.vertx.sources.shims.mutiny.FunctionInterfaceGenParameters");
         assertThat(shim).isNotNull();
-        
+
         assertThat(shim.getMethods())
                 .anySatisfy(m -> {
                     assertThat(m.getName()).isEqualTo("apply");
