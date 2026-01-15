@@ -54,7 +54,7 @@
                         <module>vertx-mutiny-json-schema</module>
                         <module>vertx-mutiny-web-validation</module>
         <!--                <module>vertx-mutiny-web-openapi</module>-->
-        <!--                <module>vertx-mutiny-web-api-service</module>-->
+<!--                        <module>vertx-mutiny-web-api-service</module>-->
         <!--                <module>vertx-mutiny-web-api-contract</module>-->
                         <module>vertx-mutiny-web-templ-freemarker</module>
                         <module>vertx-mutiny-web-templ-handlebars</module>
@@ -65,9 +65,9 @@
                         <module>vertx-mutiny-web-templ-rocker</module>
                         <module>vertx-mutiny-web-templ-thymeleaf</module>
                         <module>vertx-mutiny-web-templ-pug</module>
-        <!--                <module>vertx-mutiny-web-cookie-session-store</module>-->
-        <!--                <module>vertx-mutiny-web-redis-session-store</module>-->
-        <!--                <module>vertx-mutiny-web-infinispan-session-store</module>-->
+                        <module>vertx-mutiny-web-cookie-session-store</module>
+                        <module>vertx-mutiny-web-redis-session-store</module>
+                        <module>vertx-mutiny-web-infinispan-session-store</module>
         <!--                <module>vertx-mutiny-web-graphql</module>-->
         <!--                <module>vertx-mutiny-web-proxy</module>-->
         <!--                <module>vertx-mutiny-circuit-breaker</module>-->
