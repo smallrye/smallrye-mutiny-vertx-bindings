@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.21.4-SNAPSHOT</version>
+        <version>3.21.4</version>
     </parent>
 
     <artifactId>smallrye-mutiny-vertx-service-discovery-backend-zookeeper</artifactId>
@@ -132,4 +132,8 @@
             </properties>
         </profile>
     </profiles>
+
+  <scm>
+    <tag>3.21.4</tag>
+  </scm>
 </project>
