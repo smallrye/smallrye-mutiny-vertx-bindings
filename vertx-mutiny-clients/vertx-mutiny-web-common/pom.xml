@@ -58,7 +58,6 @@
                             <outputDirectory>${gen.output}</outputDirectory>
                         </configuration>
                     </execution>
-
                     <execution>
                         <id>unpack-vertx-core</id>
                         <phase>generate-sources</phase>

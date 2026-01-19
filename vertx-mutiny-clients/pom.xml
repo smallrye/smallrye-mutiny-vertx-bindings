@@ -68,9 +68,9 @@
                         <module>vertx-mutiny-web-cookie-session-store</module>
                         <module>vertx-mutiny-web-redis-session-store</module>
                         <module>vertx-mutiny-web-infinispan-session-store</module>
-        <!--                <module>vertx-mutiny-web-graphql</module>-->
+                        <module>vertx-mutiny-web-graphql</module>
         <!--                <module>vertx-mutiny-web-proxy</module>-->
-        <!--                <module>vertx-mutiny-circuit-breaker</module>-->
+                        <module>vertx-mutiny-circuit-breaker</module>
         <!--                <module>vertx-mutiny-stomp</module>-->
                         <module>vertx-mutiny-config</module>
                         <module>vertx-mutiny-sql-client-templates</module>
