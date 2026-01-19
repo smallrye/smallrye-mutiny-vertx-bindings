@@ -2,9 +2,9 @@ package io.vertx.mutiny.micrometer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
@@ -18,15 +18,15 @@ import io.vertx.mutiny.ext.web.client.WebClient;
 
 public class MicrometerMetricsTest {
 
-    private Vertx vertx;
+    static private Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         vertx = Vertx.vertx();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         vertx.closeAndAwait();
     }
 
@@ -38,7 +38,7 @@ public class MicrometerMetricsTest {
                         .setEnabled(true)));
 
         Router router = Router.router(vertx);
-        router.route("/metrics").handler(x -> PrometheusScrapingHandler.create().handle(x));
+        router.route("/metrics").handler(x -> PrometheusScrapingHandler.create().accept(x));
         HttpServer server = vertx.createHttpServer().requestHandler(router).listenAndAwait(8080);
 
         WebClient client = WebClient.create(vertx, new WebClientOptions().setDefaultPort(8080));
