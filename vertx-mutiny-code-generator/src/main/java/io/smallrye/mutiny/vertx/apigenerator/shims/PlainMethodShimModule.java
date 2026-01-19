@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
@@ -36,6 +39,8 @@ import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
  * It handles the case where the method returns a {@code Vert.x Gen} object, or a list/map/set of {@code Vert.x Gen} object.
  */
 public class PlainMethodShimModule implements ShimModule {
+    private static final Logger log = LoggerFactory.getLogger(PlainMethodShimModule.class);
+
     @Override
     public boolean accept(ShimClass shim) {
         return true;
@@ -484,6 +489,16 @@ public class PlainMethodShimModule implements ShimModule {
             // Body
             CodeBlock.Builder code = CodeBlock.builder();
             addGeneratedBy(code);
+
+            if (TypeUtils.mustTransformFutureIntoUni(getParameters(), getOriginalMethod().getParameters())) {
+
+                code.addStatement("return getDelegate().$L(io.smallrye.mutiny.vertx.UniHelper.toFuture($L))",
+                        getName(),
+                        getParameters().get(0).name());
+                method.addCode(code.build());
+                builder.addMethod(method.build());
+                return;
+            }
             // For each parameter, we need to convert it to the bare shimType if needed.
             for (var parameter : getParameters()) {
                 code.add(parameter.toBareVariableDeclaration("_" + parameter.name(), shim));
@@ -539,7 +554,8 @@ public class PlainMethodShimModule implements ShimModule {
                             code.addStatement("return this");
                         } else {
                             code.addStatement("return getDelegate().$L($L)", getName(),
-                                    String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
+                                    String.join(", ", getParameters()
+                                            .stream().map(p -> "_" + p.name()).toList()));
                         }
                     }
                 }

@@ -22,6 +22,19 @@ import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
 
 public class TypeUtils {
 
+    public static boolean mustTransformFutureIntoUni(List<ShimMethodParameter> methodParameters,
+            List<VertxGenMethod.ResolvedParameter> originalMethodParameters) {
+        return methodParameters.size() == 1 &&
+                methodParameters.stream()
+                        .anyMatch(p -> shimMethodParameterIsUni(p.shimType()))
+                &&
+                originalMethodParameters.get(0).type().asReferenceType().getQualifiedName().equals("io.vertx.core.Future");
+    }
+
+    private static boolean shimMethodParameterIsUni(Type t) {
+        return t.isClassOrInterfaceType() && t.asClassOrInterfaceType().getName().toString().equals("Uni");
+    }
+
     public static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim,
             List<VertxGenMethod.ResolvedParameter> parameters) {
         return convertBareToShimParameters(shim, parameters, false);

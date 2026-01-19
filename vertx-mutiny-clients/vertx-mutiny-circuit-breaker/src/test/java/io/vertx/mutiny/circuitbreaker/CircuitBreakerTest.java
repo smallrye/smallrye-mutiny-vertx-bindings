@@ -2,9 +2,9 @@ package io.vertx.mutiny.circuitbreaker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
@@ -12,15 +12,15 @@ import io.vertx.mutiny.core.Vertx;
 
 public class CircuitBreakerTest {
 
-    private Vertx vertx;
+    static private Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static public void setUp() {
         vertx = Vertx.vertx();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static public void tearDown() {
         vertx.closeAndAwait();
     }
 
