@@ -56,6 +56,11 @@ public class VertxGenCollection {
     private final List<VertxGenInterface> interfaces = new ArrayList<>();
     private final List<CompilationUnit> additionalUnits;
 
+    private final List<String> specialCases = List.of(
+            "io.vertx.sqlclient.SqlResult",
+            "io.vertx.micrometer.PrometheusRequestHandler",
+            "io.vertx.micrometer.PrometheusScrapingHandler");
+
     public VertxGenCollection(MutinyGenerator generator, SourceRoot source, List<Path> additionSources) throws IOException {
         this.generator = generator;
         logger.info("Initializing collection of sources from `{}`", source.getRoot());
@@ -173,7 +178,7 @@ public class VertxGenCollection {
                 boolean concrete = AnnotationHelper.getAttribute(annotation, CONCRETE_ATTRIBUTE)
                         .map(p -> p.getValue().asBooleanLiteralExpr().getValue()).orElse(true);
                 // TODO this might be incorporated directly in Vertx
-                if (fqn.equals("io.vertx.sqlclient.SqlResult")) {
+                if (specialCases.contains(fqn)) {
                     concrete = false;
                 }
 
@@ -465,7 +470,8 @@ public class VertxGenCollection {
                         .getAttribute(declaration.getAnnotationByClass(VertxGen.class).orElseThrow(), CONCRETE_ATTRIBUTE)
                         .map(p -> p.getValue().asBooleanLiteralExpr().getValue()).orElse(true);
                 // TODO might want to change it in Vertx
-                if (declaration.getFullyQualifiedName().get().equals("io.vertx.sqlclient.SqlResult")) {
+                if (declaration.getFullyQualifiedName().isPresent() &&
+                        specialCases.contains(declaration.getFullyQualifiedName().get())) {
                     concrete = false;
                 }
                 // Need to identify the module

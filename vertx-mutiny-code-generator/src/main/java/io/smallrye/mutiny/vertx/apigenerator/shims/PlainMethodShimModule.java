@@ -598,12 +598,35 @@ public class PlainMethodShimModule implements ShimModule {
             }
 
             String args = String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList());
-            TypeName handlerTypeName = JavaType.of(handlerType.erasure().describe()).toTypeName();
-            if (isStatic()) {
-                ClassName target = ClassName.bestGuess(shim.getSource().getFullyQualifiedName());
-                code.addStatement("return __res -> $T.$L($L).handle(($T) __res)", target, getName(), args, handlerTypeName);
+            if (shim.getFullyQualifiedName().equals("io.vertx.mutiny.micrometer.PrometheusScrapingHandler")
+                    && getName().equals("create")) {
+                code.addStatement("""
+                        return new $T<$T>() {
+                          public void accept($L event) {
+                              $T.$L($L).handle(event.getDelegate());
+                          }
+                        }
+                        """,
+                        JavaType.of("java.util.function.Consumer").toTypeName(),
+                        JavaType.of(getReturnType().asClassOrInterfaceType().getTypeArguments().get().get(0)
+                                .asClassOrInterfaceType()
+                                .getNameWithScope()).toTypeName(),
+                        JavaType.of(getReturnType().asClassOrInterfaceType().getTypeArguments().get().get(0)
+                                .asClassOrInterfaceType()
+                                .getNameWithScope()).toTypeName(),
+                        JavaType.of(shim.getSource().getType().asString()).toTypeName(),
+                        getName(),
+                        args);
             } else {
-                code.addStatement("return __res -> getDelegate().$L($L).handle(($T) __res)", getName(), args, handlerTypeName);
+                TypeName handlerTypeName = JavaType.of(handlerType.erasure().describe()).toTypeName();
+                if (isStatic()) {
+                    ClassName target = ClassName.bestGuess(shim.getSource().getFullyQualifiedName());
+                    code.addStatement("return __res -> $T.$L($L).handle(($T) __res)", target, getName(), args, handlerTypeName);
+                } else {
+                    code.addStatement("return __res -> getDelegate().$L($L).handle(($T) __res)", getName(), args,
+                            handlerTypeName);
+                }
+
             }
 
             method.addCode(code.build());
