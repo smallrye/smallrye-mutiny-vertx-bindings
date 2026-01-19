@@ -77,15 +77,15 @@
         <!--                <module>vertx-mutiny-shell</module>-->
         <!--                <module>vertx-mutiny-micrometer-metrics</module>-->
         <!--                <module>vertx-mutiny-tcp-eventbus-bridge</module>-->
-        <!--                <module>vertx-mutiny-service-discovery</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-backend-consul</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-backend-redis</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-backend-zookeeper</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-bridge-consul</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-bridge-docker</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-bridge-docker-links</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-bridge-kubernetes</module>-->
-        <!--                <module>vertx-mutiny-service-discovery-bridge-zookeeper</module>-->
+                        <module>vertx-mutiny-service-discovery</module>
+                        <module>vertx-mutiny-service-discovery-backend-consul</module>
+                        <module>vertx-mutiny-service-discovery-backend-redis</module>
+                        <module>vertx-mutiny-service-discovery-backend-zookeeper</module>
+                        <module>vertx-mutiny-service-discovery-bridge-consul</module>
+                        <module>vertx-mutiny-service-discovery-bridge-docker</module>
+                        <module>vertx-mutiny-service-discovery-bridge-docker-links</module>
+                        <module>vertx-mutiny-service-discovery-bridge-kubernetes</module>
+                        <module>vertx-mutiny-service-discovery-bridge-zookeeper</module>
                         <module>vertx-mutiny-uri-template</module>
         <!--                <module>vertx-mutiny-http-proxy</module>-->
 
