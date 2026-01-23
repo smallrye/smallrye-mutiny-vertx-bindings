@@ -58,7 +58,6 @@
                         <module>vertx-mutiny-web-templ-freemarker</module>
                         <module>vertx-mutiny-web-templ-handlebars</module>
                         <module>vertx-mutiny-web-templ-httl</module>
-<!--                        <module>vertx-mutiny-web-templ-jade</module>-->
                         <module>vertx-mutiny-web-templ-mvel</module>
                         <module>vertx-mutiny-web-templ-pebble</module>
                         <module>vertx-mutiny-web-templ-rocker</module>
@@ -70,7 +69,6 @@
                         <module>vertx-mutiny-web-graphql</module>
         <!--                <module>vertx-mutiny-web-proxy</module>-->
                         <module>vertx-mutiny-circuit-breaker</module>
-        <!--                <module>vertx-mutiny-stomp</module>-->
                         <module>vertx-mutiny-config</module>
                         <module>vertx-mutiny-sql-client-templates</module>
                         <module>vertx-mutiny-shell</module>
