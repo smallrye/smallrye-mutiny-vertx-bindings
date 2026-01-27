@@ -67,7 +67,7 @@
                         <module>vertx-mutiny-web-redis-session-store</module>
                         <module>vertx-mutiny-web-infinispan-session-store</module>
                         <module>vertx-mutiny-web-graphql</module>
-        <!--                <module>vertx-mutiny-web-proxy</module>-->
+                        <module>vertx-mutiny-web-proxy</module>
                         <module>vertx-mutiny-circuit-breaker</module>
                         <module>vertx-mutiny-config</module>
                         <module>vertx-mutiny-sql-client-templates</module>
@@ -84,7 +84,7 @@
                         <module>vertx-mutiny-service-discovery-bridge-kubernetes</module>
                         <module>vertx-mutiny-service-discovery-bridge-zookeeper</module>
                         <module>vertx-mutiny-uri-template</module>
-        <!--                <module>vertx-mutiny-http-proxy</module>-->
+                        <module>vertx-mutiny-http-proxy</module>
 
         <!-- TODO add OpenAPI modules from https://github.com/smallrye/smallrye-mutiny-vertx-bindings/pull/1176 -->
     </modules>
