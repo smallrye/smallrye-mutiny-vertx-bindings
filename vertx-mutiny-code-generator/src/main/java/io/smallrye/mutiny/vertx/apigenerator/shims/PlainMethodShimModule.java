@@ -599,11 +599,16 @@ public class PlainMethodShimModule implements ShimModule {
 
             String args = String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList());
             TypeName handlerTypeName = JavaType.of(handlerType.erasure().describe()).toTypeName();
+            var resIsVertxGen = shim.getSource().getGenerator().getCollectionResult()
+                    .isVertxGen(handlerTypeName.toString());
+            String resName = resIsVertxGen ? "__res.getDelegate()" : "__res";
             if (isStatic()) {
                 ClassName target = ClassName.bestGuess(shim.getSource().getFullyQualifiedName());
-                code.addStatement("return __res -> $T.$L($L).handle(($T) __res)", target, getName(), args, handlerTypeName);
+                code.addStatement("return __res -> $T.$L($L).handle(($T) $L)",
+                        target, getName(), args, handlerTypeName, resName);
             } else {
-                code.addStatement("return __res -> getDelegate().$L($L).handle(($T) __res)", getName(), args, handlerTypeName);
+                code.addStatement("return __res -> getDelegate().$L($L).handle(($T) $L)",
+                        getName(), args, handlerTypeName, resName);
             }
 
             method.addCode(code.build());

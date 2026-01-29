@@ -72,8 +72,8 @@
                         <module>vertx-mutiny-config</module>
                         <module>vertx-mutiny-sql-client-templates</module>
                         <module>vertx-mutiny-shell</module>
-        <!--                <module>vertx-mutiny-micrometer-metrics</module>-->
-        <!--                <module>vertx-mutiny-tcp-eventbus-bridge</module>-->
+                        <module>vertx-mutiny-micrometer-metrics</module>
+                        <module>vertx-mutiny-tcp-eventbus-bridge</module>
                         <module>vertx-mutiny-service-discovery</module>
                         <module>vertx-mutiny-service-discovery-backend-consul</module>
                         <module>vertx-mutiny-service-discovery-backend-redis</module>
