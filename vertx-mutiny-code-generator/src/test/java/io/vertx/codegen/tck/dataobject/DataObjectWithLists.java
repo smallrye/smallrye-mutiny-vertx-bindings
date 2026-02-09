@@ -1,15 +1,15 @@
 package io.vertx.codegen.tck.dataobject;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.sources.constants.TestEnum;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.sources.constants.TestEnum;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>

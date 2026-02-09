@@ -1,15 +1,15 @@
 package io.vertx.codegen.tck.dataobject;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.sources.constants.TestEnum;
+
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.sources.constants.TestEnum;
 
 @DataObject
 public class DataObjectWithMaps {
@@ -20,9 +20,7 @@ public class DataObjectWithMaps {
 
     private static <T> JsonObject toObject(Map<String, T> map, Function<T, Object> converter) {
         JsonObject object = new JsonObject();
-        map.forEach((key, value) -> {
-            object.getMap().put(key, converter.apply(value));
-        });
+        map.forEach((key, value) -> object.getMap().put(key, converter.apply(value)));
         return object;
     }
 
@@ -34,7 +32,7 @@ public class DataObjectWithMaps {
         JsonObject array = obj.getJsonObject(name);
         if (array != null) {
             return array.stream()
-                    .collect(Collectors.toMap(entry -> entry.getKey(), entry -> converter.apply(entry.getValue())));
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> converter.apply(entry.getValue())));
         } else {
             return null;
         }

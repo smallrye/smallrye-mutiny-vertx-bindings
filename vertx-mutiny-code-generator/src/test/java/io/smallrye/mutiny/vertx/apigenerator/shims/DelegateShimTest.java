@@ -1,13 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.Test;
-
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DelegateShimTest {
 

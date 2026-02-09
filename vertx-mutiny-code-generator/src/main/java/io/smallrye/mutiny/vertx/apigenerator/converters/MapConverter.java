@@ -1,11 +1,10 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
-import java.util.Map;
-
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
+
+import java.util.Map;
 
 public class MapConverter extends BaseShimTypeConverter {
 
@@ -26,8 +25,7 @@ public class MapConverter extends BaseShimTypeConverter {
         ResolvedType valueType = type.asReferenceType().getTypeParametersMap().get(1).b;
         var convertedValueType = convertType(valueType);
         var convertedKeyType = convertType(keyType);
-        ClassOrInterfaceType v = StaticJavaParser.parseClassOrInterfaceType(MAP)
+        return StaticJavaParser.parseClassOrInterfaceType(MAP)
                 .setTypeArguments(convertedKeyType, convertedValueType);
-        return v;
     }
 }

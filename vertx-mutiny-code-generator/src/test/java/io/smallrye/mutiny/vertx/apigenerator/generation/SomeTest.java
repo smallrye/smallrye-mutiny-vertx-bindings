@@ -1,22 +1,19 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import javax.lang.model.element.Modifier;
-
-import org.junit.jupiter.api.Test;
-
 import com.palantir.javapoet.AnnotationSpec;
 import com.palantir.javapoet.JavaFile;
 import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
-
 import io.smallrye.mutiny.vertx.MutinyDelegate;
 import io.smallrye.mutiny.vertx.MutinyGen;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
+
+import javax.lang.model.element.Modifier;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SomeTest {
 

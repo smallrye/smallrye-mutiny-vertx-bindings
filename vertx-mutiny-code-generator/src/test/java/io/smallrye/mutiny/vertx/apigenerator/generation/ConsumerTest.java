@@ -1,19 +1,19 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.*;
+import io.smallrye.mutiny.tuples.Tuple2;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.junit.jupiter.api.Test;
-
-import io.smallrye.mutiny.tuples.Tuple2;
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
-import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatList;
 
 public class ConsumerTest {
 

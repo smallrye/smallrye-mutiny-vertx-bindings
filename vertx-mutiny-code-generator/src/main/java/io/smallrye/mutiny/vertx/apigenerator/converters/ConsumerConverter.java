@@ -1,12 +1,11 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
-import java.util.function.Consumer;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
-
 import io.smallrye.mutiny.Uni;
+
+import java.util.function.Consumer;
 
 public class ConsumerConverter extends BaseShimTypeConverter {
 

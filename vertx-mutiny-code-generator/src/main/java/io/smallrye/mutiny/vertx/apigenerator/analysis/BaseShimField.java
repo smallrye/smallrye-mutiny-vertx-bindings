@@ -1,19 +1,13 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.lang.model.element.Modifier;
-
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.FieldSpec;
-import com.palantir.javapoet.ParameterizedTypeName;
-import com.palantir.javapoet.TypeName;
-import com.palantir.javapoet.TypeSpec;
-
+import com.palantir.javapoet.*;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
+
+import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseShimField implements ShimField {
 

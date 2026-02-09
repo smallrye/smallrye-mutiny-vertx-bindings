@@ -1,4 +1,4 @@
-package io.smallrye.mutiny.vertx.apigenerator;
+package io.smallrye.mutiny.vertx.apigenerator.utils;
 
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenModule;
 

@@ -1,11 +1,11 @@
 package io.vertx.codegen.tck.dataobject;
 
-import java.time.Instant;
-
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sources.constants.TestEnum;
+
+import java.time.Instant;
 
 @DataObject
 public class DataObjectWithValues {

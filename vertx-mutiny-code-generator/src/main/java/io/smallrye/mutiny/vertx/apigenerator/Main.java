@@ -1,16 +1,15 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import picocli.CommandLine;
-
-@CommandLine.Command(name = "vertx-mutiny-generator", mixinStandardHelpOptions = true, version = "Vert.x Mutiny Generator 1.0", description = "Entrypoint of the Vert.x Mutiny Generator")
+@CommandLine.Command(name = "vertx-mutiny-generator", mixinStandardHelpOptions = true, description = "Mutiny Vert.x 5 Bindings Generator")
 public class Main implements Callable<Integer> {
 
     @CommandLine.Option(names = "--source", description = "The source directory", required = true)
@@ -40,6 +39,7 @@ public class Main implements Callable<Integer> {
         if (output != null) {
             list.forEach(output -> {
                 try {
+                    logger.info("Writing {}", output.shim().getFullyQualifiedName());
                     output.javaFile().writeToPath(this.output);
                 } catch (Exception e) {
                     logger.error("Unable to write the file for shim class: {}", output.shim().getFullyQualifiedName(), e);

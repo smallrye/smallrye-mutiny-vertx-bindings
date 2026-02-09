@@ -1,10 +1,5 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.lang.model.element.Modifier;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.javadoc.Javadoc;
@@ -13,14 +8,13 @@ import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
 import com.palantir.javapoet.TypeVariableName;
-
 import io.smallrye.mutiny.vertx.TypeArg;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+
+import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Declares the `newInstance` method taking the {@code delegate} object as parameter.

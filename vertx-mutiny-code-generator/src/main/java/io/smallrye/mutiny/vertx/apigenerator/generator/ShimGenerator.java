@@ -1,31 +1,19 @@
 package io.smallrye.mutiny.vertx.apigenerator.generator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.lang.model.element.Modifier;
-
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.TypeParameter;
+import com.palantir.javapoet.*;
+import io.smallrye.mutiny.vertx.MutinyGen;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
+import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
+import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.ast.type.TypeParameter;
-import com.palantir.javapoet.AnnotationSpec;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.JavaFile;
-import com.palantir.javapoet.TypeSpec;
-import com.palantir.javapoet.TypeVariableName;
-
-import io.smallrye.mutiny.vertx.MutinyGen;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimCompanionClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimConstructor;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimField;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
-import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import javax.lang.model.element.Modifier;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ShimGenerator {
 

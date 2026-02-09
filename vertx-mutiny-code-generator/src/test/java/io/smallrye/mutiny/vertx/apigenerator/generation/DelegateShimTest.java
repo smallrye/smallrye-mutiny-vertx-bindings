@@ -1,29 +1,21 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.util.List;
-
-import javax.lang.model.element.Modifier;
-
-import org.junit.jupiter.api.Test;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.FieldSpec;
-import com.palantir.javapoet.MethodSpec;
-import com.palantir.javapoet.ParameterizedTypeName;
-import com.palantir.javapoet.TypeVariableName;
-
+import com.palantir.javapoet.*;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
+
+import javax.lang.model.element.Modifier;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DelegateShimTest {
 
     @Test
-    void testDelegate() throws IOException {
+    void testDelegate() {
         Env creator = new Env();
         creator.addJavaCode("me.escoffier.test", "MyInterface.java", """
                 package me.escoffier.test;
@@ -74,7 +66,7 @@ public class DelegateShimTest {
     }
 
     @Test
-    void testDelegateWithATypeParam() throws IOException {
+    void testDelegateWithATypeParam() {
         Env env = new Env();
         env.addJavaCode("me.escoffier.test", "MyInterface.java", """
                 package me.escoffier.test;

@@ -1,24 +1,21 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.palantir.javapoet.AnnotationSpec;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.smallrye.mutiny.vertx.MutinyGen;
 import io.smallrye.mutiny.vertx.TypeArg;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
+
+import java.nio.file.Paths;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NonConcreteInterfaceDeclarationTest {
 
@@ -58,7 +55,7 @@ public class NonConcreteInterfaceDeclarationTest {
     }
 
     @Test
-    void testWithNonConcreteWithExtension() throws IOException {
+    void testWithNonConcreteWithExtension() {
         Env env = new Env()
                 .addJavaCode("me.escoffier.test", "MyInterface.java", """
                         package me.escoffier.test;
@@ -81,11 +78,6 @@ public class NonConcreteInterfaceDeclarationTest {
         assertThat(output.javaFile().packageName()).isEqualTo("me.escoffier.test.mutiny");
         assertThat(output.javaFile().typeSpec().name()).isEqualTo("MyInterface");
 
-        //        assertThat(output.javaFile().typeSpec().superinterfaces())
-        //                .contains(ParameterizedTypeName.get(
-        //                        ClassName.bestGuess("java.util.function.Consumer"),
-        //                        ClassName.bestGuess("java.lang.String")));
-
         assertThat(output.javaFile().typeSpec().annotations()).contains(AnnotationSpec.builder(MutinyGen.class)
                 .addMember("value", "me.escoffier.test.MyInterface.class")
                 .build());
@@ -97,7 +89,7 @@ public class NonConcreteInterfaceDeclarationTest {
     }
 
     @Test
-    void testWithNonConcreteWithExtensionHavingAVertxGenGeneric() throws IOException {
+    void testWithNonConcreteWithExtensionHavingAVertxGenGeneric() {
         Env env = new Env()
                 .addJavaCode("me.escoffier.test.ref", "Refed.java", """
                         package me.escoffier.test.ref;
@@ -130,11 +122,6 @@ public class NonConcreteInterfaceDeclarationTest {
         assertThat(output.javaFile().packageName()).isEqualTo("me.escoffier.test.mutiny");
         assertThat(output.javaFile().typeSpec().name()).isEqualTo("MyInterface");
 
-        //        assertThat(output.javaFile().typeSpec().superinterfaces())
-        //                .contains(ParameterizedTypeName.get(
-        //                        ClassName.bestGuess("java.util.function.Consumer"),
-        //                        ClassName.bestGuess("me.escoffier.test.mutiny.ref.Refed")));
-
         MethodSpec method = Env.findMethod(output, "getDelegate");
         assertThat(method.returnType()).isEqualTo(ClassName.bestGuess("me.escoffier.test.MyInterface"));
 
@@ -142,7 +129,7 @@ public class NonConcreteInterfaceDeclarationTest {
     }
 
     @Test
-    void testWithNonConcreteWithExtensionOfVertxGen() throws IOException {
+    void testWithNonConcreteWithExtensionOfVertxGen() {
         Env env = new Env()
                 .addJavaCode("me.escoffier.test.ref", "Refed.java", """
                         package me.escoffier.test.ref;
@@ -174,9 +161,6 @@ public class NonConcreteInterfaceDeclarationTest {
         assertThat(output.javaFile().typeSpec().kind()).isEqualTo(TypeSpec.Kind.INTERFACE);
         assertThat(output.javaFile().packageName()).isEqualTo("me.escoffier.test.mutiny");
         assertThat(output.javaFile().typeSpec().name()).isEqualTo("MyInterface");
-
-        //        assertThat(output.javaFile().typeSpec().superinterfaces())
-        //                .contains(ClassName.bestGuess("me.escoffier.test.mutiny.ref.Refed"));
 
         MethodSpec method = Env.findMethod(output, "getDelegate");
         assertThat(method.returnType()).isEqualTo(ClassName.bestGuess("me.escoffier.test.MyInterface"));

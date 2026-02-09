@@ -1,19 +1,17 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.junit.jupiter.api.Test;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.VoidType;
-
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NonConcreteInheritanceTest {
 

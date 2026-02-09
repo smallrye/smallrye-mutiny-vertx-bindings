@@ -1,9 +1,9 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import java.util.List;
-
 import com.github.javaparser.ast.type.Type;
 import com.palantir.javapoet.TypeSpec;
+
+import java.util.List;
 
 public interface ShimConstructor extends Shim {
 

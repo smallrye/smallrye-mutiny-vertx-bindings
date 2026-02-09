@@ -1,9 +1,9 @@
 package io.vertx.codegen.tck.constants;
 
-import java.util.Objects;
-
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
+
+import java.util.Objects;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -59,8 +59,7 @@ public class TestDataObject {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof TestDataObject) {
-            TestDataObject that = (TestDataObject) obj;
+        if (obj instanceof TestDataObject that) {
             return Objects.equals(foo, that.foo) && bar == that.bar && wibble == that.wibble;
         }
         return false;

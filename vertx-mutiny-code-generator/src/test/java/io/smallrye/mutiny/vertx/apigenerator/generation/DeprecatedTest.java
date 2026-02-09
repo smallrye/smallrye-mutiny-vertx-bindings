@@ -1,13 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import org.junit.jupiter.api.Test;
-
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DeprecatedTest {
 

@@ -1,16 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator.types;
 
+import com.palantir.javapoet.*;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
-
-import com.palantir.javapoet.ArrayTypeName;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.ParameterizedTypeName;
-import com.palantir.javapoet.TypeName;
-import com.palantir.javapoet.WildcardTypeName;
 
 public record JavaType(String fqn, List<JavaType> parameterTypes) {
 

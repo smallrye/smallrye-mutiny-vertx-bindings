@@ -1,6 +1,6 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
-import io.smallrye.mutiny.vertx.apigenerator.ShimConstants;
+import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
 
 /**
  * Represents a Vert.x generated class.

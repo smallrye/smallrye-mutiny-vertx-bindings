@@ -3,7 +3,6 @@ package io.smallrye.mutiny.vertx.apigenerator.shims;
 import com.github.javaparser.StaticJavaParser;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.FieldSpec;
-
 import io.smallrye.mutiny.vertx.TypeArg;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimField;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;

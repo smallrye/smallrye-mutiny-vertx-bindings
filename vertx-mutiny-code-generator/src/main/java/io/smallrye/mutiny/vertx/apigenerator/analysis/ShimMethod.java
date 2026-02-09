@@ -1,13 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import java.util.List;
-
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
+
+import java.util.List;
 
 public interface ShimMethod extends Shim {
 

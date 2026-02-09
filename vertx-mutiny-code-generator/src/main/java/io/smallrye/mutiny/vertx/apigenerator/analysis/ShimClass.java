@@ -1,10 +1,5 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -13,10 +8,14 @@ import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.resolution.types.ResolvedType;
-
-import io.smallrye.mutiny.vertx.apigenerator.ShimConstants;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a shim class.

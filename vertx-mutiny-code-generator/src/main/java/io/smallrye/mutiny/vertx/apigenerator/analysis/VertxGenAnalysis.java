@@ -1,32 +1,13 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+import io.smallrye.mutiny.vertx.apigenerator.shims.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
-import io.smallrye.mutiny.vertx.apigenerator.shims.CompanionShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.ConstantShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateAndTypeArgsConstructorShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateAsObjectAndTypeArgsConstructorShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateConstructorShim;
-import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.EqualsHashCodeAndToStringShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.FunctionShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.HandlerShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.HierarchyShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.IterableShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.IteratorShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.NewInstanceMethodShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.NoArgConstructorShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.PlainMethodShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.ReadStreamModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.TypeArgConstantShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.UniMethodShimModule;
-import io.smallrye.mutiny.vertx.apigenerator.shims.WriteStreamModule;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Analyze the result of the collection and build the necessary shims.

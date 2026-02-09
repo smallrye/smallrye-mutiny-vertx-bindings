@@ -1,8 +1,5 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.List;
-import java.util.function.Function;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -11,12 +8,14 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
+
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * A shim module checking if the source implement the {@code Function} interface and if so, adds the corresponding interface
@@ -101,10 +100,10 @@ public class FunctionShimModule implements ShimModule {
      */
     public static class ApplyMethod extends BaseShimMethod {
 
-        boolean itemTypeIsVertxGen;
-        boolean returnTypeIsVertxGen;
-        ResolvedType originItemType;
-        ResolvedType originOutputType;
+        final boolean itemTypeIsVertxGen;
+        final boolean returnTypeIsVertxGen;
+        final ResolvedType originItemType;
+        final ResolvedType originOutputType;
 
         public ApplyMethod(ShimModule module, ShimClass shim, ResolvedType originItemType, ResolvedType originOutputType) {
             super(

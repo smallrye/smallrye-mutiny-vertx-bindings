@@ -1,38 +1,28 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import javax.lang.model.element.Modifier;
-
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.CodeBlock;
-import com.palantir.javapoet.MethodSpec;
-import com.palantir.javapoet.TypeName;
-import com.palantir.javapoet.TypeSpec;
-import com.palantir.javapoet.TypeVariableName;
-
+import com.palantir.javapoet.*;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
-import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimField;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import io.smallrye.mutiny.vertx.apigenerator.utils.JavadocHelper;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.lang.model.element.Modifier;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * A shim generating a method delegating to the original method for each method that is returning a Future.
@@ -40,6 +30,8 @@ import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
  * object.
  */
 public class UniMethodShimModule implements ShimModule {
+
+    private static final Logger logger = LoggerFactory.getLogger(UniMethodShimModule.class);
 
     @Override
     public boolean accept(ShimClass shim) {
@@ -55,8 +47,8 @@ public class UniMethodShimModule implements ShimModule {
                 if (!TypeUtils.isFuture(returnType)) {
                     continue;
                 }
-            } catch (ClassCastException ignored) {
-                System.err.println(ignored);
+            } catch (ClassCastException classCastException) {
+                logger.debug("Ignored class cast exception", classCastException);
                 continue;
             }
 

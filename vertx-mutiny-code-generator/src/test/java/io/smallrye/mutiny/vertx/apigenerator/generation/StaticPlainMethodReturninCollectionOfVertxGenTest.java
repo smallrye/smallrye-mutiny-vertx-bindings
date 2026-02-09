@@ -1,15 +1,14 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.smallrye.mutiny.tuples.Tuple2;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
-import io.smallrye.mutiny.tuples.Tuple2;
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class StaticPlainMethodReturninCollectionOfVertxGenTest {
 
@@ -67,7 +66,6 @@ public class StaticPlainMethodReturninCollectionOfVertxGenTest {
                 .extracting("name").contains("a", "b");
         assertThat((Set<?>) env.invoke(clazz, "returnSet")).hasSize(2)
                 .extracting("name").contains("a", "b");
-        ;
     }
 
     @SuppressWarnings({ "TestFailedLine", "unchecked" })

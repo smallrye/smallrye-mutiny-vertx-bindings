@@ -1,21 +1,20 @@
-package io.smallrye.mutiny.vertx.apigenerator;
-
-import java.util.ArrayList;
-import java.util.List;
+package io.smallrye.mutiny.vertx.apigenerator.utils;
 
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
-
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
 
-public class JavadocHelper {
+import java.util.ArrayList;
+import java.util.List;
 
-    public static Javadoc addToJavadoc(Javadoc javadoc, String content) {
+public interface JavadocHelper {
+
+    static Javadoc addToJavadoc(Javadoc javadoc, String content) {
         String doc;
         if (javadoc == null) {
             doc = """
@@ -37,7 +36,7 @@ public class JavadocHelper {
         }
     }
 
-    public static Javadoc addOrReplaceReturnTag(Javadoc javadoc, String value) {
+    static Javadoc addOrReplaceReturnTag(Javadoc javadoc, String value) {
         if (javadoc == null) {
             return new Javadoc(JavadocDescription.parseText("""
                     @return %s
@@ -55,7 +54,7 @@ public class JavadocHelper {
         return javadoc.addBlockTag("return", value);
     }
 
-    public static Javadoc removeReturnTag(Javadoc javadoc) {
+    static Javadoc removeReturnTag(Javadoc javadoc) {
         // Remove @return tag if any.
         List<JavadocBlockTag> tags = javadoc.getBlockTags();
         List<JavadocBlockTag> found = new ArrayList<>(); // Just in case a method has multiple return tags.
@@ -68,7 +67,7 @@ public class JavadocHelper {
         return javadoc;
     }
 
-    public static Javadoc replace(Javadoc jd, String v1, String v2) {
+    static Javadoc replace(Javadoc jd, String v1, String v2) {
         String newValue = jd.getDescription().toText().replace(v1, v2);
         var newJavadoc = new Javadoc(JavadocDescription.parseText(newValue));
         for (var tag : jd.getBlockTags()) {
@@ -84,7 +83,7 @@ public class JavadocHelper {
      * @param shim the shim class, to access Vert.x Gen types
      * @return the transformed Javadoc
      */
-    public static Javadoc toMutinyTypes(Javadoc javadoc, ShimClass shim) {
+    static Javadoc toMutinyTypes(Javadoc javadoc, ShimClass shim) {
         if (javadoc == null) {
             return null;
         }
@@ -112,8 +111,7 @@ public class JavadocHelper {
 
     private static void transformJavadocDescriptionElement(ShimClass shim, JavadocDescriptionElement element,
             List<JavadocDescriptionElement> elements) {
-        if (element instanceof JavadocInlineTag) {
-            JavadocInlineTag tag = (JavadocInlineTag) element;
+        if (element instanceof JavadocInlineTag tag) {
             String link = tag.getContent();
             for (VertxGenClass clz : shim.getSource().getGenerator().getCollectionResult().allVertxGenClasses()) {
                 if (link.contains(clz.fullyQualifiedName())) {
@@ -126,7 +124,7 @@ public class JavadocHelper {
         }
     }
 
-    public static Javadoc amendJavadocIfReturnTypeIsNullable(Javadoc javadoc) {
+    static Javadoc amendJavadocIfReturnTypeIsNullable(Javadoc javadoc) {
         if (javadoc == null) {
             return null;
         }
@@ -149,7 +147,7 @@ public class JavadocHelper {
         return javadoc;
     }
 
-    public static Javadoc amendJavadocIfParameterTypeIsNullable(Javadoc javadoc, ShimMethodParameter parameter) {
+    static Javadoc amendJavadocIfParameterTypeIsNullable(Javadoc javadoc, ShimMethodParameter parameter) {
         if (javadoc == null) {
             return null;
         }
@@ -158,9 +156,7 @@ public class JavadocHelper {
             JavadocBlockTag tag = javadoc.getBlockTags().stream()
                     .filter(t -> t.getType() == JavadocBlockTag.Type.PARAM && t.getName().orElse("").equals(parameter.name()))
                     .findFirst().orElse(null);
-            if (tag == null) {
-                return javadoc;
-            } else {
+            if (tag != null) {
                 String text = tag.getContent().toText();
                 if (text.contains("null")) {
                     return javadoc; // Already mentioned
@@ -173,8 +169,8 @@ public class JavadocHelper {
                 int idx = javadoc.getBlockTags().indexOf(tag);
                 javadoc.getBlockTags().remove(tag);
                 javadoc.getBlockTags().add(idx, newTag);
-                return javadoc;
             }
+            return javadoc;
         } else {
             return javadoc;
         }

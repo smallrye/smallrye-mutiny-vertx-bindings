@@ -1,11 +1,10 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 public class InheritanceTest {
 

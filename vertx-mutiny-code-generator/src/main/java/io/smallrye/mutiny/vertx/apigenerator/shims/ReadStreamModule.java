@@ -1,8 +1,5 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.List;
-import java.util.stream.Stream;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.Type;
@@ -12,7 +9,6 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
 import com.palantir.javapoet.TypeVariableName;
-
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimField;
@@ -22,6 +18,9 @@ import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Generate the toMulti, toBlockingIterable and toBlockingStream methods when the source implements the ReadStream interface.

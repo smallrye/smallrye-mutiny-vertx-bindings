@@ -1,18 +1,17 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.Iterator;
-import java.util.List;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A shim module checking if the source implement the {@code Iterator} interface and if so, adds the corresponding interface

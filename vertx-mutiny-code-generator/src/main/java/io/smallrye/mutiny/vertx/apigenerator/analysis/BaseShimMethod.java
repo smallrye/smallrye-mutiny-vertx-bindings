@@ -1,12 +1,5 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import java.util.List;
-
-import javax.lang.model.element.Modifier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
@@ -14,10 +7,14 @@ import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
 import com.palantir.javapoet.TypeVariableName;
-
 import io.smallrye.common.annotation.CheckReturnValue;
-import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.lang.model.element.Modifier;
+import java.util.List;
 
 public class BaseShimMethod implements ShimMethod {
 

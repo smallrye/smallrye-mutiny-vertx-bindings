@@ -1,17 +1,6 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Stream;
-
-import javax.lang.model.element.Modifier;
-
-import org.junit.jupiter.api.Test;
-
 import com.palantir.javapoet.MethodSpec;
-
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -19,6 +8,14 @@ import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import org.junit.jupiter.api.Test;
+
+import javax.lang.model.element.Modifier;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * These tests are slight different:

@@ -1,20 +1,14 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.List;
-
-import javax.lang.model.element.Modifier;
-
 import com.github.javaparser.ast.type.TypeParameter;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimConstructor;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+
+import javax.lang.model.element.Modifier;
+import java.util.List;
 
 /**
  * Declares the constructor taking the `delegate` as parameter.

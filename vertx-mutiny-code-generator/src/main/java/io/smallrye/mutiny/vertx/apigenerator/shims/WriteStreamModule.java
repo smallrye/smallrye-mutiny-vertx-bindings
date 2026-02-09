@@ -1,24 +1,14 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import java.util.List;
-import java.util.concurrent.Flow;
-import java.util.stream.Stream;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.MethodSpec;
-import com.palantir.javapoet.ParameterizedTypeName;
-import com.palantir.javapoet.TypeSpec;
-import com.palantir.javapoet.TypeVariableName;
-
+import com.palantir.javapoet.*;
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.vertx.WriteStreamSubscriber;
-import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimField;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
@@ -26,6 +16,11 @@ import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import io.smallrye.mutiny.vertx.apigenerator.utils.JavadocHelper;
+
+import java.util.List;
+import java.util.concurrent.Flow;
+import java.util.stream.Stream;
 
 /**
  * Generate the toSubscriber method when the source implements the WriteStream interface.

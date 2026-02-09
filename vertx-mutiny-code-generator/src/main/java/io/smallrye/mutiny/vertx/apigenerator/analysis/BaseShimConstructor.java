@@ -1,9 +1,9 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
+import com.github.javaparser.ast.type.Type;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.github.javaparser.ast.type.Type;
 
 public abstract class BaseShimConstructor implements ShimConstructor {
 

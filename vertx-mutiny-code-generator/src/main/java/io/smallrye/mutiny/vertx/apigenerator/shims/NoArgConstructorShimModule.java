@@ -3,7 +3,6 @@ package io.smallrye.mutiny.vertx.apigenerator.shims;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimConstructor;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
