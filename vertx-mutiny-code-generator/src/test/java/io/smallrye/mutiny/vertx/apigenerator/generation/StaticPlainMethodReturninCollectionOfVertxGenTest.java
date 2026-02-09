@@ -67,7 +67,6 @@ public class StaticPlainMethodReturninCollectionOfVertxGenTest {
                 .extracting("name").contains("a", "b");
         assertThat((Set<?>) env.invoke(clazz, "returnSet")).hasSize(2)
                 .extracting("name").contains("a", "b");
-        ;
     }
 
     @SuppressWarnings({ "TestFailedLine", "unchecked" })

@@ -14,9 +14,9 @@ import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import io.smallrye.mutiny.vertx.apigenerator.ShimConstants;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
 
 /**
  * Represents a shim class.

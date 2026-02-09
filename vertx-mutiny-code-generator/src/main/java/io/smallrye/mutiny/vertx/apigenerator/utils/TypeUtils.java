@@ -1,10 +1,6 @@
-package io.smallrye.mutiny.vertx.apigenerator;
+package io.smallrye.mutiny.vertx.apigenerator.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -20,9 +16,9 @@ import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
 
-public class TypeUtils {
+public interface TypeUtils {
 
-    public static boolean mustTransformFutureIntoUni(List<ShimMethodParameter> methodParameters,
+    static boolean mustTransformFutureIntoUni(List<ShimMethodParameter> methodParameters,
             List<VertxGenMethod.ResolvedParameter> originalMethodParameters) {
         return methodParameters.size() == 1 &&
                 methodParameters.stream()
@@ -35,22 +31,22 @@ public class TypeUtils {
         return t.isClassOrInterfaceType() && t.asClassOrInterfaceType().getName().toString().equals("Uni");
     }
 
-    public static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim,
+    static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim,
             List<VertxGenMethod.ResolvedParameter> parameters) {
         return convertBareToShimParameters(shim, parameters, false);
     }
 
-    public static boolean isGenericTypeParameter(Type type) {
+    static boolean isGenericTypeParameter(Type type) {
         var typeNameAsString = type.asClassOrInterfaceType().getNameAsString();
         return isGenericTypeParameter(typeNameAsString);
     }
 
-    public static boolean isGenericTypeParameter(String typeName) {
+    static boolean isGenericTypeParameter(String typeName) {
         // following the convention for naming type parameters
         return typeName.length() == 1 && typeName.toUpperCase().equals(typeName);
     }
 
-    public static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim,
+    static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim,
             List<VertxGenMethod.ResolvedParameter> parameters, boolean readStreamAsPublisher) {
         List<ShimMethodParameter> params = new ArrayList<>();
         for (VertxGenMethod.ResolvedParameter parameter : parameters) {
@@ -67,16 +63,16 @@ public class TypeUtils {
         return params;
     }
 
-    public static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim, VertxGenMethod method) {
+    static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim, VertxGenMethod method) {
         return convertBareToShimParameters(shim, method.getParameters());
     }
 
-    public static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim, VertxGenMethod method,
+    static List<ShimMethodParameter> convertBareToShimParameters(ShimClass shim, VertxGenMethod method,
             boolean readStreamAsPublisher) {
         return convertBareToShimParameters(shim, method.getParameters(), readStreamAsPublisher);
     }
 
-    public static List<Type> convertBaseToShimThrows(ShimClass shim, VertxGenMethod method) {
+    static List<Type> convertBaseToShimThrows(ShimClass shim, VertxGenMethod method) {
         List<Type> types = new ArrayList<>();
         for (ResolvedType type : method.getThrownExceptions()) {
             types.add(shim.convert(type));
@@ -84,7 +80,7 @@ public class TypeUtils {
         return types;
     }
 
-    public static Type convertBareToShimReturnType(ShimClass shim, VertxGenMethod method) {
+    static Type convertBareToShimReturnType(ShimClass shim, VertxGenMethod method) {
         if (method.isFluent() && !TypeUtils.isFuture(method.getReturnedType())) {
             return shim.getType();
         }
@@ -92,7 +88,7 @@ public class TypeUtils {
         return shim.convert(type);
     }
 
-    public static Type buildParameterizedType(Class<?> clazz, Type... parameters) {
+    static Type buildParameterizedType(Class<?> clazz, Type... parameters) {
         ClassOrInterfaceType type = StaticJavaParser.parseClassOrInterfaceType(clazz.getName());
         if (parameters != null) {
             type.setTypeArguments(parameters);
@@ -100,18 +96,18 @@ public class TypeUtils {
         return type;
     }
 
-    public static String getFullyQualifiedName(ResolvedType type) {
+    static String getFullyQualifiedName(ResolvedType type) {
         if (!type.isReferenceType()) {
             return null;
         }
         return type.asReferenceType().getQualifiedName();
     }
 
-    public static boolean isParameterizedType(ResolvedType type) {
+    static boolean isParameterizedType(ResolvedType type) {
         return (type.isReferenceType() && !type.asReferenceType().typeParametersMap().isEmpty());
     }
 
-    public static List<ResolvedType> getTypeParameters(ResolvedType type) {
+    static List<ResolvedType> getTypeParameters(ResolvedType type) {
         if (!type.isReferenceType()) {
             throw new IllegalArgumentException("The given type is not a reference type: " + type);
         }
@@ -133,7 +129,7 @@ public class TypeUtils {
         }
     }
 
-    public static ResolvedType getFirstParameterizedType(ResolvedType type) {
+    static ResolvedType getFirstParameterizedType(ResolvedType type) {
         if (!type.isReferenceType()) {
             throw new IllegalArgumentException("The given type is not a reference type: " + type);
         }
@@ -145,7 +141,7 @@ public class TypeUtils {
         return parameters.get(0);
     }
 
-    public static ResolvedType getSecondParameterizedType(ResolvedType type) {
+    static ResolvedType getSecondParameterizedType(ResolvedType type) {
         if (!type.isReferenceType()) {
             throw new IllegalArgumentException("The given type is not a reference type: " + type);
         }
@@ -156,49 +152,49 @@ public class TypeUtils {
         return parameters.get(1);
     }
 
-    public static boolean isFuture(ResolvedType type) {
+    static boolean isFuture(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals("io.vertx.core.Future");
     }
 
-    public static boolean isList(ResolvedType type) {
+    static boolean isList(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(List.class.getName());
     }
 
-    public static boolean isSet(ResolvedType type) {
+    static boolean isSet(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Set.class.getName());
     }
 
-    public static boolean isMap(ResolvedType type) {
+    static boolean isMap(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Map.class.getName());
     }
 
-    public static boolean isIterable(ResolvedType type) {
+    static boolean isIterable(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Iterable.class.getName());
     }
 
-    public static boolean isHandler(ResolvedType type) {
+    static boolean isHandler(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals("io.vertx.core.Handler");
     }
 
-    public static boolean isHandlerOfPromise(ResolvedType type) {
+    static boolean isHandlerOfPromise(ResolvedType type) {
         boolean isHandler = type.isReferenceType()
                 && type.asReferenceType().getQualifiedName().equals("io.vertx.core.Handler");
         if (isHandler) {
@@ -213,14 +209,14 @@ public class TypeUtils {
         return false;
     }
 
-    public static boolean isConsumer(ResolvedType type) {
+    static boolean isConsumer(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Consumer.class.getName());
     }
 
-    public static boolean isConsumerOfPromise(ResolvedType type) {
+    static boolean isConsumerOfPromise(ResolvedType type) {
         boolean isConsumer = type.isReferenceType()
                 && type.asReferenceType().getQualifiedName().equals(Consumer.class.getName());
         if (isConsumer) {
@@ -233,28 +229,28 @@ public class TypeUtils {
         return false;
     }
 
-    public static boolean isSupplier(ResolvedType type) {
+    static boolean isSupplier(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Supplier.class.getName());
     }
 
-    public static boolean isFunction(ResolvedType type) {
+    static boolean isFunction(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals(Function.class.getName());
     }
 
-    public static boolean isReadStream(ResolvedType type) {
+    static boolean isReadStream(ResolvedType type) {
         if (!type.isReferenceType()) {
             return false;
         }
         return type.asReferenceType().getQualifiedName().equals("io.vertx.core.streams.ReadStream");
     }
 
-    public static boolean isSupplierOfFuture(ResolvedType type) {
+    static boolean isSupplierOfFuture(ResolvedType type) {
         boolean isSupplier = type.isReferenceType()
                 && type.asReferenceType().getQualifiedName().equals(Supplier.class.getName());
         if (isSupplier) {
@@ -267,7 +263,7 @@ public class TypeUtils {
         return false;
     }
 
-    public static boolean hasMethodAReadStreamParameter(List<VertxGenMethod.ResolvedParameter> parameters) {
+    static boolean hasMethodAReadStreamParameter(List<VertxGenMethod.ResolvedParameter> parameters) {
         if (parameters.isEmpty()) {
             return false;
         }
@@ -279,7 +275,7 @@ public class TypeUtils {
         return false;
     }
 
-    public static boolean isPublisher(Type shimType) {
+    static boolean isPublisher(Type shimType) {
         return shimType.isClassOrInterfaceType()
                 && shimType.asClassOrInterfaceType().getNameWithScope().equals("java.util.concurrent.Flow.Publisher");
     }

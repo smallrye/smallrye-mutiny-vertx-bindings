@@ -12,11 +12,7 @@ import com.palantir.javapoet.TypeName;
 import com.palantir.javapoet.TypeSpec;
 
 import io.smallrye.mutiny.vertx.TypeArg;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimConstructor;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 

@@ -1,16 +1,10 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
-import static io.smallrye.mutiny.vertx.apigenerator.TypeUtils.isFuture;
+import static io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils.isFuture;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +29,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.SourceRoot;
 
-import io.smallrye.mutiny.vertx.apigenerator.AnnotationHelper;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.utils.AnnotationHelper;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.ModuleGen;
 import io.vertx.codegen.annotations.VertxGen;
@@ -64,7 +58,6 @@ public class VertxGenCollection {
     public VertxGenCollection(MutinyGenerator generator, SourceRoot source, List<Path> additionSources) throws IOException {
         this.generator = generator;
         logger.info("Initializing collection of sources from `{}`", source.getRoot());
-        logger.info("Parsing source code from `{}`", source);
         List<TypeSolver> solvers = new ArrayList<>();
         solvers.add(new JavaParserTypeSolver(source.getRoot()));
         for (Path path : additionSources) {
@@ -147,7 +140,7 @@ public class VertxGenCollection {
         interfaces.addAll(collectInterfacesForModule(units, module));
         logger.info("Found {} interfaces in module `{}`", interfaces.size(), module.name());
 
-        logger.info("Collection completed");
+        logger.info("Collection completed in module `{}`", module.name());
         return new CollectionResult(
                 units,
                 module,
@@ -159,7 +152,7 @@ public class VertxGenCollection {
     }
 
     public List<VertxGenInterface> collectInterfacesForModule(List<CompilationUnit> compilations, VertxGenModule module) {
-        logger.info("Collecting Vert.x Gen interfaces");
+        logger.info("Collecting Vert.x Gen interfaces for module {}", module.name());
         List<VertxGenInterface> foundInterfaces = new ArrayList<>();
         for (CompilationUnit unit : compilations) {
             var list = unit.findAll(ClassOrInterfaceDeclaration.class).stream()
@@ -170,7 +163,7 @@ public class VertxGenCollection {
                 String fqn = unit.getPackageDeclaration().map(p -> p.getName().asString() + ".").orElse("")
                         + vg.getNameAsString();
                 if (!belongsToModule(fqn, module)) {
-                    logger.warn("Ignoring `{}` as it does not belong to the module `{}`", fqn, module.name());
+                    logger.debug("Ignoring `{}` as it does not belong to the module `{}`", fqn, module.name());
                     continue;
                 }
                 AnnotationExpr annotation = vg.getAnnotationByClass(VertxGen.class)
@@ -236,7 +229,7 @@ public class VertxGenCollection {
                     if (astDeclaration == null) {
                         astDeclaration = lookForMethodDeclaration(typeDeclaringMethod, method);
                         if (astDeclaration == null) {
-                            logger.warn("Cannot resolve the AST declaration of method `{}` of type {} declared in {}",
+                            logger.debug("Cannot resolve the AST declaration of method `{}` of type {} declared in {}",
                                     method.getName(),
                                     resolvedDeclaration.toDescriptor(),
                                     typeDeclaringMethod.getQualifiedName());

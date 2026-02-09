@@ -2,8 +2,6 @@ package io.smallrye.mutiny.vertx.apigenerator.generation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
@@ -12,7 +10,7 @@ import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 public class TypeArgsConstantShimModuleTest {
 
     @Test
-    void testSimple() throws IOException {
+    void testSimple() {
         Env env = new Env();
         env
                 .addModuleGen("org.extra", "shimType-args")
@@ -37,7 +35,7 @@ public class TypeArgsConstantShimModuleTest {
     }
 
     @Test
-    void testWithGeneric() throws IOException {
+    void testWithGeneric() {
         Env env = new Env();
         env
                 .addModuleGen("org.extra", "shimType-args")

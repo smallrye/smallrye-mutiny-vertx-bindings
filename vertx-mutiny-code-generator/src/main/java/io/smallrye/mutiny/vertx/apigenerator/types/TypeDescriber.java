@@ -3,7 +3,7 @@ package io.smallrye.mutiny.vertx.apigenerator.types;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-public class TypeDescriber {
+public interface TypeDescriber {
 
     /**
      * Attempts to resolve the type using the symbol solver.
@@ -11,7 +11,7 @@ public class TypeDescriber {
      * If not resolvable, falls back to a best-effort reconstruction
      * from the AST (which may be partial, e.g. "Foo<String>" with no package).
      */
-    public static String safeDescribeType(Type astType) {
+    static String safeDescribeType(Type astType) {
         try {
             ResolvedType resolvedType = astType.resolve();
             return resolvedType.describe();

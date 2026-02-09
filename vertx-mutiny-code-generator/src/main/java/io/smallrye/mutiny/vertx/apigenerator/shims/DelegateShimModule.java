@@ -11,11 +11,7 @@ import com.github.javaparser.ast.type.TypeParameter;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
 
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimField;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 
 /**
  * A shim module adding the `delegate` field and the `getDelegate()` method

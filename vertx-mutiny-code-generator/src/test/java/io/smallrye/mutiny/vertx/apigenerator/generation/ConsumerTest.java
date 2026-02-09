@@ -1,6 +1,7 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatList;
 
 import java.nio.file.Paths;
 import java.util.List;

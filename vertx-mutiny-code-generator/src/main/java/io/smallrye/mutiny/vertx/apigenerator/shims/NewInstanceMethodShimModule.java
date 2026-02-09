@@ -15,11 +15,7 @@ import com.palantir.javapoet.TypeSpec;
 import com.palantir.javapoet.TypeVariableName;
 
 import io.smallrye.mutiny.vertx.TypeArg;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
 
 /**

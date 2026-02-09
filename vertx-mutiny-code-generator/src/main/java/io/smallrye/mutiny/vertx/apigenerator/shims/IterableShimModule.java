@@ -13,13 +13,13 @@ import com.palantir.javapoet.TypeSpec;
 
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
 import io.smallrye.mutiny.vertx.impl.MappingIterator;
 
 /**

@@ -101,10 +101,10 @@ public class FunctionShimModule implements ShimModule {
      */
     public static class ApplyMethod extends BaseShimMethod {
 
-        boolean itemTypeIsVertxGen;
-        boolean returnTypeIsVertxGen;
-        ResolvedType originItemType;
-        ResolvedType originOutputType;
+        final boolean itemTypeIsVertxGen;
+        final boolean returnTypeIsVertxGen;
+        final ResolvedType originItemType;
+        final ResolvedType originOutputType;
 
         public ApplyMethod(ShimModule module, ShimClass shim, ResolvedType originItemType, ResolvedType originOutputType) {
             super(

@@ -2,7 +2,6 @@ package io.smallrye.mutiny.vertx.apigenerator.generation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.lang.model.element.Modifier;
@@ -57,7 +56,7 @@ public class DelegateAndTypeArgConstructorShimTest {
     }
 
     @Test
-    void testDelegateWithTypeParams() throws IOException {
+    void testDelegateWithTypeParams() {
         Env env = new Env();
         env.addJavaCode("me.escoffier.test", "MyInterface.java", """
                 package me.escoffier.test;

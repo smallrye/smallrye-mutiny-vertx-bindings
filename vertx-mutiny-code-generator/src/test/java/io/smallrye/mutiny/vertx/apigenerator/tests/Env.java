@@ -3,30 +3,15 @@ package io.smallrye.mutiny.vertx.apigenerator.tests;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Stream;
 
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.ToolProvider;
+import javax.tools.*;
 
 import com.palantir.javapoet.FieldSpec;
 import com.palantir.javapoet.MethodSpec;
@@ -38,7 +23,7 @@ public class Env {
 
     public static final String DEFAULT_OUTPUT_DIRECTORY = "target/codegen-test";
     private final File root;
-    private List<MutinyGenerator.GeneratorOutput> outputs = new ArrayList<>();
+    private final List<MutinyGenerator.GeneratorOutput> outputs = new ArrayList<>();
 
     public Env() {
         this(DEFAULT_OUTPUT_DIRECTORY);
@@ -217,7 +202,7 @@ public class Env {
         return classes;
     }
 
-    private List<Class<?>> classes = new ArrayList<>();
+    private final List<Class<?>> classes = new ArrayList<>();
 
     public void dump(String path) {
         for (InMemorySource source : sources) {

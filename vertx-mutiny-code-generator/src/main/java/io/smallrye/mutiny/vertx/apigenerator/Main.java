@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "vertx-mutiny-generator", mixinStandardHelpOptions = true, version = "Vert.x Mutiny Generator 1.0", description = "Entrypoint of the Vert.x Mutiny Generator")
+@CommandLine.Command(name = "vertx-mutiny-generator", mixinStandardHelpOptions = true, description = "Mutiny Vert.x 5 Bindings Generator")
 public class Main implements Callable<Integer> {
 
     @CommandLine.Option(names = "--source", description = "The source directory", required = true)
@@ -33,20 +33,26 @@ public class Main implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        MutinyGenerator generator = new MutinyGenerator(source, module, additionalSources.toArray(new Path[0]));
-        // Collection happens during the construction.
-        generator.analyze();
-        List<MutinyGenerator.GeneratorOutput> list = generator.generate();
-        if (output != null) {
-            list.forEach(output -> {
-                try {
-                    output.javaFile().writeToPath(this.output);
-                } catch (Exception e) {
-                    logger.error("Unable to write the file for shim class: {}", output.shim().getFullyQualifiedName(), e);
+        try {
+            MutinyGenerator generator = new MutinyGenerator(source, module, additionalSources.toArray(new Path[0]));
+            // Collection happens during the construction.
+            generator.analyze();
+            List<MutinyGenerator.GeneratorOutput> list = generator.generate();
+            if (output != null) {
+                for (MutinyGenerator.GeneratorOutput generatorOutput : list) {
+                    try {
+                        generatorOutput.javaFile().writeToPath(this.output);
+                    } catch (Exception e) {
+                        logger.error("Unable to write the file for shim class: {}",
+                                generatorOutput.shim().getFullyQualifiedName(), e);
+                        return -1;
+                    }
                 }
-            });
+            }
+            return 0;
+        } catch (Throwable err) {
+            logger.error("The generator encountered a fatal error", err);
+            return -1;
         }
-
-        return 0;
     }
 }

@@ -4,22 +4,16 @@ edit_uri: edit/main/docs/
 
 nav:
   - Overview: 'index.md'
-  - API Translation: 'api-translation.md'
   - Javadoc: './apidocs/index.html'
-
-copyright: >-
-  Sponsored by <a href="https://www.redhat.com"><img style="vertical-align: middle; height: 2.5em;" alt="Red Hat" src="./images/redhat_reversed.svg"/></a> <br/>
-  <a href="https://creativecommons.org/licenses/by/3.0/">CC by 3.0</a> |
-  <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
 
 theme:
   name: material
+  font:
+    text: IBM Plex Sans
+    code: IBM Plex Mono
   palette:
     primary: deep purple
     accent: deep purple
-  font:
-    text: Red Hat Text
-    code: Ubuntu Mono
   features:
     - navigation.sections
 

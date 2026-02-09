@@ -16,8 +16,8 @@ import com.palantir.javapoet.TypeSpec;
 import com.palantir.javapoet.TypeVariableName;
 
 import io.smallrye.common.annotation.CheckReturnValue;
-import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
 
 public class BaseShimMethod implements ShimMethod {
 

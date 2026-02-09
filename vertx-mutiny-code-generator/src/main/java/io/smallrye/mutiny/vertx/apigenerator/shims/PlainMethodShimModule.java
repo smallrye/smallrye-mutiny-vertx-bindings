@@ -1,6 +1,6 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
-import static io.smallrye.mutiny.vertx.apigenerator.JavadocHelper.amendJavadocIfReturnTypeIsNullable;
+import static io.smallrye.mutiny.vertx.apigenerator.utils.JavadocHelper.amendJavadocIfReturnTypeIsNullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,26 +13,17 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.CodeBlock;
-import com.palantir.javapoet.MethodSpec;
-import com.palantir.javapoet.TypeName;
-import com.palantir.javapoet.TypeSpec;
+import com.palantir.javapoet.*;
 
 import io.smallrye.mutiny.vertx.TypeArg;
-import io.smallrye.mutiny.vertx.apigenerator.JavadocHelper;
-import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.Shim;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethod;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
+import io.smallrye.mutiny.vertx.apigenerator.utils.JavadocHelper;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
 
 /**
  * A shim generating a method delegating to the original method for each method that is not returning a Future.

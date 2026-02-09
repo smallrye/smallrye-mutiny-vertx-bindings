@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenModule;
+import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
 
 class ConstantsTest {
 

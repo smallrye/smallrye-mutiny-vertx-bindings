@@ -23,7 +23,6 @@ public class DataObjectTest {
         assertThat(content)
                 .contains("DataObjectWithValues getDataObjectWithValues()")
                 .contains("getDelegate().getDataObjectWithValues()");
-        ;
 
         assertThat(content)
                 .contains("void setDataObjectWithValues(DataObjectWithValues dataObject)")

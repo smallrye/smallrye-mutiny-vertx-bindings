@@ -9,10 +9,10 @@ import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.TypeName;
 
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
-import io.smallrye.mutiny.vertx.apigenerator.TypeUtils;
 import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
 
 public record ShimMethodParameter(String name, Type shimType, ResolvedType originalType, boolean nullable) {
 

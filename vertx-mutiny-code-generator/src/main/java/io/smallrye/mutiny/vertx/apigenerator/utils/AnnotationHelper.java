@@ -1,4 +1,4 @@
-package io.smallrye.mutiny.vertx.apigenerator;
+package io.smallrye.mutiny.vertx.apigenerator.utils;
 
 import java.util.Optional;
 
@@ -9,9 +9,9 @@ import com.github.javaparser.ast.expr.MemberValuePair;
 
 import io.vertx.codegen.annotations.GenIgnore;
 
-public class AnnotationHelper {
+public interface AnnotationHelper {
 
-    public static Optional<MemberValuePair> getAttribute(AnnotationExpr expr, String attribute) {
+    static Optional<MemberValuePair> getAttribute(AnnotationExpr expr, String attribute) {
         if (expr.isMarkerAnnotationExpr()) {
             return Optional.empty();
         }
@@ -22,7 +22,7 @@ public class AnnotationHelper {
                 .filter(p -> p.getNameAsString().equals(attribute)).findFirst();
     }
 
-    public static boolean isIgnored(MethodDeclaration method) {
+    static boolean isIgnored(MethodDeclaration method) {
         boolean present = method.isAnnotationPresent(GenIgnore.class);
         if (present) {
             AnnotationExpr expr = method.getAnnotationByClass(GenIgnore.class).orElseThrow();
@@ -47,7 +47,7 @@ public class AnnotationHelper {
         }
     }
 
-    public static boolean isIgnored(FieldDeclaration field) {
+    static boolean isIgnored(FieldDeclaration field) {
         boolean present = field.isAnnotationPresent(GenIgnore.class);
         if (present) {
             AnnotationExpr expr = field.getAnnotationByClass(GenIgnore.class).orElseThrow();

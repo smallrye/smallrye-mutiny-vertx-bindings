@@ -14,5 +14,4 @@ public interface Shim {
         String val = TypeDescriber.safeDescribeType(type);
         return JavaType.of(val).toTypeName();
     }
-
 }

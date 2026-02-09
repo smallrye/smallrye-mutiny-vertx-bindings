@@ -6,11 +6,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import com.palantir.javapoet.ArrayTypeName;
-import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.ParameterizedTypeName;
-import com.palantir.javapoet.TypeName;
-import com.palantir.javapoet.WildcardTypeName;
+import com.palantir.javapoet.*;
 
 public record JavaType(String fqn, List<JavaType> parameterTypes) {
 

@@ -59,8 +59,7 @@ public class TestDataObject {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof TestDataObject) {
-            TestDataObject that = (TestDataObject) obj;
+        if (obj instanceof TestDataObject that) {
             return Objects.equals(foo, that.foo) && bar == that.bar && wibble == that.wibble;
         }
         return false;
