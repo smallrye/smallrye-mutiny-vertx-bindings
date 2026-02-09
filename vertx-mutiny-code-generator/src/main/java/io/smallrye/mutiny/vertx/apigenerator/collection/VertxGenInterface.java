@@ -1,5 +1,9 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -7,11 +11,8 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.javadoc.Javadoc;
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 
 /**
  * A structure to represent an interface annotated with {@link io.vertx.codegen.annotations.VertxGen}.

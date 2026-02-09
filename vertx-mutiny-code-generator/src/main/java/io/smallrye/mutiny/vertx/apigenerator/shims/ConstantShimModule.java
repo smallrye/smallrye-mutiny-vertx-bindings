@@ -1,17 +1,18 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.FieldSpec;
+
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimField;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenConstant;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Handles constants.

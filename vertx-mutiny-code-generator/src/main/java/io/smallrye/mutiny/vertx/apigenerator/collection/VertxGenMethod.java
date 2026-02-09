@@ -1,5 +1,8 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.MethodUsage;
@@ -7,13 +10,11 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
+
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.utils.JavadocHelper;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class VertxGenMethod {
 

@@ -1,13 +1,14 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
-import io.smallrye.mutiny.vertx.apigenerator.shims.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+import io.smallrye.mutiny.vertx.apigenerator.shims.*;
 
 /**
  * Analyze the result of the collection and build the necessary shims.

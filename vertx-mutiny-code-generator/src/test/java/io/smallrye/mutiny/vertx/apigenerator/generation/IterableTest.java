@@ -1,15 +1,17 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import com.palantir.javapoet.MethodSpec;
-import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Iterator;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import com.palantir.javapoet.MethodSpec;
+
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 
 /**
  * Check the support of Vert.x Gen interface implementing Iterable:

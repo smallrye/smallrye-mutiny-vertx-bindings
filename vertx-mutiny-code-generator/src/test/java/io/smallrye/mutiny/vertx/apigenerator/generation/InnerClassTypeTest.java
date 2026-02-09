@@ -1,8 +1,9 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
+import org.junit.jupiter.api.Test;
+
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
-import org.junit.jupiter.api.Test;
 
 public class InnerClassTypeTest {
 

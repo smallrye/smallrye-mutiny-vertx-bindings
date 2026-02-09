@@ -1,13 +1,13 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
+import java.util.List;
+import java.util.function.Function;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.utils.Pair;
-
-import java.util.List;
-import java.util.function.Function;
 
 public class FunctionConverter extends BaseShimTypeConverter {
 

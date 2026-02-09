@@ -1,14 +1,15 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
+import java.util.function.Supplier;
+
+import org.junit.jupiter.api.Test;
+
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.tuples.Tuple2;
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
-import org.junit.jupiter.api.Test;
-
-import java.util.function.Supplier;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class SupplierOfFutureTest {
 

@@ -1,15 +1,16 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
 import io.vertx.converters.ConverterTestClass;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.nio.file.Paths;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConverterTest {
 

@@ -1,12 +1,13 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
-import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenModule;
-import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenModule;
+import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
 
 class ConstantsTest {
 

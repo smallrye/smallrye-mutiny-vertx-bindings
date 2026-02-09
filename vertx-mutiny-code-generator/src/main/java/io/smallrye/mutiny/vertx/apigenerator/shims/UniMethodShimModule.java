@@ -1,5 +1,15 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import javax.lang.model.element.Modifier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
@@ -7,6 +17,7 @@ import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.*;
+
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
@@ -15,14 +26,6 @@ import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.utils.JavadocHelper;
 import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.lang.model.element.Modifier;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * A shim generating a method delegating to the original method for each method that is returning a Future.

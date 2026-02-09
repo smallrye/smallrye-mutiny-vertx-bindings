@@ -1,12 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator.types;
 
+import java.util.stream.Collectors;
+
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedWildcard;
-
-import java.util.stream.Collectors;
 
 public class ResolvedTypeDescriber {
 

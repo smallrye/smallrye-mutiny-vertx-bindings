@@ -1,9 +1,9 @@
 package io.vertx.codegen.tck.dataobject;
 
+import java.util.Objects;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
-
-import java.util.Objects;
 
 @DataObject
 public class TestDataObject {

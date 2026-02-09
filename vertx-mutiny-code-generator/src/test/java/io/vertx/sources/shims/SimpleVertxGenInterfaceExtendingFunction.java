@@ -1,8 +1,8 @@
 package io.vertx.sources.shims;
 
-import io.vertx.codegen.annotations.VertxGen;
-
 import java.util.function.Function;
+
+import io.vertx.codegen.annotations.VertxGen;
 
 @VertxGen
 public interface SimpleVertxGenInterfaceExtendingFunction extends Function<String, String> {

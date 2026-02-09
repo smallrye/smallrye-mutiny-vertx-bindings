@@ -1,10 +1,10 @@
 package io.smallrye.mutiny.vertx.apigenerator.collection;
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 
 public record CollectionResult(
         List<CompilationUnit> units,

@@ -1,16 +1,18 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import java.util.List;
+
+import javax.lang.model.element.Modifier;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.palantir.javapoet.ClassName;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
+
 import io.smallrye.mutiny.vertx.apigenerator.analysis.BaseShimMethod;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimModule;
-
-import javax.lang.model.element.Modifier;
-import java.util.List;
 
 /**
  * A shim module adding the `hashCode`, `equals` and `toString` methods to the shim class.

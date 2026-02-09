@@ -1,17 +1,18 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
-import io.smallrye.mutiny.vertx.apigenerator.analysis.AnalysisResult;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
-import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
-import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import io.smallrye.mutiny.vertx.apigenerator.analysis.AnalysisResult;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
+import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
+import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 
 public class CollectionTest {
 

@@ -1,15 +1,16 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.WildcardType;
 import com.github.javaparser.resolution.types.ResolvedType;
+
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Converters {
 

@@ -1,10 +1,11 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
-import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 
 public class NullableCollectionTest {
 

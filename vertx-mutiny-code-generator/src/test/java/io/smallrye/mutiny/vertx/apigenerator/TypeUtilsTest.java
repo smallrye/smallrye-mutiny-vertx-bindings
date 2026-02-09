@@ -1,12 +1,14 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.type.Type;
-import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.type.Type;
+
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
 
 class TypeUtilsTest {
 

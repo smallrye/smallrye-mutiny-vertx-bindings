@@ -1,12 +1,13 @@
 package io.smallrye.mutiny.vertx.apigenerator.utils;
 
+import java.util.Optional;
+
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.MemberValuePair;
-import io.vertx.codegen.annotations.GenIgnore;
 
-import java.util.Optional;
+import io.vertx.codegen.annotations.GenIgnore;
 
 public interface AnnotationHelper {
 

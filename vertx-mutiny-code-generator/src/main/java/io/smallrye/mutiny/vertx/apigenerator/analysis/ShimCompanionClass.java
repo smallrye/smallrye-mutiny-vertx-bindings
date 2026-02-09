@@ -1,11 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
+import java.util.List;
+
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
+
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
 import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
-
-import java.util.List;
 
 /**
  * Represents a shim companion class, i.e. an `Impl` class associated with a non-concrete shim class.

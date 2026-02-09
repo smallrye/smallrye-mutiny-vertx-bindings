@@ -1,14 +1,15 @@
 package io.smallrye.mutiny.vertx.apigenerator.generation;
 
-import io.smallrye.mutiny.tuples.Tuple2;
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import io.smallrye.mutiny.tuples.Tuple2;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 
 public class StaticPlainMethodReturningMapOfVertxGenTest {
 

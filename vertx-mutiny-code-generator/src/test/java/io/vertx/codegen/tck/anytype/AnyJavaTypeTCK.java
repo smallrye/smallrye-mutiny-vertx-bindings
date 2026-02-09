@@ -1,14 +1,14 @@
 package io.vertx.codegen.tck.anytype;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 @VertxGen()
 public interface AnyJavaTypeTCK {

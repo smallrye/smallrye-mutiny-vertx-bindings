@@ -1,10 +1,10 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
+import java.util.function.Supplier;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
-
-import java.util.function.Supplier;
 
 public class SupplierConverter extends BaseShimTypeConverter {
 

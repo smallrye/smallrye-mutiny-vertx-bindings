@@ -1,11 +1,11 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
+import java.util.List;
+import java.util.Set;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
-
-import java.util.List;
-import java.util.Set;
 
 public class ListAndSetConverter extends BaseShimTypeConverter {
 

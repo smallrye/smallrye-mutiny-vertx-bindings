@@ -1,9 +1,18 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.utils.SourceRoot;
 import com.palantir.javapoet.JavaFile;
+
 import io.smallrye.mutiny.vertx.apigenerator.analysis.AnalysisResult;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.VertxGenAnalysis;
@@ -12,13 +21,6 @@ import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenCollection;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenInterface;
 import io.smallrye.mutiny.vertx.apigenerator.converters.Converters;
 import io.smallrye.mutiny.vertx.apigenerator.generator.ShimGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MutinyGenerator {
 

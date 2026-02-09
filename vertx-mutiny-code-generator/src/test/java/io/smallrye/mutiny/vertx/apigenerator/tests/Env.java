@@ -1,11 +1,8 @@
 package io.smallrye.mutiny.vertx.apigenerator.tests;
 
-import com.palantir.javapoet.FieldSpec;
-import com.palantir.javapoet.MethodSpec;
-import io.smallrye.mutiny.tuples.Tuple2;
-import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.tools.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -14,8 +11,13 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.tools.*;
+
+import com.palantir.javapoet.FieldSpec;
+import com.palantir.javapoet.MethodSpec;
+
+import io.smallrye.mutiny.tuples.Tuple2;
+import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 
 public class Env {
 

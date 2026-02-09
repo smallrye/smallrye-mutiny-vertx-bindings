@@ -1,9 +1,9 @@
 package io.vertx.codegen.tck.constants;
 
+import java.util.Objects;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
-
-import java.util.Objects;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>

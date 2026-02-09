@@ -1,16 +1,17 @@
 package io.smallrye.mutiny.vertx.apigenerator.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import com.github.javaparser.javadoc.description.JavadocDescriptionElement;
 import com.github.javaparser.javadoc.description.JavadocInlineTag;
+
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimClass;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.ShimMethodParameter;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenClass;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public interface JavadocHelper {
 

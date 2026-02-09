@@ -45,7 +45,7 @@ public class Main implements Callable<Integer> {
                     } catch (Exception e) {
                         logger.error("Unable to write the file for shim class: {}",
                                 generatorOutput.shim().getFullyQualifiedName(), e);
-                        throw e;
+                        return -1;
                     }
                 }
             }

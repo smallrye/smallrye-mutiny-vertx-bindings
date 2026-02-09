@@ -1,12 +1,12 @@
 package io.vertx.codegen.tck.dataobject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @DataObject
 public class DataObjectWithNestedBuffer {

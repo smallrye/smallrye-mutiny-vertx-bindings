@@ -2,6 +2,7 @@ package io.smallrye.mutiny.vertx.apigenerator.converters;
 
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
+
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 
 /**

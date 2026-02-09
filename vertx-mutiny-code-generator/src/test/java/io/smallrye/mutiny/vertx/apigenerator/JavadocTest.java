@@ -1,10 +1,12 @@
 package io.smallrye.mutiny.vertx.apigenerator;
 
-import com.palantir.javapoet.MethodSpec;
-import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.palantir.javapoet.MethodSpec;
+
+import io.smallrye.mutiny.vertx.apigenerator.tests.Env;
 
 public class JavadocTest {
 

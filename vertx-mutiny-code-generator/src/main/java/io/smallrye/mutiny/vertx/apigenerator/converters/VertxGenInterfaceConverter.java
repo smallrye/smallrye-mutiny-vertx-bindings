@@ -1,17 +1,18 @@
 package io.smallrye.mutiny.vertx.apigenerator.converters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
+
 import io.smallrye.mutiny.vertx.apigenerator.MutinyGenerator;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.types.TypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.utils.ShimConstants;
 import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class VertxGenInterfaceConverter extends BaseShimTypeConverter {
 

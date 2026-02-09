@@ -1,15 +1,17 @@
 package io.smallrye.mutiny.vertx.apigenerator.shims;
 
+import java.util.List;
+
+import javax.lang.model.element.Modifier;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
-import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 
-import javax.lang.model.element.Modifier;
-import java.util.List;
+import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 
 /**
  * A shim module adding the `delegate` field and the `getDelegate()` method

@@ -1,17 +1,18 @@
 package io.smallrye.mutiny.vertx.apigenerator.analysis;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.TypeName;
+
 import io.smallrye.mutiny.vertx.ReadStreamSubscriber;
 import io.smallrye.mutiny.vertx.apigenerator.shims.DelegateShimModule;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
 import io.smallrye.mutiny.vertx.apigenerator.types.ResolvedTypeDescriber;
 import io.smallrye.mutiny.vertx.apigenerator.utils.TypeUtils;
-
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public record ShimMethodParameter(String name, Type shimType, ResolvedType originalType, boolean nullable) {
 
