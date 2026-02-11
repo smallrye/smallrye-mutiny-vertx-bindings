@@ -3,25 +3,65 @@ repo_url: https://github.com/smallrye/smallrye-mutiny-vertx-bindings
 edit_uri: edit/main/docs/
 
 nav:
-  - Overview: 'index.md'
+  - Overview: index.md
+  - Getting Started: getting-started.md
+  - 'Uni and Multi': uni-and-multi.md
+  - Type Mapping: type-mapping.md
+  - Error Handling: error-handling.md
+  - Blocking and Testing: blocking-and-testing.md
+  - Using the Generator: using-the-generator.md
+  - Available Modules: available-modules.md
   - Javadoc: './apidocs/index.html'
 
 theme:
   name: material
-  font:
-    text: IBM Plex Sans
-    code: IBM Plex Mono
+  icon:
+    logo: material/swap-horizontal-bold
   palette:
-    primary: deep purple
-    accent: deep purple
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   features:
     - navigation.sections
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+plugins:
+  - search
 
 markdown_extensions:
-  - pymdownx.highlight
-  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
   - admonition
+  - pymdownx.details
+  - attr_list
+  - tables
 
 extra:
   manifest: manifest.webmanifest
