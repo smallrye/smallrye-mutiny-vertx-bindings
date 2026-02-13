@@ -22,6 +22,9 @@ public class ResolvedTypeDescriber {
      * - "T"
      */
     public static String describeResolvedType(ResolvedType type) {
+        if (type == null) {
+            return "?";
+        }
         if (type.isPrimitive()) {
             // E.g. "int", "boolean"
             return type.asPrimitive().describe();

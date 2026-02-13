@@ -42,6 +42,9 @@ public record JavaType(String fqn, List<JavaType> parameterTypes) {
             return ArrayTypeName.of(arrayTypeName);
         }
         if (!hasParameterTypes()) {
+            if (fqn.equals("?") || fqn.equals("? extends java.lang.Object")) {
+                return WildcardTypeName.subtypeOf(ClassName.OBJECT);
+            }
             return ClassName.bestGuess(fqn);
         }
         TypeName[] typeNames = new TypeName[parameterTypes.size()];
@@ -55,6 +58,8 @@ public record JavaType(String fqn, List<JavaType> parameterTypes) {
                 typeNames[i] = WildcardTypeName.supertypeOf(superTypeName);
             } else if (type.hasParameterTypes()) {
                 typeNames[i] = type.toTypeName();
+            } else if ("?".equals(type.fqn())) {
+                typeNames[i] = WildcardTypeName.subtypeOf(ClassName.OBJECT);
             } else {
                 typeNames[i] = ClassName.bestGuess(type.fqn().trim());
             }

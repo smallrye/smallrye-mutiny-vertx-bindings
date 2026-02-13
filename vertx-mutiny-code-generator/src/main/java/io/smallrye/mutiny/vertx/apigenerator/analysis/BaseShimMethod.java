@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
-import com.palantir.javapoet.CodeBlock;
-import com.palantir.javapoet.MethodSpec;
-import com.palantir.javapoet.TypeSpec;
-import com.palantir.javapoet.TypeVariableName;
+import com.palantir.javapoet.*;
 
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;

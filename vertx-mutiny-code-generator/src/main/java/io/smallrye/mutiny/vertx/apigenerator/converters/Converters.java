@@ -52,6 +52,9 @@ public class Converters {
             return StaticJavaParser.parseType(described);
         } else {
             String described = ResolvedTypeDescriber.describeResolvedType(type.erasure());
+            if ("?".equals(described)) {
+                return new WildcardType();
+            }
             Type parsedType = StaticJavaParser.parseType(described);
             if (type.asWildcard().isSuper()) {
                 return new WildcardType(null, parsedType.asReferenceType(), new NodeList<>());

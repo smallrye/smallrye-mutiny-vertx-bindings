@@ -258,7 +258,8 @@ public interface TypeUtils {
             if (firstParameterizedType.isWildcard()) {
                 firstParameterizedType = firstParameterizedType.erasure();
             }
-            return firstParameterizedType.asReferenceType().getQualifiedName().equals("io.vertx.core.Future");
+            return firstParameterizedType.isReferenceType()
+                    && firstParameterizedType.asReferenceType().getQualifiedName().equals("io.vertx.core.Future");
         }
         return false;
     }
