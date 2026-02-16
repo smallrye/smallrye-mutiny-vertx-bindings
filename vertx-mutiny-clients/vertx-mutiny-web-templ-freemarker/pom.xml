@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.21.5</version>
+        <version>3.21.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>smallrye-mutiny-vertx-web-templ-freemarker</artifactId>
@@ -138,8 +138,4 @@
             </properties>
         </profile>
     </profiles>
-
-  <scm>
-    <tag>3.21.5</tag>
-  </scm>
 </project>
