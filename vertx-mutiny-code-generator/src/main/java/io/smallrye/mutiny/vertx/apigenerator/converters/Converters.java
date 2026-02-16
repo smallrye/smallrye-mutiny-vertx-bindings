@@ -16,6 +16,8 @@ public class Converters {
 
     private final List<ShimTypeConverter> converters = new ArrayList<>();
 
+    private ShimTypeConverter defaultConverter;
+
     public Converters(MutinyGenerator generator) {
         converters.add(new VoidConverter().configure(generator));
         converters.add(new StringConverter().configure(generator));
@@ -36,6 +38,7 @@ public class Converters {
         converters.add(new VertxAsyncResultConverter().configure(generator));
         converters.add(new FunctionConverter().configure(generator));
         converters.add(new ConsumerConverter().configure(generator));
+        defaultConverter = new DefaultConverter().configure(generator);
     }
 
     public Type convert(ResolvedType type) {
@@ -48,8 +51,7 @@ public class Converters {
             }
         }
         if (!type.isWildcard()) {
-            String described = ResolvedTypeDescriber.describeResolvedType(type);
-            return StaticJavaParser.parseType(described);
+            return defaultConverter.convert(type);
         } else {
             String described = ResolvedTypeDescriber.describeResolvedType(type.erasure());
             if ("?".equals(described)) {
