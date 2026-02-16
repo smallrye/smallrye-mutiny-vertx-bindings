@@ -46,6 +46,9 @@ public class UniMethodDelegatingTest {
                             Future<Map<String, MyDataObject>> returnMap();
                             Future<Void> returnVoid();
 
+                            Future<?> returnWildcard();
+                            Future<?> allAboutWildcards(List<?> list, Set<List<?>> set);
+
                             Future<String> returnStringWithParams(List<String> foo, MyDataObject bar);
 
                             default Future<String> returnVoidAsDefaultMethod() {
@@ -66,7 +69,8 @@ public class UniMethodDelegatingTest {
                 "returnVoidAsDefaultMethod",
                 "returnListAndAwait", "returnListAndForget",
                 "returnSetAndAwait", "returnSetAndForget",
-                "dataObjectAndAwait", "dataObjectAndForget");
+                "dataObjectAndAwait", "dataObjectAndForget",
+                "returnWildcardAndAwait", "returnWildcardAndForget");
 
         env.compile();
     }
