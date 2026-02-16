@@ -82,7 +82,7 @@
                         <configuration>
                             <includes>io/vertx/**/*.java</includes>
                             <excludes>**/impl/**/*.java</excludes>
-                            <includeArtifactIds>vertx-core</includeArtifactIds>
+                            <includeArtifactIds>vertx-core, vertx-redis-client</includeArtifactIds>
                             <outputDirectory>${project.basedir}/target/additional-sources/vertx-core</outputDirectory>
                         </configuration>
                     </execution>
