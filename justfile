@@ -6,7 +6,7 @@ build:
 
 # Build everything (no tests)
 build-fast:
-    ./mvnw -DskipTests clean install
+    ./mvnw -DskipTests clean install -T4
 
 # Build the generator
 build-generator:
