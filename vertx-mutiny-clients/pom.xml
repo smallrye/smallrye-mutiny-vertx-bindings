@@ -20,7 +20,6 @@
         <module>vertx-mutiny-camel-bridge</module>
         <module>vertx-mutiny-mail-client</module>
         <module>vertx-mutiny-bridge-common</module>
-<!--        <artifactId>vertx-mutiny-eventbus-bridge-parent</artifactId>-->
         <module>vertx-mutiny-web-common</module>
         <module>vertx-mutiny-web</module>
         <module>vertx-mutiny-web-client</module>
