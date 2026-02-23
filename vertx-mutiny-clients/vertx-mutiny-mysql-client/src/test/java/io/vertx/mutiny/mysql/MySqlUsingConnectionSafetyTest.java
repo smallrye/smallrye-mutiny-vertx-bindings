@@ -1,12 +1,13 @@
 package io.vertx.mutiny.mysql;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.mysqlclient.MySQLPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.UsingConnectionSafetyTest;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
@@ -15,7 +16,6 @@ public class MySqlUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
     private static final String MYSQL_ROOT_PASSWORD = "my-secret-pw";
     private static final String MYSQL_DATABASE = "test";
 
-    @ClassRule
     public static GenericContainer<?> container = new GenericContainer<>("mysql:8")
             .withExposedPorts(3306)
             .withEnv("MYSQL_ROOT_PASSWORD", MYSQL_ROOT_PASSWORD)
@@ -24,7 +24,17 @@ public class MySqlUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
     private Vertx vertx;
     private int maxSize;
 
-    @Before
+    @BeforeAll
+    public static void init() {
+        container.start();
+    }
+
+    @AfterAll
+    public static void shutdown() {
+        container.stop();
+    }
+
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
 
@@ -36,7 +46,7 @@ public class MySqlUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
                 .setPassword(MYSQL_ROOT_PASSWORD);
 
         maxSize = 5;
-        pool = MySQLPool.pool(vertx, options, new PoolOptions().setMaxSize(maxSize));
+        pool = Pool.pool(vertx, options, new PoolOptions().setMaxSize(maxSize));
     }
 
     @Override
@@ -44,7 +54,7 @@ public class MySqlUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
         return maxSize;
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         pool.close();
         vertx.closeAndAwait();

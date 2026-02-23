@@ -55,9 +55,22 @@ public class UniHelper {
      * @return the future
      */
     public static <T> Future<T> toFuture(Uni<T> single) {
+        return toPromise(single).future();
+    }
+
+    public static <T> Promise<T> toPromise(Uni<T> uni) {
         Promise<T> promise = Promise.promise();
-        single.subscribe().with(promise::complete, promise::fail);
-        return promise.future();
+        uni.subscribe().with(promise::complete, promise::fail);
+        return promise;
+    }
+
+    public static <T> Handler<Promise<T>> toHandlerOfPromise(Uni<T> uni) {
+        return new Handler<Promise<T>>() {
+            @Override
+            public void handle(Promise<T> promise) {
+                uni.subscribe().with(promise::complete, promise::fail);
+            }
+        };
     }
 
     public static <T> Uni<T> toUni(Future<T> future) {

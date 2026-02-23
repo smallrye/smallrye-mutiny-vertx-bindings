@@ -6,9 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;
@@ -17,12 +17,12 @@ public class ExecuteBlockingTest {
 
     private Vertx vertx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
     }
@@ -30,9 +30,9 @@ public class ExecuteBlockingTest {
     @Test
     public void testExecuteBlocking() {
         AtomicInteger count = new AtomicInteger();
-        Uni<Integer> uni = vertx.executeBlocking(Uni.createFrom().item(count::incrementAndGet)
-                .onItem().delayIt().by(Duration.ofMillis(10)));
-
+        Uni<Integer> uni = vertx.executeBlocking(() -> Uni.createFrom().item(count::incrementAndGet)
+                .onItem().delayIt().by(Duration.ofMillis(10))
+                .await().indefinitely());
         assertThat(uni.await().indefinitely()).isEqualTo(1);
         assertThat(uni.await().indefinitely()).isEqualTo(2);
         assertThat(uni.await().indefinitely()).isEqualTo(3);
@@ -42,8 +42,8 @@ public class ExecuteBlockingTest {
     public void testExecuteBlockingNotOrdered() {
         AtomicInteger count = new AtomicInteger();
         Uni<Integer> uni = vertx.executeBlocking(
-                Uni.createFrom().item(count::incrementAndGet).onItem().delayIt().by(Duration.ofMillis(10)),
-                false);
+                () -> Uni.createFrom().item(count::incrementAndGet).onItem().delayIt().by(Duration.ofMillis(10)),
+                false).await().indefinitely();
 
         assertThat(uni.await().indefinitely()).isEqualTo(1);
         assertThat(uni.await().indefinitely()).isEqualTo(2);
@@ -53,8 +53,8 @@ public class ExecuteBlockingTest {
     @Test
     public void testExecuteBlockingWithFailure() {
         AtomicInteger count = new AtomicInteger();
-        Uni<Integer> uni = vertx.executeBlocking(Uni.createFrom().item(count::incrementAndGet)
-                .onItem().failWith(x -> new Exception("boom-" + x)));
+        Uni<Integer> uni = vertx.executeBlocking(() -> Uni.createFrom().item(count::incrementAndGet)
+                .onItem().failWith(x -> new Exception("boom-" + x)).await().indefinitely());
 
         assertThatThrownBy(() -> uni.await().indefinitely())
                 .hasCauseInstanceOf(Exception.class).hasMessageContaining("boom-1");

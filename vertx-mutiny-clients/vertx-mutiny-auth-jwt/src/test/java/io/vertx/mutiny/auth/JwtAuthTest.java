@@ -1,14 +1,18 @@
 package io.vertx.mutiny.auth;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.JWTOptions;
 import io.vertx.ext.auth.KeyStoreOptions;
+import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.impl.jose.JWK;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.mutiny.core.Vertx;
@@ -20,24 +24,22 @@ public class JwtAuthTest {
     private Vertx vertx;
     private static final String JWT_VALID = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJQYXVsbyIsImV4cCI6MTc0NzA1NTMxMywiaWF0IjoxNDMxNjk1MzEzLCJwZXJtaXNzaW9ucyI6WyJyZWFkIiwid3JpdGUiLCJleGVjdXRlIl0sInJvbGVzIjpbImFkbWluIiwiZGV2ZWxvcGVyIiwidXNlciJdfQ.UdA6oYDn9s_k7uogFFg8jvKmq9RgITBnlq4xV6JGsCY";
 
-    @Before
+    @BeforeEach
     public void setup() {
         vertx = Vertx.vertx();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
     }
 
-    @Test
-    @Ignore
+    @Disabled
     public void testAuthentication() {
         JWTAuth authProvider = JWTAuth.create(vertx, getConfig());
-        JsonObject authInfo = new JsonObject().put("jwt", JWT_VALID);
-        User user = authProvider.authenticate(authInfo).await().indefinitely();
+        User user = authProvider.authenticate(new TokenCredentials(JWT_VALID)).await().indefinitely();
         assertNotNull(user);
-        Assert.assertEquals("Paulo", user.principal().getString("sub"));
+        assertEquals("Paulo", user.principal().getString("sub"));
     }
 
     @Test

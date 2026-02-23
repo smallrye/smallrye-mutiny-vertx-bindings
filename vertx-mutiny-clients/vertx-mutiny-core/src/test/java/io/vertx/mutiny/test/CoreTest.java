@@ -1,5 +1,10 @@
 package io.vertx.mutiny.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -11,11 +16,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.buffer.Buffer;
@@ -27,27 +31,49 @@ import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import io.vertx.mutiny.core.file.AsyncFile;
-import io.vertx.mutiny.core.http.*;
-import io.vertx.test.core.TestUtils;
-import io.vertx.test.core.VertxTestBase;
+import io.vertx.mutiny.core.http.HttpClient;
+import io.vertx.mutiny.core.http.HttpClientResponse;
+import io.vertx.mutiny.core.http.HttpServer;
+import io.vertx.mutiny.core.http.WebSocket;
+import io.vertx.mutiny.core.http.WebSocketClient;
 
-public class CoreTest extends VertxTestBase {
+public class CoreTest {
 
     private static final String DEFAULT_FILE_PERMS = "rw-r--r--";
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
     private Vertx vertx;
     private String pathSep;
     private String testDir;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        vertx = new Vertx(super.vertx);
+    @BeforeEach
+    public void setUp() {
+        vertx = Vertx.vertx();
         java.nio.file.FileSystem fs = FileSystems.getDefault();
         pathSep = fs.getSeparator();
-        File ftestDir = testFolder.newFolder();
+        File ftestDir = new File("target/temp/" + System.nanoTime());
+        ftestDir.mkdirs();
         testDir = ftestDir.toString();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        if (vertx != null) {
+            vertx.closeAndAwait();
+        }
+    }
+
+    /**
+     * Creates a random string of ascii alpha characters
+     *
+     * @param length the length of the string to create
+     * @return a String of random ascii alpha characters
+     */
+    public static String randomAlphaString(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            char c = (char) (65 + 25 * Math.random());
+            builder.append(c);
+        }
+        return builder.toString();
     }
 
     @Test
@@ -55,14 +81,10 @@ public class CoreTest extends VertxTestBase {
         String fileName = "some-file.dat";
         int chunkSize = 1000;
         int chunks = 10;
-        byte[] expected = TestUtils.randomAlphaString(chunkSize * chunks).getBytes();
+        byte[] expected = randomAlphaString(chunkSize * chunks).getBytes();
         createFile(fileName, expected);
-        vertx.fileSystem().open(testDir + pathSep + fileName, new OpenOptions())
-                .subscribeAsCompletionStage().whenComplete((file, err) -> {
-                    assertNull(err);
-                    subscribe(expected, file, 3);
-                });
-        await();
+        AsyncFile af = vertx.fileSystem().open(testDir + pathSep + fileName, new OpenOptions()).await().indefinitely();
+        readFileAndCheck(expected, af, 3);
     }
 
     @Test
@@ -70,16 +92,16 @@ public class CoreTest extends VertxTestBase {
         String fileName = "some-file.dat";
         int chunkSize = 1000;
         int chunks = 10;
-        byte[] expected = TestUtils.randomAlphaString(chunkSize * chunks).getBytes();
+        byte[] expected = randomAlphaString(chunkSize * chunks).getBytes();
         createFile(fileName, expected);
         Buffer buffer = Buffer.buffer();
         AsyncFile asyncFile = vertx.fileSystem().openAndAwait(testDir + pathSep + fileName, new OpenOptions());
-        asyncFile.toBlockingStream().forEach(b -> buffer.appendBuffer(b.getDelegate()));
+        asyncFile.toBlockingStream().forEach(buffer::appendBuffer);
         assertEquals(Buffer.buffer(expected), buffer);
     }
 
     @Test
-    public void testAndWaitMethod() {
+    public void testAndAwaitMethod() {
         EventBus eventBus = vertx.eventBus();
         eventBus.consumer("my-address").handler(m -> m.getDelegate().reply(m.body() + " world"));
         Message<Object> message = eventBus.requestAndAwait("my-address", "hello");
@@ -88,29 +110,36 @@ public class CoreTest extends VertxTestBase {
 
     @Test
     public void testWebSocket() {
-        waitFor(2);
+        CountDownLatch latch = new CountDownLatch(2);
         AtomicLong serverReceived = new AtomicLong();
         // Set a 2 seconds timeout to force a TCP connection close
-        vertx.createHttpServer(new HttpServerOptions().setIdleTimeout(2)).webSocketHandler(ws -> {
+        int port = vertx.createHttpServer(new HttpServerOptions().setIdleTimeout(2)).webSocketHandler(ws -> {
             ws.toMulti()
                     .subscribe().with(msg -> {
                         serverReceived.incrementAndGet();
                         ws.writeTextMessageAndForget("pong");
-                        complete();
-                    }, (Consumer<Throwable>) this::fail);
-        }).listenAndAwait(8080, "localhost");
+                        latch.countDown();
+                    }, (t -> {
+                        fail(t.getMessage());
+                        latch.countDown();
+                    }));
+        }).listenAndAwait(0, "localhost").actualPort();
 
-        HttpClient client = vertx.createHttpClient();
+        WebSocketClient client = vertx.createWebSocketClient();
         AtomicLong clientReceived = new AtomicLong();
-        client.webSocket(8080, "localhost", "/")
+
+        client.connect(port, "localhost", "/")
                 .onItem().call(ws -> ws.writeTextMessage("ping"))
                 .onItem().transformToMulti(WebSocket::toMulti)
                 .subscribe().with(
                         msg -> {
                             clientReceived.incrementAndGet();
-                            complete();
-                        }, (Consumer<Throwable>) this::fail);
-        await();
+                            latch.countDown();
+                        }, (t -> {
+                            fail(t.getMessage());
+                            latch.countDown();
+                        }));
+        await().until(() -> latch.getCount() == 0);
         assertEquals(1, serverReceived.get());
         assertEquals(1, clientReceived.get());
     }
@@ -120,7 +149,7 @@ public class CoreTest extends VertxTestBase {
         CountDownLatch latch = new CountDownLatch(1);
         vertx.setTimer(10, x -> latch.countDown());
 
-        assertTrue(latch.await(1, TimeUnit.SECONDS));
+        assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
     }
 
     @Test
@@ -128,29 +157,20 @@ public class CoreTest extends VertxTestBase {
         CountDownLatch latch = new CountDownLatch(5);
         vertx.setPeriodic(10, x -> latch.countDown());
 
-        assertTrue(latch.await(1, TimeUnit.SECONDS));
+        assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
     }
 
-    private void subscribe(byte[] expected, AsyncFile file, int times) {
-        file.setReadPos(0);
-        Buffer actual = Buffer.buffer();
-        file.toMulti()
-                .onItem().transform(io.vertx.mutiny.core.buffer.Buffer::getDelegate)
-                .onItem().invoke(actual::appendBuffer)
-                .onItem().ignoreAsUni()
-                .subscribeAsCompletionStage()
-                .exceptionally(t -> {
-                    fail(t);
-                    return null;
-                })
-                .whenComplete((x, e) -> {
-                    assertEquals(Buffer.buffer(expected), actual);
-                    if (times > 0) {
-                        subscribe(expected, file, times - 1);
-                    } else {
-                        testComplete();
-                    }
-                });
+    private void readFileAndCheck(byte[] expected, AsyncFile file, int times) {
+        for (int i = 0; i < times; i++) {
+            file.setReadPos(0);
+            Buffer actual = Buffer.buffer();
+            file.toMulti()
+                    .onItem().invoke(actual::appendBuffer)
+                    .onItem().ignoreAsUni()
+                    .await().indefinitely();
+
+            assertThat(actual.getBytes()).isEqualTo(expected);
+        }
     }
 
     private void createFile(String fileName, byte[] bytes) throws Exception {
@@ -172,13 +192,16 @@ public class CoreTest extends VertxTestBase {
 
     @Test
     public void testFollowRedirect() {
+        CountDownLatch latch = new CountDownLatch(1);
         HttpServerOptions options = new HttpServerOptions().setPort(8081).setHost("localhost");
         AtomicInteger redirects = new AtomicInteger();
         HttpServer server = vertx.createHttpServer(options)
                 .requestHandler(req -> {
                     redirects.incrementAndGet();
                     req.response().setStatusCode(301)
-                            .putHeader(HttpHeaders.LOCATION, "http://localhost:" + 8082 + "/whatever").endAndForget();
+                            .putHeader(io.vertx.core.http.HttpHeaders.LOCATION.toString(),
+                                    "http://localhost:" + 8082 + "/whatever")
+                            .endAndForget();
                 });
         server.listenAndAwait();
 
@@ -187,14 +210,14 @@ public class CoreTest extends VertxTestBase {
             assertEquals(1, redirects.get());
             assertEquals("http://localhost:" + 8082 + "/custom", req.absoluteURI());
             req.response().endAndForget();
-            complete();
+            latch.countDown();
         });
         server2.listenAndAwait();
 
-        HttpClient client = vertx.createHttpClient();
-        client.redirectHandler(resp -> Uni.createFrom().emitter(e -> vertx.setTimer(25,
-                id -> e.complete(
-                        new RequestOptions().setAbsoluteURI("http://localhost:" + 8082 + "/custom")))));
+        HttpClient client = vertx.httpClientBuilder().withRedirectHandler(resp -> Uni.createFrom().emitter(e -> {
+            vertx.setTimer(25, tick -> e.complete(new RequestOptions()
+                    .setAbsoluteURI("http://localhost:" + 8082 + "/custom")));
+        })).build();
 
         HttpClientResponse response = client.request(new RequestOptions().setHost("localhost").setPort(8081))
                 .onItem().transformToUni(req -> {

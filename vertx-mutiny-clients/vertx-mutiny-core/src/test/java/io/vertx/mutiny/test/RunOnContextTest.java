@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.mutiny.core.Context;
 import io.vertx.mutiny.core.Vertx;
@@ -16,12 +16,12 @@ public class RunOnContextTest {
 
     private Vertx vertx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
     }
@@ -29,8 +29,9 @@ public class RunOnContextTest {
     @Test
     public void testRunOnContext() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
+
         vertx.runOnContext(() -> {
-            assertThat(Vertx.currentContext() != null);
+            assertThat(Vertx.currentContext()).isNotNull();
             assertThat(Context.isOnVertxThread()).isTrue();
             latch.countDown();
         });
@@ -43,7 +44,7 @@ public class RunOnContextTest {
         CountDownLatch latch = new CountDownLatch(1);
         Context context = vertx.getOrCreateContext();
         context.runOnContext(() -> {
-            assertThat(Vertx.currentContext() != null);
+            assertThat(Vertx.currentContext()).isNotNull();
             assertThat(Context.isOnVertxThread()).isTrue();
             latch.countDown();
         });

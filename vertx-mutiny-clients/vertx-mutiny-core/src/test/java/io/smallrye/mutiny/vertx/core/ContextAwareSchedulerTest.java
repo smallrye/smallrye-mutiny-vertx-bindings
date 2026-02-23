@@ -5,15 +5,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
-import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.internal.ContextInternal;
 import io.vertx.mutiny.core.Context;
 import io.vertx.mutiny.core.Vertx;
 
@@ -22,13 +26,13 @@ public class ContextAwareSchedulerTest {
     Vertx vertx;
     ScheduledExecutorService delegate;
 
-    @Before
+    @BeforeEach
     public void setup() {
         vertx = Vertx.vertx();
         delegate = Executors.newSingleThreadScheduledExecutor();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         delegate.shutdownNow();
         vertx.closeAndAwait();
@@ -159,7 +163,7 @@ public class ContextAwareSchedulerTest {
     }
 
     @Test
-    public void executor_requiredCurrentContext_fail() throws InterruptedException {
+    public void executor_requiredCurrentContext_fail() {
         assertThatThrownBy(() -> ContextAwareScheduler
                 .delegatingTo(delegate)
                 .withCurrentContext())

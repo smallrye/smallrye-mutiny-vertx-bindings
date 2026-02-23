@@ -3,30 +3,30 @@ package io.vertx.mutiny.mqtt;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.mqtt.MqttServerOptions;
 import io.vertx.mutiny.core.Vertx;
 
-public class MqttServerTest {
+class MqttServerTest {
 
     private Vertx vertx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
         assertThat(vertx, is(notNullValue()));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
     }
 
     @Test
-    public void test() {
+    void test() {
         MqttServer server = MqttServer.create(vertx, new MqttServerOptions()
                 .setPort(0).setHost("0.0.0.0"))
                 .endpointHandler(e -> {

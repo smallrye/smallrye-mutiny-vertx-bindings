@@ -4,10 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.ext.consul.ConsulClientOptions;
@@ -15,29 +14,30 @@ import io.vertx.ext.consul.KeyValue;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.consul.ConsulClient;
 
-public class ConsulClientTest {
+class ConsulClientTest {
 
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("consul:1.9")
+    static GenericContainer<?> container = new GenericContainer<>("consul:1.9")
             .withExposedPorts(8500);
 
-    private Vertx vertx;
+    static Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void init() {
         vertx = Vertx.vertx();
         assertThat(vertx).isNotNull();
+        container.start();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static void tearDown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
-    public void testMutinyAPI() {
+    void testMutinyAPI() {
         ConsulClient client = ConsulClient.create(vertx, new ConsulClientOptions()
-                .setHost(container.getContainerIpAddress())
+                .setHost(container.getHost())
                 .setPort(container.getMappedPort(8500)));
 
         String uuid = UUID.randomUUID().toString();

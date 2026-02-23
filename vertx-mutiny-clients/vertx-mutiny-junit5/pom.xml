@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.smallrye.reactive</groupId>
         <artifactId>vertx-mutiny-clients</artifactId>
-        <version>3.21.6-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>smallrye-mutiny-vertx-junit5</artifactId>
@@ -14,6 +14,7 @@
         <gen-source-groupId>io.vertx</gen-source-groupId>
         <gen-source-artifactId>vertx-junit5</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
+        <gen-module>vertx-junit5</gen-module>
     </properties>
 
     <dependencies>
@@ -43,31 +44,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <configuration>
-                    <includeGroupIds>${gen-source-groupId}</includeGroupIds>
-                    <includeArtifactIds>${gen-source-artifactId}</includeArtifactIds>
-                    <classifier>sources</classifier>
-                    <includeTypes>jar</includeTypes>
-                </configuration>
-                <executions>
-                    <!-- Unpack java sources to target/java-sources -->
-                    <execution>
-                        <id>unpack-java</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includes>io/vertx/**/*.java</includes>
-                            <excludes>**/impl/**/*.java</excludes>
-                            <outputDirectory>${gen.output}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -84,38 +60,7 @@
                     </archive>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <version>5.1-jdk8</version>
-                <configuration>
-                    <systemProperties>
-                        <java.util.logging.SimpleFormatter.format>%4$s: %3$s - %5$s %6$s%n
-                        </java.util.logging.SimpleFormatter.format>
-                        <mvel2.disable.jit>true</mvel2.disable.jit>
-                    </systemProperties>
-                </configuration>
-                <executions>
-                    <!-- Run the annotation processor on java sources and generate the API -->
-                    <execution>
-                        <id>generate-api</id>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <sourceDirectory>${project.build.directory}/sources/java</sourceDirectory>
-                            <processors>
-                                <processor>io.vertx.codegen.CodeGenProcessor</processor>
-                            </processors>
-                            <optionMap>
-                                <codegen.generators>mutiny</codegen.generators>
-                            </optionMap>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+
 </project>
