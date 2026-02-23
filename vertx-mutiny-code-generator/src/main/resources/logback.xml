@@ -1,0 +1,15 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%highlight(%level)] %cyan(%logger{20}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="io.smallrye.mutiny.vertx.apigenerator" level="info"/>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

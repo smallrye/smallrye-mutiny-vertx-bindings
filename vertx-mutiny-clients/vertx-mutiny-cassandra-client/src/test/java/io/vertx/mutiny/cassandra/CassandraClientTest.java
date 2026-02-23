@@ -2,37 +2,37 @@ package io.vertx.mutiny.cassandra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.CassandraContainer;
 
 import io.vertx.cassandra.CassandraClientOptions;
 import io.vertx.mutiny.core.Vertx;
 
-public class CassandraClientTest {
+class CassandraClientTest {
 
-    @Rule
-    public CassandraContainer<?> container = new CassandraContainer<>("cassandra:3.11")
+    static CassandraContainer<?> container = new CassandraContainer<>("cassandra:3.11")
             .withExposedPorts(9042);
 
-    private Vertx vertx;
+    private static Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void setUp() {
         vertx = Vertx.vertx();
         assertThat(vertx).isNotNull();
+        container.start();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static void tearDown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
-    public void testMutinyAPI() {
+    void testMutinyAPI() {
         CassandraClient client = CassandraClient.create(vertx, new CassandraClientOptions()
-                .addContactPoint(container.getContainerIpAddress(), container.getMappedPort(9042)));
+                .addContactPoint(container.getHost(), container.getMappedPort(9042)));
     }
 }

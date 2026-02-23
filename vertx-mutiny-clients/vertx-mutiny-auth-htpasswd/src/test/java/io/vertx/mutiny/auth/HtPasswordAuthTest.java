@@ -1,11 +1,11 @@
 package io.vertx.mutiny.auth;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.ext.auth.authentication.UsernamePasswordCredentials;
 import io.vertx.ext.auth.htpasswd.HtpasswdAuthOptions;
@@ -21,7 +21,7 @@ public class HtPasswordAuthTest {
     private HtpasswdAuth authProviderPlainText;
     private HtpasswdAuth authProviderUsersAreAuthorizedForNothing;
 
-    @Before
+    @BeforeEach
     public void setup() {
         vertx = Vertx.vertx();
         authProviderCrypt = HtpasswdAuth.create(vertx);
@@ -29,7 +29,7 @@ public class HtPasswordAuthTest {
         authProviderUsersAreAuthorizedForNothing = HtpasswdAuth.create(vertx);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
     }

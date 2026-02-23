@@ -4,7 +4,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -14,6 +15,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.json.*;
 
 class CompatibilityReport {
+
+    public static List<Predicate<Difference>> IGNORED_ERROR_MESSAGES = List.of(
+      d -> d.getDescription().equals("The return type changed from 'java.lang.Void' to  'void'."), // Yes, double space.
+      d -> d.getDescription().equals("The type of the parameter changed from 'io.vertx.mutiny.core.buffer.Buffer' to 'io.vertx.core.buffer.Buffer'."),
+      d -> isNewDataObjectDifference(d),
+      d -> d.getDescription().contains("The return type changed from 'void' to ")  && d.getOldCode().contains("AndForget"),
+      d -> d.getOldCode() != null  && d.getOldCode().contains("executeBlocking"),
+      d -> d.getDescription().contains("io.vertx.mutiny.core.buffer.Buffer")  && d.getDescription().contains("io.vertx.core.buffer.Buffer")
+
+    );
+
+    public static boolean isNewDataObjectDifference(Difference diff) {
+        var matcher = Pattern.compile("The return type changed from '(.*?)' to '(.*?)'\\.").matcher(diff.getDescription());
+        if (!matcher.find()) {
+            matcher = Pattern.compile("The type parameter of method parameter changed\\. The original type was '(.*?)'while the new type is '(.*?)'\\.").matcher(diff.getDescription());
+        }
+
+         if (matcher.find()) {
+            var g1 = matcher.group(1).replace("io.vertx.mutiny.", "io.vertx.");
+            var g2 = matcher.group(2).replace("io.vertx.mutiny.", "io.vertx.");
+            return g1.equals(g2);
+        } else {
+            return false;
+        }
+
+    }
 
     public static void main(String[] args) throws Exception {
         System.out.println("Looking for compatibility reports");
@@ -52,6 +79,7 @@ class CompatibilityReport {
             List<Difference> differences = mapper.readValue(diff.encode(), new TypeReference<List<Difference>>() {
             })
                     .stream()
+                    .filter(f -> !f.isIgnored())
                     .filter(f -> !f.isCompatible())
                     .collect(Collectors.toList());
 
@@ -182,6 +210,15 @@ class CompatibilityReport {
 
         public String getCriticality() {
             return criticality;
+        }
+
+        public boolean isIgnored() {
+            for (Predicate<Difference> predicate : IGNORED_ERROR_MESSAGES) {
+                if (predicate.test(this)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private String findAttachmentByName(String name) {

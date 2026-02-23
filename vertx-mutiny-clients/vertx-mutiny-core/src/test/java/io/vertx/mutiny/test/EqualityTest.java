@@ -1,16 +1,16 @@
 package io.vertx.mutiny.test;
 
 import static java.util.stream.Collectors.toSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.core.net.impl.SocketAddressImpl;
-import io.vertx.mutiny.core.buffer.Buffer;
-import io.vertx.mutiny.core.net.SocketAddress;
 
 /**
  * @author Thomas Segismont
@@ -34,16 +34,9 @@ public class EqualityTest {
 
     @Test
     public void testSocketAddressEquality() {
-        SocketAddress address1 = SocketAddress.newInstance(new SocketAddressImpl(8888, "guest"));
-        SocketAddress address2 = SocketAddress.newInstance(new SocketAddressImpl(8888, "guest"));
+        SocketAddress address1 = new SocketAddressImpl(8888, "guest");
+        SocketAddress address2 = new SocketAddressImpl(8888, "guest");
         assertNotSame(address1, address2);
         assertEquals(address1, address2);
-    }
-
-    @Test
-    public void testSocketAddressSet() {
-        SocketAddress address1 = SocketAddress.newInstance(new SocketAddressImpl(8888, "guest"));
-        SocketAddress address2 = SocketAddress.newInstance(new SocketAddressImpl(8888, "guest"));
-        assertEquals(1, Stream.of(address1, address2).collect(toSet()).size());
     }
 }

@@ -4,33 +4,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.mongo.MongoClient;
 
-public class MongoClientTest {
+class MongoClientTest {
 
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("mongo:4.4")
+    static GenericContainer<?> container = new GenericContainer<>("mongo:4.4")
             .withExposedPorts(27017);
 
-    private Vertx vertx;
+    static Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void init() {
+        container.start();
         vertx = Vertx.vertx();
         assertThat(vertx).isNotNull();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test

@@ -1,59 +1,76 @@
 # Overview
 
-[Eclipse Vert.x](https://vertx.io/) is the leading toolkit for writing reactive applications on the JVM.
+SmallRye Mutiny Vert.x Bindings provides Vert.x client APIs using the [Mutiny](https://smallrye.io/smallrye-mutiny/) reactive programming model.
+Instead of working with Vert.x `Future` and callback-based APIs, you use `Uni` (for single results) and `Multi` (for streams of items) with a rich, explicit set of operators.
+The bindings are generated automatically from the Vert.x source code, so they stay in sync with every Vert.x release.
 
-While the Vert.x core APIs expose asynchronous programming through _callbacks_ and _promise / future_, code generators offer bindings to other asynchronous programming models, including: [Kotlin coroutines](https://github.com/vert-x3/vertx-lang-kotlin/tree/master/vertx-lang-kotlin-coroutines), and [RxJava 1, 2 and 3](https://github.com/vert-x3/vertx-rx).
+## Why Mutiny?
 
-This project offers [Vert.x](https://vertx.io/) binding for [Mutiny, an intuitive event-driven reactive programming library for Java](https://smallrye.io/smallrye-mutiny/).
+- **Lazy evaluation**: a `Uni` does nothing until you subscribe, giving you full control over when side effects happen.
+- **Explicit operator vocabulary**: methods like `onItem().transform()` and `onFailure().retry()` make the intent of each pipeline stage obvious.
+- **Back-pressured streams**: `Multi` implements Reactive Streams, so producers cannot overwhelm consumers.
+- **Blocking helpers for tests and virtual threads**: call `andAwait()` to block until a result is available, which is useful in unit tests and when running on virtual threads.
 
-## Getting the bindings
+## Quick Example
 
-The bindings can be accessed from the following Maven coordinates:
+The following example fetches JSON data from an HTTP endpoint. Compare the Mutiny bindings with the equivalent vanilla Vert.x code:
 
-* Group: `io.smallrye.reactive`
-* Artifact: `smallrye-mutiny-vertx-<MODULE>` where `MODULE` refers to a Vert.x module, such as `core`, `pg-client`, `web-client`, etc.
+=== "Mutiny Bindings"
 
-!!! note "The Mutiny bindings are modular"
-    If you are familiar with other Vert.x bindings such as those for RxJava then you need to be aware that the Mutiny bindings are offered on a per-module basis.
-    For instance the RxJava 3 bindings are exposed through the `io.vertx:vertx-rx-java3` dependency, and that `vertx-rx-java3` has optional dependencies _on the whole Vert.x stack_.
-    We think that it is cleaner to offer bindings on a per-module basis, so your project does not have optional dependencies on modules of the Vert.x stack that you don't consume.
+    ```java
+    Uni<JsonObject> fetchData(WebClient client) {
+        return client.get("/api/data")
+            .as(BodyCodec.jsonObject())
+            .send()
+            .onItem().transform(HttpResponse::body)
+            .onFailure().retry().atMost(3)
+            .onFailure().invoke(err -> logger.error("Request failed", err));
+    }
+    ```
 
-The full list of supported modules from the Vert.x stack is available at [https://github.com/smallrye/smallrye-mutiny-vertx-bindings/tree/main/vertx-mutiny-clients](https://github.com/smallrye/smallrye-mutiny-vertx-bindings/tree/main/vertx-mutiny-clients)
+=== "Vanilla Vert.x"
 
-## A short example
+    ```java
+    Future<JsonObject> fetchData(WebClient client, int retries) {
+        return client.get("/api/data")
+            .as(BodyCodec.jsonObject())
+            .send()
+            .map(HttpResponse::body)
+            .recover(err -> {
+                logger.error("Request failed", err);
+                if (retries > 0) {
+                    return fetchData(client, retries - 1);
+                }
+                return Future.failedFuture(err);
+            });
+    }
+    ```
 
-The following self-contained [JBang](https://www.jbang.dev) script shows some of the features of the Vert.x Mutiny bindings (see the highlights):
+With the Mutiny bindings, every step in the pipeline is visible:
 
-```java linenums="1" hl_lines="20 27 37 42 53"
---8<-- "docs/snippets/hello.java"
+1. `send()` returns a `Uni<HttpResponse<JsonObject>>`: nothing happens yet.
+2. `onItem().transform()` maps the response to its JSON body when the item arrives.
+3. `onFailure().retry().atMost(3)` retries the entire operation up to 3 times on failure.
+4. `onFailure().invoke()` logs errors that persist after retries, without swallowing them.
+
+Notice that retry logic requires no extra code with Mutiny — it is a built-in operator. With vanilla Vert.x, you need to manage a retry counter and use recursive `recover()` calls, as shown in the second tab.
+
+You can also block for the result when that is appropriate (tests, virtual threads):
+
+```java
+JsonObject body = fetchData(client).await().indefinitely();
 ```
 
-This script can be run with `./hello.java` or `jbang run hello.java`, and exposes a HTTP server on port 8080:
+!!! tip "Explicit operators"
 
-```
-$ ./hello.java
-[jbang] Building jar...
-Deployment Starting
-See http://127.0.0.1:8080
-Deployment completed
-```
+    Mutiny favours explicit names over short aliases.
+    Prefer `onItem().transform()` over `map`, `onItem().transformToUni()` over `flatMap`, and `onItem().invoke()` over a bare `invoke`.
+    The longer forms make pipelines easier to read and review.
 
-The HTTP server responds to any HTTP request with the current value of a counter that is incremented every 2 seconds:
+## Next Steps
 
-```
-$ http :8080
-HTTP/1.1 200 OK
-content-length: 2
-
-@1
-
-$ http :8080
-HTTP/1.1 200 OK
-content-length: 2
-
-@2
-
-```
-
-The deployed verticle uses the Mutiny API, where the `start(Promise<Void>)` method is replaced by `asyncStart()` method that returns a `Uni<Void>`.
-The code also shows how to convert Vert.x streams into Mutiny `Multi` streams, and how to await for the verticle deployment to complete.
+- [Getting Started](getting-started.md): add the dependency and write your first Mutiny Vert.x program.
+- [Uni and Multi](uni-and-multi.md): learn the two core reactive types in depth.
+- [Type Mapping](type-mapping.md): understand how Vert.x types are converted to Mutiny types.
+- [Error Handling](error-handling.md): strategies for handling failures in reactive pipelines.
+- [Available Modules](available-modules.md): the full list of generated client modules.

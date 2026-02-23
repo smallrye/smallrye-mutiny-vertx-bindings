@@ -1,53 +1,110 @@
 package io.vertx.mutiny.web;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.GenericContainer;
+import java.util.function.Consumer;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.core.http.HttpServer;
+import io.vertx.mutiny.core.http.HttpServerRequest;
 import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
+import io.vertx.mutiny.ext.web.codec.BodyCodec;
 
-public class WebClientTest {
+class WebClientTest {
 
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("kennethreitz/httpbin:latest")
-            .withExposedPorts(80)
-            .withFileSystemBind("target", "/tmp/fakemail", BindMode.READ_WRITE);
+    Vertx vertx;
 
-    private Vertx vertx;
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         vertx = Vertx.vertx();
-        assertThat(vertx, is(notNullValue()));
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         vertx.closeAndAwait();
     }
 
-    @Test
-    public void testWebClient() {
-        WebClient client = WebClient.create(vertx, new WebClientOptions()
-                .setDefaultPort(container.getMappedPort(80))
-                .setDefaultHost(container.getContainerIpAddress()));
-        assertThat(client, is(notNullValue()));
+    HttpServer startServer(Consumer<HttpServerRequest> handler) {
+        return vertx.createHttpServer()
+                .requestHandler(handler)
+                .listenAndAwait(8081);
+    }
 
-        JsonObject object = client.get("/get?msg=hello").send()
-                .subscribeAsCompletionStage()
-                .thenApply(HttpResponse::bodyAsJsonObject)
-                .toCompletableFuture().join();
-        assertThat(object.getJsonObject("args").getString("msg"), is("hello"));
+    @Test
+    public void getJsonObject() {
+        HttpServer server = startServer(req -> {
+            JsonObject data = new JsonObject().put("msg", "hello");
+            req.response()
+                    .putHeader("Content-Type", "application/json")
+                    .endAndForget(data.encode());
+        });
+
+        WebClient client = WebClient.create(vertx, new WebClientOptions()
+                .setDefaultPort(server.actualPort())
+                .setDefaultHost("localhost"));
+
+        HttpResponse<JsonObject> response = client.get("/yo")
+                .as(BodyCodec.jsonObject())
+                .sendAndAwait();
+
+        assertThat(response.statusCode(), is(200));
+        assertThat(response.getHeader("Content-Type"), is("application/json"));
+        assertThat(response.body().getString("msg"), is("hello"));
+    }
+
+    @Test
+    public void getJsonObjectMappedToRecord() {
+        record Payload(String msg) {
+        }
+
+        HttpServer server = startServer(req -> {
+            JsonObject data = new JsonObject().put("msg", "hello");
+            req.response()
+                    .putHeader("Content-Type", "application/json")
+                    .endAndForget(data.encode());
+        });
+
+        WebClient client = WebClient.create(vertx, new WebClientOptions()
+                .setDefaultPort(server.actualPort())
+                .setDefaultHost("localhost"));
+
+        HttpResponse<Payload> response = client.get("/yo")
+                .as(BodyCodec.json(Payload.class))
+                .sendAndAwait();
+
+        assertThat(response.statusCode(), is(200));
+        assertThat(response.getHeader("Content-Type"), is("application/json"));
+        assertThat(response.body().msg(), is("hello"));
+    }
+
+    @Test
+    public void sendJsonPost() {
+        JsonObject outPayload = new JsonObject().put("foo", "bar");
+
+        HttpServer server = startServer(req -> {
+            req.bodyHandler(buffer -> req.response()
+                    .putHeader("Content-Type", "application/json")
+                    .endAndForget(buffer));
+        });
+
+        WebClient client = WebClient.create(vertx, new WebClientOptions()
+                .setDefaultPort(server.actualPort())
+                .setDefaultHost("localhost"));
+
+        HttpResponse<JsonObject> response = client.post("/yo")
+                .as(BodyCodec.jsonObject())
+                .sendJsonObjectAndAwait(outPayload);
+
+        assertThat(response.statusCode(), is(200));
+        assertThat(response.getHeader("Content-Type"), is("application/json"));
+        assertThat(response.body().getString("foo"), is("bar"));
     }
 }

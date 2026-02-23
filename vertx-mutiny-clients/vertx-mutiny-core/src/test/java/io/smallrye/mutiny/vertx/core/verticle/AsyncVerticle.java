@@ -18,7 +18,7 @@ public class AsyncVerticle extends AbstractVerticle {
         return vertx.eventBus().consumer("foo")
                 .handler(m -> {
                 })
-                .completionHandler().onItem().invoke(x -> {
+                .completion().onItem().invoke(x -> {
                     DEPLOYED = true;
                 });
     }

@@ -44,10 +44,10 @@ public class MutinyHelper {
      * @return the executor
      */
     public static Executor blockingExecutor(io.vertx.core.Vertx vertx) {
-        return command -> vertx.executeBlocking(fut -> {
+        return command -> vertx.executeBlocking(() -> {
             command.run();
-            fut.complete();
-        }, null);
+            return null;
+        });
     }
 
     /**
@@ -61,10 +61,10 @@ public class MutinyHelper {
      * @return the executor
      */
     public static Executor blockingExecutor(Vertx vertx, boolean ordered) {
-        return command -> vertx.executeBlocking(fut -> {
+        return command -> vertx.executeBlocking(() -> {
             command.run();
-            fut.complete();
-        }, ordered, null);
+            return null;
+        }, ordered);
     }
 
     /**
@@ -75,10 +75,10 @@ public class MutinyHelper {
      * @return the executor
      */
     public static Executor blockingExecutor(WorkerExecutor worker) {
-        return command -> worker.executeBlocking(fut -> {
+        return command -> worker.executeBlocking(() -> {
             command.run();
-            fut.complete();
-        }, null);
+            return null;
+        });
     }
 
     /**

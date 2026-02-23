@@ -2,7 +2,9 @@ package io.smallrye.mutiny.vertx.core;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import io.smallrye.common.annotation.CheckReturnValue;
 import io.vertx.mutiny.core.Context;
@@ -99,7 +101,7 @@ public interface ContextAwareScheduler {
 
         private static Context captureCurrentContextOrFail() throws IllegalStateException {
             Context context = Vertx.currentContext();
-            if (context == null) {
+            if (context == null) { // context is nullable
                 throw new IllegalStateException("There is no Vert.x context in the current thread: " + Thread.currentThread());
             }
             return context;

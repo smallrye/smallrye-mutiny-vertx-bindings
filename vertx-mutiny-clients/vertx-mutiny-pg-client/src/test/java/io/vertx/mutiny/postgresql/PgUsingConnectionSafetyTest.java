@@ -1,13 +1,13 @@
 package io.vertx.mutiny.postgresql;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.UsingConnectionSafetyTest;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
@@ -16,12 +16,12 @@ public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
 
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>();
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         container.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdown() {
         container.stop();
     }
@@ -29,7 +29,7 @@ public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
     Vertx vertx;
     private int maxSize;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         vertx = Vertx.vertx();
 
@@ -41,7 +41,7 @@ public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
                 .setPassword(container.getPassword());
 
         maxSize = 5;
-        pool = PgPool.pool(vertx, options, new PoolOptions().setMaxSize(maxSize));
+        pool = Pool.pool(vertx, options, new PoolOptions().setMaxSize(maxSize));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class PgUsingConnectionSafetyTest extends UsingConnectionSafetyTest {
         return maxSize;
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         pool.closeAndAwait();
         vertx.closeAndAwait();

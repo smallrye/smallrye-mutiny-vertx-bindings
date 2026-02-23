@@ -10,10 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
@@ -21,38 +20,39 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.core.buffer.Buffer;
 import io.vertx.rabbitmq.RabbitMQOptions;
 
-public class RabbitMQClientTest {
+class RabbitMQClientTest {
 
     private static final String QUEUE = "my-queue";
-    @Rule
-    public GenericContainer<?> container = new GenericContainer<>("rabbitmq:3.8-alpine")
+    static GenericContainer<?> container = new GenericContainer<>("rabbitmq:3.8-alpine")
             .withCreateContainerCmdModifier(cmd -> cmd.withHostName("my-rabbit"))
             .waitingFor(
                     Wait.forLogMessage(".*started TCP listener on.*\\n", 1))
             .withExposedPorts(5672);
 
-    private Vertx vertx;
+    static Vertx vertx;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void setUp() {
         vertx = Vertx.vertx();
         assertThat(vertx).isNotNull();
+        container.start();
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    static void tearDown() {
         vertx.closeAndAwait();
+        container.stop();
     }
 
     @Test
-    public void testMutinyAPI()
+    void testMutinyAPI()
             throws KeyManagementException, TimeoutException, NoSuchAlgorithmException, IOException, URISyntaxException {
         String uuid = UUID.randomUUID().toString();
-        String uri = "amqp://" + container.getContainerIpAddress() + ":" + container.getMappedPort(5672);
+        String uri = "amqp://" + container.getHost() + ":" + container.getMappedPort(5672);
         RabbitMQClient client = RabbitMQClient.create(vertx, new RabbitMQOptions()
                 .setUri(uri));
         client.start().subscribeAsCompletionStage().join();
