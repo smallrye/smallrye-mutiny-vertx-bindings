@@ -10,7 +10,7 @@
 
     <groupId>io.smallrye.reactive</groupId>
     <artifactId>smallrye-mutiny-vertx-bindings-projects</artifactId>
-    <version>4.0.0-beta0</version>
+    <version>4.0.0-beta1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -41,7 +41,7 @@
         <connection>scm:git:git@github.com:smallrye/smallrye-mutiny-vertx-bindings.git</connection>
         <developerConnection>scm:git:git@github.com:smallrye/smallrye-mutiny-vertx-bindings.git</developerConnection>
         <url>https://github.com/smallrye/smallrye-mutiny-vertx-bindings</url>
-        <tag>4.0.0-beta0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
