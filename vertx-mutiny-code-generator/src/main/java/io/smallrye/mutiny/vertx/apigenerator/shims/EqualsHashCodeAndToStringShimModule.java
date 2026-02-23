@@ -87,8 +87,8 @@ public class EqualsHashCodeAndToStringShimModule implements ShimModule {
             method.returns(boolean.class);
             method.addParameter(Object.class, "o");
             addGeneratedBy(method);
-            method.addStatement("if (this == o) return true;");
-            method.addStatement("if (o == null || getClass() != o.getClass()) return false;");
+            method.addStatement("if (this == o) return true");
+            method.addStatement("if (o == null || getClass() != o.getClass()) return false");
             method.addStatement("$T that = ($T) o",
                     ClassName.bestGuess(shim.getFullyQualifiedName()),
                     ClassName.bestGuess(shim.getFullyQualifiedName()));
