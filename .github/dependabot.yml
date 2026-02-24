@@ -37,6 +37,8 @@ updates:
       prefix: "build(deps)"
     ignore:
       - dependency-name: "io.micrometer:*"
+      - dependency-name: "io.vertx:*"
+        versions: [">=5.0.0"]
     groups:
       minor-and-patch:
         update-types:
