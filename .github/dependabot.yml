@@ -10,9 +10,11 @@ updates:
     commit-message:
       prefix: "build(deps)"
     groups:
-      minor-and-patch:
+      minor:
         update-types:
           - minor
+      patch:
+        update-types:
           - patch
   - package-ecosystem: github-actions
     directory: "/"
@@ -40,9 +42,11 @@ updates:
       - dependency-name: "io.vertx:*"
         versions: [">=5.0.0"]
     groups:
-      minor-and-patch:
+      minor:
         update-types:
           - minor
+      patch:
+        update-types:
           - patch
   - package-ecosystem: github-actions
     directory: "/"
