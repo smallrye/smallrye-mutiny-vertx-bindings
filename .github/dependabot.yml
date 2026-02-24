@@ -35,6 +35,8 @@ updates:
     open-pull-requests-limit: 10
     commit-message:
       prefix: "build(deps)"
+    ignore:
+      - dependency-name: "io.micrometer:*"
     groups:
       minor-and-patch:
         update-types:
