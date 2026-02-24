@@ -16,7 +16,7 @@
         <gen-source-artifactId>vertx-micrometer-metrics</gen-source-artifactId>
         <gen.output>${project.build.directory}/sources/java</gen.output>
         <gen-module>vertx-micrometer-metrics</gen-module>
-        <micrometer.version>1.16.2</micrometer.version>
+        <micrometer.version>1.16.3</micrometer.version>
     </properties>
 
     <dependencies>
