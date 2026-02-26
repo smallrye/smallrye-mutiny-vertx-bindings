@@ -41,6 +41,8 @@ updates:
       - dependency-name: "io.micrometer:*"
       - dependency-name: "io.vertx:*"
         versions: [">=5.0.0"]
+      - dependency-name: "com.fasterxml.jackson.core:*"
+        versions: [">=2.21.0"]
     groups:
       minor:
         update-types:
