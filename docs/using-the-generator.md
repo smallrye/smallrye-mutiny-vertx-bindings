@@ -66,6 +66,46 @@ The `maven-dependency-plugin` extracts Vert.x source JARs into `target/sources/j
 </plugin>
 ```
 
+!!! tip "Additional sources"
+You might need to generate Mutiny bindings for modules `moduleA` and `moduleB`, where `moduleB` uses classes or interfaces from `moduleA`.
+In this instance, you should add `moduleA` as additional sources to ensure that you are using the generated mutiny API for `moduleA` in `moduleB`, and not the original one. 
+This is easily achievable by setting the `maven-dependency-plugin` for `moduleB` like below.
+```xml
+<plugin>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <configuration>
+        <includeGroupIds>org.acme</includeGroupIds>
+        <includeArtifactIds>moduleB</includeArtifactIds>
+        <classifier>sources</classifier>
+        <includeTypes>jar</includeTypes>
+    </configuration>
+    <executions>
+        <execution>
+            <id>unpack-java</id>
+            <phase>generate-sources</phase>
+            <goals><goal>unpack-dependencies</goal></goals>
+            <configuration>
+                <includes>io/vertx/**/*.java</includes>
+                <excludes>**/impl/**/*.java</excludes>
+                <outputDirectory>${project.build.directory}/sources/java</outputDirectory>
+            </configuration>
+        </execution>
+        <!-- Optional: unpack additional sources for cross-module resolution -->
+        <execution>
+            <id>unpack-vertx-core</id>
+            <phase>generate-sources</phase>
+            <goals><goal>unpack-dependencies</goal></goals>
+            <configuration>
+                <includes>io/vertx/**/*.java</includes>
+                <excludes>**/impl/**/*.java</excludes>
+                <includeArtifactIds>vertx-core,moduleA</includeArtifactIds>
+                <outputDirectory>${project.basedir}/target/additional-sources/vertx-core</outputDirectory>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
 ### 2. Run the Generator
 
 The `exec-maven-plugin` invokes the generator with the unpacked sources as input.

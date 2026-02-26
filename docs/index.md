@@ -74,3 +74,5 @@ JsonObject body = fetchData(client).await().indefinitely();
 - [Type Mapping](type-mapping.md): understand how Vert.x types are converted to Mutiny types.
 - [Error Handling](error-handling.md): strategies for handling failures in reactive pipelines.
 - [Available Modules](available-modules.md): the full list of generated client modules.
+- [Upgrading from version 3 to 4](migration-guide-3x-4x.md): migrate to the new Mutiny bindings generator.
+- [Using the binding generator for your own APIs](using-the-generator.md): learn to use the generator for your own APIs.
