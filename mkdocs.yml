@@ -11,6 +11,7 @@ nav:
   - Blocking and Testing: blocking-and-testing.md
   - Using the Generator: using-the-generator.md
   - Available Modules: available-modules.md
+  - Upgrading from version 3 to 4: migration-guide-3x-4x.md
   - Javadoc: './apidocs/index.html'
 
 theme:
