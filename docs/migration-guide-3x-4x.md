@@ -14,7 +14,7 @@ This makes it easier to test and faster to run.
 Numerous API changes are due to the transition to Vert.x 5.
 The Vert.x 4 to 5 migration guide is available at https://vertx.io/docs/guides/vertx-5-migration-guide/.
 
-We provide here a brief summary of the breaking changes.
+We provide here a brief summary of the breaking changes, the exhaustive list can be found [here](compatibility-report.html).
 
 ### No more Callbacks
 
