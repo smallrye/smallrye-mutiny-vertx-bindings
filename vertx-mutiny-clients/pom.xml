@@ -92,4 +92,46 @@
         <module>vertx-mutiny-http-proxy</module>
     </modules>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>${maven-processor-plugin.version}</version>
+                    <configuration>
+                        <systemProperties>
+                            <java.util.logging.SimpleFormatter.format>%4$s: %3$s - %5$s %6$s%n
+                            </java.util.logging.SimpleFormatter.format>
+                            <mvel2.disable.jit>true</mvel2.disable.jit>
+                        </systemProperties>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>vertx-mutiny-generator</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                        <!-- Log dependencies required by Vert.x -->
+                        <dependency>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-api</artifactId>
+                            <version>${log4j.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-core</artifactId>
+                            <version>${log4j.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                            <version>${slf4j-api.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>
