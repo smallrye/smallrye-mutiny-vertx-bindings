@@ -79,7 +79,7 @@
         <assertj-core.version>3.27.7</assertj-core.version>
         <log4j.version>2.25.4</log4j.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
-        <smallrye-common.version>2.17.0</smallrye-common.version>
+        <smallrye-common.version>2.17.1</smallrye-common.version>
         <scram-client.version>3.2</scram-client.version>
 
         <revapi-maven-plugin.version>0.15.1</revapi-maven-plugin.version>
