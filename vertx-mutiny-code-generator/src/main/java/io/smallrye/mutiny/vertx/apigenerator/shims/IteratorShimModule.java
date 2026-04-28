@@ -124,7 +124,7 @@ public class IteratorShimModule implements ShimModule {
      * <p>
      *
      * <pre>{@code
-     * @CheckReturnValue
+     * &#64;CheckReturnValue
      * public Multi<X> toMulti() {
      *     String support = StreamSupport.class.getName();
      *     String splitIterators = Spliterators.class.getName() + ".spliteratorUnknownSize";
