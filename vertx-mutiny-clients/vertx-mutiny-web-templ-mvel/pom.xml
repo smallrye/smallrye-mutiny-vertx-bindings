@@ -21,6 +21,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-codegen</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- Generation source -->
         <dependency>
