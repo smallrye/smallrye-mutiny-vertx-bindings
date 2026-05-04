@@ -82,7 +82,7 @@
         <reactor-core.version>3.8.5</reactor-core.version>
         <rxjava2-interop.version>0.13.7</rxjava2-interop.version>
 
-        <javaparser.version>3.28.0</javaparser.version>
+        <javaparser.version>3.28.1</javaparser.version>
         <javapoet.version>0.14.0</javapoet.version>
         <picocli.version>4.7.7</picocli.version>
 
