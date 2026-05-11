@@ -70,7 +70,7 @@
         <mutiny.version>3.2.0</mutiny.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>
         <jackson.version>2.21.3</jackson.version>
-        <smallrye-common.version>2.17.1</smallrye-common.version>
+        <smallrye-common.version>2.18.0</smallrye-common.version>
 
         <logback-classic.version>1.5.32</logback-classic.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
