@@ -72,7 +72,7 @@
         <jackson.version>2.21.3</jackson.version>
         <smallrye-common.version>2.18.1</smallrye-common.version>
 
-        <logback-classic.version>1.5.32</logback-classic.version>
+        <logback-classic.version>1.5.33</logback-classic.version>
         <slf4j-api.version>2.0.18</slf4j-api.version>
         <scram-client.version>3.2</scram-client.version>
 
