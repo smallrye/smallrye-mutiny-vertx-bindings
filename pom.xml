@@ -80,7 +80,7 @@
         <log4j.version>2.26.0</log4j.version>
         <slf4j-api.version>2.0.18</slf4j-api.version>
         <smallrye-common.version>2.19.0</smallrye-common.version>
-        <scram-client.version>3.3</scram-client.version>
+        <scram-client.version>3.4</scram-client.version>
 
         <revapi-maven-plugin.version>0.15.1</revapi-maven-plugin.version>
         <revapi-java.version>0.28.4</revapi-java.version>
