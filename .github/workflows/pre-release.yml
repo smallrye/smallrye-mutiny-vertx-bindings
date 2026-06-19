@@ -14,5 +14,5 @@ jobs:
   prepare-release:
     name: Prepare Release
     if: ${{ github.event.pull_request.merged == true}}
-    uses: smallrye/.github/.github/workflows/prepare-release.yml@main
+    uses: smallrye/.github/.github/workflows/prepare-release.yml@394b0cc9f368ad0a6fadd1e98e71ec47984a3fde # main
     secrets: inherit
