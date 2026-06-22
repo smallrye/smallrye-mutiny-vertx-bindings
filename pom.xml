@@ -99,7 +99,7 @@
         <revapi-reporter-text.version>0.15.1</revapi-reporter-text.version>
 
         <jandex-maven-plugin.version>3.6.0</jandex-maven-plugin.version>
-        <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
+        <cyclonedx-maven-plugin.version>2.9.2</cyclonedx-maven-plugin.version>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
         <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
