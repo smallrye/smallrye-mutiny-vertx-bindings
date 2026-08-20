@@ -69,7 +69,7 @@
         <vertx.version>5.1.6</vertx.version>
         <mutiny.version>3.3.0</mutiny.version>
         <reactive-streams.version>1.0.4</reactive-streams.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <smallrye-common.version>2.20.0</smallrye-common.version>
 
         <logback-classic.version>1.6.3</logback-classic.version>
