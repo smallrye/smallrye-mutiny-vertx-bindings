@@ -8,5 +8,4 @@ cp -R vertx-mutiny-clients/target/reports/apidocs docs/
 PROJECT_VERSION=$(cat .github/project.yml | yq eval '.release.current-version' -)
 uv sync --all-extras --dev
 uv run mkdocs build
-uv run mike deploy --push --update-aliases $PROJECT_VERSION latest
-uv run mike set-default --push latest
+uv run mike deploy --push "$PROJECT_VERSION"
