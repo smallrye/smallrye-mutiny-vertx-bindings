@@ -21,7 +21,7 @@ import io.vertx.mutiny.kafka.client.producer.KafkaProducerRecord;
 
 class KafkaClientTest {
 
-    static RedpandaContainer container = new RedpandaContainer("docker.redpanda.com/redpandadata/redpanda:latest");
+    static RedpandaContainer container = new RedpandaContainer("redpandadata/redpanda:v24.3.1");
 
     static Vertx vertx;
 
@@ -34,7 +34,9 @@ class KafkaClientTest {
 
     @AfterAll
     static void tearDown() {
-        vertx.closeAndAwait();
+        if (vertx != null) {
+            vertx.closeAndAwait();
+        }
         container.stop();
     }
 
