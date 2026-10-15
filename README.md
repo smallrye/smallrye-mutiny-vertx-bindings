@@ -11,6 +11,8 @@ The `vertx-mutiny-clients` module contains the Vert.x client API using the Mutin
 
 It also contains the Vert.x code generator.
 
+The documentation is at [smallrye.io/docs/smallrye-mutiny-vertx-bindings](https://smallrye.io/docs/smallrye-mutiny-vertx-bindings/latest/); its sources are in [`docs/`](docs/README.adoc).
+
 ## Build
 
 `mvn clean install`
