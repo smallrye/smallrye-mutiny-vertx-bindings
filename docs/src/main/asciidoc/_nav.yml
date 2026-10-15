@@ -1,0 +1,22 @@
+title: Mutiny Vert.x bindings
+nav:
+- title: Overview
+  page: index
+- title: Getting Started
+  page: getting-started
+- title: Uni and Multi
+  page: uni-and-multi
+- title: Type Mapping
+  page: type-mapping
+- title: Error Handling
+  page: error-handling
+- title: Blocking and Testing
+  page: blocking-and-testing
+- title: Using the Generator
+  page: using-the-generator
+- title: Available Modules
+  page: available-modules
+- title: Upgrading from version 3 to 4
+  page: migration-guide-3x-4x
+- title: Javadoc (core)
+  url: https://javadoc.io/doc/io.smallrye.reactive/smallrye-mutiny-vertx-core
