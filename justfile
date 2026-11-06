@@ -19,13 +19,5 @@ build-generator-fast:
 # Compatibility report analysis
 compatibility-report:
     ./mvnw verify -DskipTests revapi:report@revapi-check  -Prevapi -DskipTests -Dmaven.javadoc.skip=true -pl \!vertx-mutiny-clients-bom -pl \!vertx-mutiny-clients/vertx-mutiny-sql-client
-    jbang CompatibilityReport.java && asciidoctor target/compatibility-report.adoc
-
-# Update MkDocs dependencies
-update-mkdocs-dependencies:
-    uv sync --upgrade
-
-# Serve the MkDocs website
-serve-website:
-    uv sync
-    uv run mkdocs serve
+    jbang CompatibilityReport.java
+    @echo "Report: target/compatibility-report.adoc"
