@@ -264,3 +264,58 @@ The client pipeline demonstrates a common pattern:
 2. `.onItem().call(...)` sends a message as an asynchronous side effect, then continues with the same `WebSocket`.
 3. `.onItem().transformToMulti(...)` switches from a single `Uni<WebSocket>` to a `Multi` of incoming messages.
 4. `.subscribe().with(...)` starts the whole pipeline.
+
+## Streams produced by asynchronous operations
+
+Some operations produce a stream, such as `HttpClientRequest.send()` producing a `HttpClientResponse`.
+Vert.x delivers the data of such a stream as it arrives, and data that arrives while no handler is attached and the stream is not paused is lost.
+Calling `toMulti()` pauses the stream, and the returned `Multi` attaches the handlers when it is subscribed, then fetches the data on demand.
+
+The safe pattern is to subscribe to `toMulti()` in the same pipeline step that receives the stream:
+
+```java
+client.request(options)
+    .onItem().transformToUni(request -> request.send())
+    .onItem().transformToUni(response -> response.toMulti()
+        .collect().in(Buffer::buffer, Buffer::appendBuffer));
+```
+
+The bindings deliver the outcome of a Vert.x operation on the Vert.x context of that operation when it has one, rather than on the thread that subscribed.
+Each following step of the pipeline therefore runs on that context, and Vert.x cannot process the stream before `toMulti()` has attached its handlers.
+This holds when the pipeline is subscribed from a thread without a Vert.x context, such as a virtual thread: the first operation then gets a Vert.x context of its own.
+
+When `toMulti()` cannot be subscribed in that step, for instance because of `emitOn(...)`, `onItem().delayIt()` or another asynchronous operation in between, pause the stream in the step that receives it.
+`toMulti()` fetches items on demand, so the data waits until the `Multi` is subscribed:
+
+```java
+client.request(options)
+    .onItem().transformToUni(request -> request.send())
+    .onItem().invoke(HttpClientResponse::pause)
+    .emitOn(executor)
+    .onItem().transformToUni(response -> response.toMulti()
+        .collect().in(Buffer::buffer, Buffer::appendBuffer));
+```
+
+The same applies when blocking on a virtual thread: keep `send()` in the pipeline and pause the response before `await()` returns it:
+
+```java
+HttpClientResponse response = client.request(options)
+    .onItem().transformToUni(request -> request.send())
+    .onItem().invoke(HttpClientResponse::pause)
+    .await().indefinitely();
+Buffer body = response.toMulti()
+    .collect().in(Buffer::buffer, Buffer::appendBuffer)
+    .await().indefinitely();
+```
+
+Starting the operation that produces the stream from a thread that is not a Vert.x thread is not safe, for instance calling `send()` on a request that was obtained with `await()` on a virtual thread, or subscribing from such a thread to a pipeline whose first operation produces the stream.
+Vert.x may then process the stream before the pipeline receives it, so pausing it in the pipeline is too late.
+In this case, pause the response from a handler registered before sending:
+
+```java
+HttpClientRequest request = client.request(options).await().indefinitely();
+request.getDelegate().response().onSuccess(io.vertx.core.http.HttpClientResponse::pause); // Before sending
+HttpClientResponse response = request.send().await().indefinitely();
+```
+
+Subscribing to the safe pattern from a Vert.x context, for instance with `vertx.runOnContext(...)`, also starts its first operation on that context.

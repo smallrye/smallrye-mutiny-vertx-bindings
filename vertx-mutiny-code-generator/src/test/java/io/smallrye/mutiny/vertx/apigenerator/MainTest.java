@@ -57,6 +57,8 @@ class MainTest {
 
         assertThat(run("--module-name=acme")).isZero();
         assertThat(generatedFiles()).isEqualTo(1);
+        assertThat(output.resolve("org/acme/mutiny/Greeter.java"))
+                .content().contains("AsyncResultUni.fromFuture(_res)");
     }
 
     @Test

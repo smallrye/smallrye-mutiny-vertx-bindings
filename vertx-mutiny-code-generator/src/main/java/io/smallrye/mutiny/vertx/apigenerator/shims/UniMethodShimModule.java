@@ -19,6 +19,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.palantir.javapoet.*;
 
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.vertx.AsyncResultUni;
 import io.smallrye.mutiny.vertx.apigenerator.analysis.*;
 import io.smallrye.mutiny.vertx.apigenerator.collection.VertxGenMethod;
 import io.smallrye.mutiny.vertx.apigenerator.types.JavaType;
@@ -160,7 +161,7 @@ public class UniMethodShimModule implements ShimModule {
      * <pre>
      * Uni&lt;S&gt; method(...) {
      *     ... params...
-     *     return Uni.createFrom().completionStage(() -> getDelegate().method(_param1, _param2).toCompletionStage()).map(S::new);
+     *     return AsyncResultUni.fromFuture(() -> getDelegate().method(_param1, _param2)).map(S::new);
      * }
      * </pre>
      * </code>
@@ -208,9 +209,9 @@ public class UniMethodShimModule implements ShimModule {
             // Delegate, Create Uni and transform the item:
             // Supplier<Future<X>> _res = () -> getDelegate().method(_param1, _param2);
             // either
-            // (i) return Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(S::new);
+            // (i) return AsyncResultUni.fromFuture(_res).map(S::new);
             // OR
-            // (ii) Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(el -> io.vertx.mutiny.T.newInstance((io.vertx.T)el));
+            // (ii) AsyncResultUni.fromFuture(_res).map(el -> io.vertx.mutiny.T.newInstance((io.vertx.T)el));
             // (ii) is applied if the T in Future<T> in the original method is an interface annotated with VertxGen
             if (isStatic()) {
                 code.addStatement("$T<$T> _res = () -> $T.$L($L)", ClassName.get(Supplier.class), futureTypeName,
@@ -230,17 +231,17 @@ public class UniMethodShimModule implements ShimModule {
                     .isVertxGen(
                             originalReturnType.typeParametersMap().getTypes().get(0).asReferenceType().getQualifiedName()))) {
                 code.addStatement(
-                        "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(el -> " +
+                        "return $T.fromFuture(_res).map(el -> " +
                                 "$L.newInstance(($L)el))",
-                        Uni.class,
+                        AsyncResultUni.class,
                         (shim.getVertxGen(itemType).concrete() ? shimStaticClass
                                 : shimItemType.asClassOrInterfaceType().getNameWithScope()),
                         (shim.getVertxGen(itemType).concrete() ? itemType.asReferenceType().getQualifiedName()
                                 : shim.getVertxGen(itemType).fullyQualifiedName()));
             } else {
                 code.addStatement(
-                        "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map($T::new)",
-                        Uni.class,
+                        "return $T.fromFuture(_res).map($T::new)",
+                        AsyncResultUni.class,
                         shim.getVertxGen(itemType).concrete() ? shimTypeName
                                 : JavaType.of(shim.getVertxGen(itemType).getShimCompanionName()).toTypeName());
             }
@@ -264,7 +265,7 @@ public class UniMethodShimModule implements ShimModule {
      * Uni&lt;List&lt;S&gt;&gt; method(...) {
      *     ... params...
      *     Future&lt;List&lt;X&gt;&gt; _res = getDelegate().method(_param1, _param2);
-     *     return Uni.createFrom().completionStage(() -> _res.toCompletionStage()).map(list -> list.stream().map(S::new).collect(Collectors.toList()));
+     *     return AsyncResultUni.fromFuture(() -> _res).map(list -> list.stream().map(S::new).collect(Collectors.toList()));
      * }
      * </pre>
      * </code>
@@ -311,7 +312,7 @@ public class UniMethodShimModule implements ShimModule {
             // Uni<List<S>> method(...) { // Or Set instead of List
             //     ... params...
             //     Supplier<Future<List<X>>> _res = () -> getDelegate().method(_param1, _param2); // Or Set instead of List
-            //     return Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(list -> list.stream().map(S::new).collect(Collectors.toList())); // Or toSet()
+            //     return AsyncResultUni.fromFuture(_res).map(list -> list.stream().map(S::new).collect(Collectors.toList())); // Or toSet()
             // }
 
             // Invoke the method
@@ -325,8 +326,8 @@ public class UniMethodShimModule implements ShimModule {
                         String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
             }
             code.addStatement(
-                    "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(__list -> __list.stream().map($T::new).collect($T.$L()))",
-                    Uni.class,
+                    "return $T.fromFuture(_res).map(__list -> __list.stream().map($T::new).collect($T.$L()))",
+                    AsyncResultUni.class,
                     shim.getVertxGen(originalElementType).concrete() ? elementTypeName
                             : JavaType.of(shim.getVertxGen(originalElementType).getShimCompanionName()).toTypeName(),
                     Collectors.class,
@@ -351,7 +352,7 @@ public class UniMethodShimModule implements ShimModule {
      * Uni&lt;Map&lt;K, S&gt;&gt; method(...) {
      *     ... params...
      *     Future&lt;Map&lt;K, V&gt;&gt; _res = getDelegate().method(_param1, _param2);
-     *     return Uni.createFrom().completionStage(() -> _res.toCompletionStage()).map(map -> map.entrySet().stream()
+     *     return AsyncResultUni.fromFuture(() -> _res).map(map -> map.entrySet().stream()
      *      .collect(Collectors.toMap(Map.Entry::getKey, e -> new S(e.getValue())));
      * }
      * </pre>
@@ -399,7 +400,7 @@ public class UniMethodShimModule implements ShimModule {
             // Uni<Map<K, S>> method(...) {
             //  ... params...
             //  Supplier<Future<Map<K, V>>> _res = () -> getDelegate().method(_param1, _param2);
-            //  return Uni.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(map -> map.entrySet().stream()
+            //  return AsyncResultUni.fromFuture(_res).map(map -> map.entrySet().stream()
             //       .collect(Collectors.toMap(Map.Entry::getKey, e -> new S(e.getValue())));
             // }
 
@@ -414,10 +415,10 @@ public class UniMethodShimModule implements ShimModule {
                         String.join(", ", getParameters().stream().map(p -> "_" + p.name()).toList()));
             }
             code.addStatement(
-                    "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage()).map(__map -> __map.entrySet().stream()\n"
+                    "return $T.fromFuture(_res).map(__map -> __map.entrySet().stream()\n"
                             +
                             "        .collect($T.toMap($T::getKey, e -> new $T(e.getValue()))))",
-                    Uni.class,
+                    AsyncResultUni.class,
                     Collectors.class,
                     Map.Entry.class,
                     shim.getVertxGen(originalValueType).concrete() ? shimValueTypeName
@@ -441,7 +442,7 @@ public class UniMethodShimModule implements ShimModule {
      * Uni&lt;X&gt method(...) {
      *     ... params...
      *     Future&lt;X&gt; _res = getDelegate().method(_param1, _param2);
-     *     return Uni.createFrom().completionStage(() -> _res.toCompletionStage());
+     *     return AsyncResultUni.fromFuture(() -> _res);
      * }
      * </pre>
      * </code>
@@ -488,7 +489,7 @@ public class UniMethodShimModule implements ShimModule {
             // We just delegate:
             // ... params ...
             // Supplier<Future<X>> _res = () -> getDelegate().method(_param1, _param2);
-            // return Uni.createFrom().completionStage(() -> _res.get().toCompletionStage());
+            // return AsyncResultUni.fromFuture(_res);
 
             if (isStatic()) {
                 code.addStatement("$T<$T> _res = () -> $T.$L($L)", Supplier.class, futureTypeName,
@@ -520,13 +521,12 @@ public class UniMethodShimModule implements ShimModule {
             }
             if (typeCast != null) {
                 code.addStatement(
-                        "return $T.createFrom().completionStage(() -> _res.get()" +
-                                ".toCompletionStage().thenApply($L::wrap))",
-                        Uni.class, typeCast.getName());
+                        "return $T.fromFuture(_res).map($L::wrap)",
+                        AsyncResultUni.class, typeCast.getName());
             } else {
                 code.addStatement(
-                        "return $T.createFrom().completionStage(() -> _res.get().toCompletionStage())",
-                        Uni.class);
+                        "return $T.fromFuture(_res)",
+                        AsyncResultUni.class);
             }
 
             method.addCode(code.build());
