@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.utils.SourceRoot;
@@ -26,8 +23,6 @@ public class MutinyGenerator {
 
     private final Converters converters;
 
-    private static final Logger logger = LoggerFactory.getLogger(MutinyGenerator.class);
-
     private final CollectionResult collection;
     private final VertxGenAnalysis analyzer;
     private AnalysisResult analysisResult;
@@ -41,7 +36,6 @@ public class MutinyGenerator {
         try {
             this.collection = new VertxGenCollection(this, root, Arrays.asList(additionalSources)).collect(module);
         } catch (Exception e) {
-            logger.error("Unable to run collection", e);
             throw new IllegalStateException("Unable to run collection", e);
         }
         this.analyzer = new VertxGenAnalysis(this);

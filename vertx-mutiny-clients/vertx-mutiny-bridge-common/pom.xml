@@ -107,6 +107,8 @@
                             <mainClass>io.smallrye.mutiny.vertx.apigenerator.Main</mainClass>
                             <arguments>
                                 <arg>--module-name=${gen-module}</arg>
+                                <!-- Vert.x 5 io.vertx:vertx-bridge-common has no Vert.x Gen type -->
+                                <arg>--allow-empty</arg>
                                 <arg>--source=${project.basedir}/target/sources</arg>
                                 <arg>--output=${project.basedir}/target/generated-sources/codegen</arg>
                                 <arg>--additional-source=${project.basedir}/target/additional-sources/vertx-core</arg>
