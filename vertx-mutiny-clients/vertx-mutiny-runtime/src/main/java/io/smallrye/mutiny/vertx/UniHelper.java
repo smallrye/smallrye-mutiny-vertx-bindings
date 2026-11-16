@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.helpers.ParameterValidation;
 import io.smallrye.mutiny.subscription.UniSubscriber;
 import io.smallrye.mutiny.subscription.UniSubscription;
 import io.vertx.core.AsyncResult;
@@ -74,7 +75,8 @@ public class UniHelper {
     }
 
     public static <T> Uni<T> toUni(Future<T> future) {
-        return Uni.createFrom().completionStage(future.toCompletionStage());
+        ParameterValidation.nonNull(future, "future");
+        return AsyncResultUni.fromFuture(() -> future);
     }
 
     /**

@@ -9,6 +9,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
@@ -38,7 +40,10 @@ import io.vertx.codegen.annotations.VertxGen;
 public class VertxGenCollection {
 
     public static final String CONCRETE_ATTRIBUTE = "concrete";
+
     private static final Logger logger = LoggerFactory.getLogger(VertxGenCollection.class);
+    private static final ParserConfiguration.LanguageLevel LANGUAGE_LEVEL = ParserConfiguration.LanguageLevel.CURRENT;
+
     private final JavaSymbolSolver solver;
     private final List<CompilationUnit> units;
 
@@ -49,6 +54,7 @@ public class VertxGenCollection {
 
     private final List<VertxGenInterface> interfaces = new ArrayList<>();
     private final List<CompilationUnit> additionalUnits;
+    private final boolean primarySourcesDeclareVertxGen;
 
     private final List<String> specialCases = List.of(
             "io.vertx.sqlclient.SqlResult",
@@ -68,15 +74,22 @@ public class VertxGenCollection {
         solver = new JavaSymbolSolver(typeSolver);
         StaticJavaParser.getParserConfiguration().setSymbolResolver(solver);
 
-        source.setParserConfiguration(source.getParserConfiguration().setSymbolResolver(solver));
-        source.tryToParse();
+        source.setParserConfiguration(source.getParserConfiguration()
+                .setSymbolResolver(solver)
+                .setLanguageLevel(LANGUAGE_LEVEL));
+        failOnParseProblems(source.tryToParse());
         units = source.getCompilationUnits();
+        primarySourcesDeclareVertxGen = units.stream().anyMatch(unit -> unit.findAll(PackageDeclaration.class).stream()
+                .anyMatch(pd -> pd.isAnnotationPresent(ModuleGen.class))
+                || unit.findFirst(ClassOrInterfaceDeclaration.class, type -> type.isAnnotationPresent(VertxGen.class))
+                        .isPresent());
 
         List<CompilationUnit> additionalUnits = new ArrayList<>();
         for (Path path : additionSources) {
             SourceRoot root = new SourceRoot(path);
-            root.setParserConfiguration(root.getParserConfiguration().setSymbolResolver(solver));
-            root.tryToParse();
+            root.setParserConfiguration(
+                    root.getParserConfiguration().setSymbolResolver(solver).setLanguageLevel(LANGUAGE_LEVEL));
+            failOnParseProblems(root.tryToParse());
             additionalUnits.addAll(root.getCompilationUnits());
         }
         this.additionalUnits = additionalUnits;
@@ -139,6 +152,9 @@ public class VertxGenCollection {
 
         interfaces.addAll(collectInterfacesForModule(units, module));
         logger.info("Found {} interfaces in module `{}`", interfaces.size(), module.name());
+        if (interfaces.isEmpty()) {
+            throw new NothingToGenerateException("No Vert.x Gen interface found in module " + module.name());
+        }
 
         logger.info("Collection completed in module `{}`", module.name());
         return new CollectionResult(
@@ -400,6 +416,18 @@ public class VertxGenCollection {
         return false;
     }
 
+    private static void failOnParseProblems(List<ParseResult<CompilationUnit>> results) {
+        // Unparsable files are otherwise silently ignored
+        List<String> failures = results.stream()
+                .filter(result -> !result.isSuccessful())
+                .map(result -> result.getSourcePath().map(Path::toString).orElse("<unknown file>") + ": "
+                        + result.getProblems())
+                .toList();
+        if (!failures.isEmpty()) {
+            throw new IllegalStateException("Unable to parse sources: " + String.join(", ", failures));
+        }
+    }
+
     private VertxGenModule lookupModule(String moduleName) {
         if (moduleName == null) {
             if (modules.isEmpty()) {
@@ -412,7 +440,14 @@ public class VertxGenCollection {
             return modules.get(0);
         }
         return modules.stream().filter(v -> v.name().equals(moduleName)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No module found with the module name " + moduleName));
+                .orElseThrow(() -> {
+                    String message = "No module found with the module name " + moduleName;
+                    // Only sources without any Vert.x Gen declaration have nothing to generate.
+                    // Empty sources and a wrong module name are errors.
+                    return units.isEmpty() || primarySourcesDeclareVertxGen
+                            ? new IllegalArgumentException(message)
+                            : new NothingToGenerateException(message);
+                });
     }
 
     private List<VertxGenModule> collectVertxGenModuleFromCompilationUnits(List<CompilationUnit> cu) {
