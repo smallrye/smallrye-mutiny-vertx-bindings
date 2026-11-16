@@ -2,17 +2,23 @@ package io.smallrye.mutiny.vertx;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.subscription.UniSubscriber;
+import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 
 class UniHelperTest {
 
@@ -54,6 +60,49 @@ class UniHelperTest {
     void test_toUniOfFuture() {
         Uni<String> uni = UniHelper.toUni(Future.succeededFuture("Ok"));
         assertEquals("Ok", uni.await().atMost(Duration.ofSeconds(1)));
+    }
+
+    @Test
+    void test_toUniOfFutureDispatchesOnTheContextOfTheFuture() throws TimeoutException {
+        Vertx vertx = Vertx.vertx();
+        try {
+            Context context = vertx.getOrCreateContext();
+            Future<String> future = context.executeBlocking(() -> "Ok");
+            future.await(Duration.ofSeconds(5));
+            AtomicReference<Context> deliveryContext = new AtomicReference<>();
+            AtomicReference<String> deliveryThread = new AtomicReference<>();
+
+            // Subscribed from the test thread (no Vert.x context) to an already completed future.
+            // The delay in onSubscribe gives any intermediate asynchronous hop time to complete before the result is consumed.
+            String item = UniHelper.toUni(future)
+                    .onSubscription().invoke(() -> LockSupport.parkNanos(Duration.ofMillis(100).toNanos()))
+                    .onItem().invoke(() -> {
+                        deliveryContext.set(Vertx.currentContext());
+                        deliveryThread.set(Thread.currentThread().getName());
+                    })
+                    .await().atMost(Duration.ofSeconds(5));
+
+            assertEquals("Ok", item);
+            assertSame(context, deliveryContext.get(), "Delivered on " + deliveryThread.get());
+        } finally {
+            vertx.close().await();
+        }
+    }
+
+    @Test
+    void test_toUniOfNullFutureFailsEagerly() {
+        assertThrows(IllegalArgumentException.class, () -> UniHelper.toUni((Future<String>) null));
+    }
+
+    @Test
+    void test_toUniOfFutureUnwrapsCompletionException() {
+        Uni<String> uni = UniHelper.toUni(Future.failedFuture(new CompletionException(new IOException("boom"))));
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        uni.subscribe().with(item -> fail("No item expected"), failure::set);
+
+        assertInstanceOf(IOException.class, failure.get());
+        assertEquals("boom", failure.get().getMessage());
     }
 
     @Test
